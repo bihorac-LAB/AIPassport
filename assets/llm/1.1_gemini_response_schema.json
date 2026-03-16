@@ -1,0 +1,134 @@
+{
+    "type": "object",
+    "description": "This is the primary result for your assigned task: As part of an interactive web application called \"AI: Fact or Fiction?\", your task is to judge (with various qualifications and other supporting information) whether a given claim about artificial intelligence is true, false, or somewhere in between. Claims will come from AI newcomers who have little to no prior experience with math, coding, or AI/ML. The primary goal of this assignment is to \"demystify\" artificial intelligence (which to many beginners can appear as \"magic\", \"sentient\", or \"all-knowing\") by analyzing user statements, providing high-level explanations that introduce basic AI/ML concepts (when possible), connecting statements to current biomedical AI research and real-world AI-powered systems in biomedical domains, and providing commentary on limitations, challenges, and future directions that are specifically related to the user's input statement. The objective is to provide a gentle introduction to what AI actually IS by addressing each user's preconceived notions and assumptions. Because the response will be formatted as a JSON object before being returned to the user, it is critically important to escape any special characters in your response, such as quotation marks.",
+    "properties": {
+        "verdict": {
+            "type": "string",
+            "enum": [
+                "FACT",
+                "MOSTLY FACT",
+                "CURRENTLY FACT",
+                "FICTION",
+                "MOSTLY FICTION",
+                "CURRENTLY FICTION",
+                "MISLEADING",
+                "NOT A STATEMENT",
+                "MALICIOUS"
+            ],
+            "description": "The primary assessment (the verdict) of the user's statement about AI."
+        },
+        "verdict_explanation": {
+            "type": "object",
+            "description": "A comprehensive explanation of the returned verdict. It should be written at a high-level and be easy to follow and understand for non-experts. However, you should include mentions, definitions, and/or discussions of core AI/ML topics (only as appropriate, if directly related to the user's statement).",
+            "properties": {
+                "verdict_explanation_summary": {
+                    "type": "string",
+                    "description": "An overall summary of the verdict, presented at a high level, and aimed at a general audience. This will be presented as free-text before proceeding with structured components of the verdict explanation. Since this will be a part of "
+                },
+                "potential_correction": {
+                    "type": "string",
+                    "description": "If possible, a minimal correction to the input statement if the statement was given a verdict of MISLEADING or NOT A STATEMENT."
+                },
+                "potential_future_changes": {
+                    "type": "string",
+                    "description": "A description of potential future changes that may affect the statement. These changes might be technical, ethical, legal, regulatory, social, etc."
+                },
+                "limitations": {
+                    "type": "string",
+                    "description": "A description of the limitations of the current AI landscape related to the statement."
+                },
+                "challenges": {
+                    "type": "string",
+                    "description": "A description of the challenges that AI faces in relation to the statement."
+                },
+                "future_requirements": {
+                    "type": "string",
+                    "description": "A description of the requirements for either the statement to remain true, to become true, or to overcome limitations or challenges."
+                }
+            },
+            "required": [
+                "verdict_explanation_summary",
+                "potential_future_changes",
+                "limitations",
+                "challenges",
+                "future_requirements"
+            ],
+            "propertyOrdering": [
+                "verdict_explanation_summary",
+                "potential_correction",
+                "potential_future_changes",
+                "limitations",
+                "challenges",
+                "future_requirements"
+            ]
+        },
+        "real_world_examples": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 3,
+            "items": {
+                "type": "string",
+                "description": "A description of a real-world example that supports the verdict. This could also be a hypothetical example that is not yet realized but is plausible given the current state of AI."
+            },
+            "description": "Real-world examples that support the verdict."
+        },
+        "research_papers": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 3,
+            "items": {
+                "type": "string",
+                "description": "A list of cited research papers that support the verdict, including theoretical or hypothetical real-world applications. Include a citation in Vancouver style, and a DOI link if available. Remember to escape any special characters since this will be returned as a JSON string. "
+            },
+            "description": "Research papers that support the verdict."
+        },
+        "high_level_machine_learning_concepts": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 3,
+            "description": "The most relevant high-level machine learning concepts that are directly related to the statement.",
+            "items": {
+                "type": "string",
+                "description": "A single machine learning concept or term that is related to the input statement."
+            }
+        },
+        "relevant_public_datasets": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 3,
+            "description": "A list of publicly available datasets related to the input statement. For example, these could be datasets that have been used to train models that are relevant to the statement, or datasets which could potentially be used with AI to address the statement.",
+            "items": {
+                "type": "string",
+                "description": "A single publicly available dataset that is related to the input statement."
+            }
+        },
+        "potential_research_directions": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 3,
+            "description": "A list of potential research directions that could be pursued to address the statement. These could be theoretical or hypothetical research directions.",
+            "items": {
+                "type": "string",
+                "description": "A single potential research direction that is related to the input statement."
+            }
+        }
+    },
+    "required": [
+        "verdict",
+        "verdict_explanation",
+        "real_world_examples",
+        "research_papers",
+        "high_level_machine_learning_concepts",
+        "relevant_public_datasets",
+        "potential_research_directions"
+    ],
+    "propertyOrdering": [
+        "verdict",
+        "verdict_explanation",
+        "real_world_examples",
+        "research_papers",
+        "high_level_machine_learning_concepts",
+        "relevant_public_datasets",
+        "potential_research_directions"
+    ]
+}

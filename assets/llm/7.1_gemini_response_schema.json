@@ -1,0 +1,75 @@
+{
+    "type": "object",
+    "description": "Structured feedback for proposed research involving artificial intelligence in clinical and biomedical domains. Format all text for printing in Markdown.",
+    "properties": {
+        "summary": {
+            "type": "string",
+            "description": "A brief summary of your overall assessment of the experiment idea (2-4 sentences)."
+        },
+        "summary_sentiment": {
+            "type": "string",
+            "enum": [
+                "positive",
+                "neutral",
+                "negative"
+            ],
+            "description": "The overall sentiment of the summary. This should be a high-level assessment of the experiment idea, as-written, before feedback is provided to the user."
+        },
+        "hypothesis": {
+            "type": "string",
+            "description": "Evaluate how clearly the hypothesis is stated. Suggest improvements if it's vague or implicit."
+        },
+        "ai_methods": {
+            "type": "string",
+            "description": "Recommend one or more AI methods that are appropriate for the proposed problem and data type."
+        },
+        "baselines": {
+            "type": "string",
+            "description": "Suggest reasonable baseline models, heuristics, or comparisons the researcher should consider. This is the evaluation plan for the experiment."
+        },
+        "feasibility": {
+            "type": "string",
+            "description": "Comment on the overall feasibility of the experiment, including challenges like data availability, annotation, or compute resources."
+        },
+        "suggestions": {
+            "type": "string",
+            "description": "Concrete ways to strengthen the design, such as narrowing scope, including control variables, or refining outcome measures."
+        },
+        "pitfalls": {
+            "type": "string",
+            "description": "List of risks or common mistakes relevant to the proposed approach."
+        },
+        "datasets": {
+            "type": "string",
+            "description": "Publicly available datasets that can support the proposed research, e.g., to train models or validate results."
+        },
+        "related_work": {
+            "type": "string",
+            "description": "Citations and descriptions of published manuscripts that share similarities to the proposed work. If possible, provide citations in Vancouver style, and DOI links if available. Remember to escape any special characters since this will be returned as a JSON string."
+        }
+    },
+    "propertyOrdering": [
+        "summary",
+        "summary_sentiment",
+        "hypothesis",
+        "ai_methods",
+        "baselines",
+        "feasibility",
+        "suggestions",
+        "pitfalls",
+        "datasets",
+        "related_work"
+    ],
+    "required": [
+        "summary",
+        "summary_sentiment",
+        "hypothesis",
+        "ai_methods",
+        "baselines",
+        "feasibility",
+        "suggestions",
+        "pitfalls",
+        "datasets",
+        "related_work"
+    ]
+}

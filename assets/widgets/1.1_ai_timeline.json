@@ -1,0 +1,257 @@
+{
+    "title":
+    {
+        "text":
+        {
+            "headline": "Milestones in the History of Artificial Intelligence",
+            "text": "A timeline of major events in the development of AI from its early conceptual roots to state-of-the-art breakthroughs up to 2025."
+        },
+        "media":
+        {
+            "url": "https://www.captechu.edu/sites/default/files/AICE_Hero.jpg"
+        }
+    },
+    "events":
+    [
+        {
+            "start_date":
+            {
+                "year": 1950
+            },
+            "text":
+            {
+                "headline": "Alan Turing Proposes the Turing Test",
+                "text": "Alan Turing publishes 'Computing Machinery and Intelligence,' proposing a test to determine if a machine can exhibit intelligent behavior equivalent to, or indistinguishable from, that of a human."
+            },
+            "media":
+            {
+                "url": "https://upload.wikimedia.org/wikipedia/commons/a/a1/Alan_Turing_Aged_16.jpg",
+                "caption": "Alan Turing (age 16)"
+            }
+        },
+        {
+            "start_date":
+            {
+                "year": 1956
+            },
+            "text":
+            {
+                "headline": "Dartmouth Conference",
+                "text": "The Dartmouth Summer Research Project on Artificial Intelligence is held, where the term 'artificial intelligence' is coined and AI is born as a field."
+            },
+            "media":
+            {
+                "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/49/John_McCarthy_Stanford.jpg/1034px-John_McCarthy_Stanford.jpg",
+                "caption": "John McCarthy, organizer of the Dartmouth Conference"
+            }
+        },
+        {
+            "start_date":
+            {
+                "year": 1966
+            },
+            "text":
+            {
+                "headline": "ELIZA Created",
+                "text": "Joseph Weizenbaum creates ELIZA, one of the first natural language processing programs that simulates conversation."
+            },
+            "media":
+            {
+                "url": "https://upload.wikimedia.org/wikipedia/commons/4/4e/ELIZA_conversation.jpg",
+                "caption": "ELIZA conversation example"
+            }
+        },
+        {
+            "start_date":
+            {
+                "year": 1972
+            },
+            "text":
+            {
+                "headline": "SHRDLU Demonstrates Early AI in a Virtual World",
+                "text": "Terry Winograd develops SHRDLU, which could manipulate objects in a virtual blocks world using natural language instructions."
+            },
+            "media":
+            {
+                "url": "https://i.makeagif.com/media/11-15-2016/ue7L3y.gif",
+                "caption": "SHRDLU in the blocks world"
+            }
+        },
+        {
+            "start_date":
+            {
+                "year": 1980
+            },
+            "text":
+            {
+                "headline": "Expert Systems Gain Traction",
+                "text": "The 1980s see a surge in expert systems, such as XCON at Digital Equipment Corporation, marking commercial success for rule-based AI systems."
+            },
+            "media":
+            {
+                "url": "https://upload.wikimedia.org/wikipedia/commons/7/7a/BackwardChaining_David_C_England_1990_p21.gif",
+                "caption": "Example of an expert system interface"
+            }
+        },
+        {
+            "start_date":
+            {
+                "year": 1997
+            },
+            "text":
+            {
+                "headline": "IBM's Deep Blue Defeats Garry Kasparov",
+                "text": "Deep Blue becomes the first computer chess-playing system to beat a reigning world champion under standard chess tournament time controls."
+            },
+            "media":
+            {
+                "url": "https://upload.wikimedia.org/wikipedia/commons/b/be/Deep_Blue.jpg",
+                "caption": "Deep Blue"
+            }
+        },
+        {
+            "start_date":
+            {
+                "year": 2011
+            },
+            "text":
+            {
+                "headline": "IBM Watson Wins Jeopardy!",
+                "text": "IBM Watson defeats champions Ken Jennings and Brad Rutter on the quiz show Jeopardy!, showcasing advances in question answering and NLP."
+            },
+            "media":
+            {
+                "url": "https://upload.wikimedia.org/wikipedia/commons/2/22/IBM_Watson.PNG",
+                "caption": "Watson vs. Ken Jennings and Brad Rutter"
+            }
+        },
+        {
+            "start_date":
+            {
+                "year": 2012
+            },
+            "text":
+            {
+                "headline": "Deep Learning Breakthrough with AlexNet",
+                "text": "AlexNet, a deep convolutional neural network, wins the ImageNet competition by a large margin, ushering in the deep learning era."
+            },
+            "media":
+            {
+                "url": "https://upload.wikimedia.org/wikipedia/commons/1/1d/AlexNet_architecture.png",
+                "caption": "Architecture of AlexNet"
+            }
+        },
+        {
+            "start_date":
+            {
+                "year": 2016
+            },
+            "text":
+            {
+                "headline": "AlphaGo Defeats Lee Sedol",
+                "text": "DeepMind's AlphaGo defeats Go world champion Lee Sedol, a landmark for AI in mastering complex strategic games previously thought to be out of reach."
+            },
+            "media":
+            {
+                "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/55/FHvAG5.jpg/500px-FHvAG5.jpg",
+                "caption": "AlphaGo vs. Lee Sedol"
+            }
+        },
+        {
+            "start_date":
+            {
+                "year": 2020
+            },
+            "text":
+            {
+                "headline": "GPT-3 Released",
+                "text": "OpenAI releases GPT-3, a 175 billion parameter language model demonstrating powerful few-shot learning capabilities and coherent text generation."
+            },
+            "media":
+            {
+                "url": "https://dugas.ch/artificial_curiosity/img/GPT_architecture/GPT1.png",
+                "caption": "GPT-3 architecture diagram (simplified)"
+            }
+        },
+        {
+            "start_date":
+            {
+                "year": 2021
+            },
+            "text":
+            {
+                "headline": "AlphaFold Solves Protein Folding",
+                "text": "DeepMind's AlphaFold achieves near-experimental accuracy in predicting protein structures, revolutionizing structural biology."
+            },
+            "media":
+            {
+                "url": "https://media.nature.com/lw767/magazine-assets/d41586-022-00997-5/d41586-022-00997-5_20300540.png",
+                "caption": "AlphaFold predicted vs. experimental protein structure"
+            }
+        },
+        {
+            "start_date":
+            {
+                "year": 2022
+            },
+            "text":
+            {
+                "headline": "Stable Diffusion and DALL·E 2 Popularize AI Art",
+                "text": "Generative models like Stable Diffusion and DALL·E 2 capture public attention by generating high-quality images from textual prompts."
+            },
+            "media":
+            {
+                "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/82/Astronaut_Riding_a_Horse_%28SD3.5%29.webp/500px-Astronaut_Riding_a_Horse_%28SD3.5%29.webp.png",
+                "caption": "Stable Diffusion generated image"
+            }
+        },
+        {
+            "start_date":
+            {
+                "year": 2023
+            },
+            "text":
+            {
+                "headline": "ChatGPT and Generative AI Go Mainstream",
+                "text": "OpenAI's ChatGPT, based on GPT-4, becomes widely used, leading to massive adoption of generative AI across industries."
+            },
+            "media":
+            {
+                "url": "https://images.ctfassets.net/kftzwdyauwt9/2TGxQkhDFLiCHyxUZZKzC/5c0aa7b1c3424a6c3f1ab291c3e7b8f7/Summarize.jpg?w=3840&q=90&fm=webp",
+                "caption": "ChatGPT interface"
+            }
+        },
+        {
+            "start_date":
+            {
+                "year": 2024
+            },
+            "text":
+            {
+                "headline": "Open-Source LLMs and AI Regulation Expand",
+                "text": "The AI ecosystem diversifies with open-source models like Mistral and LLaMA, while governments begin formalizing AI safety and ethics policies."
+            },
+            "media":
+            {
+                "url": "https://miro.medium.com/v2/resize:fit:640/1*5O7jf-q30mwMJlPgxLywNQ.jpeg",
+                "caption": "Introduction of Meta's Llama 3"
+            }
+        },
+        {
+            "start_date":
+            {
+                "year": 2025
+            },
+            "text":
+            {
+                "headline": "Multimodal and Agentic AI Systems Accelerate",
+                "text": "AI systems become increasingly agentic and multimodal, integrating reasoning, vision, and interaction capabilities in real-time applications."
+            },
+            "media":
+            {
+                "url": "https://miro.medium.com/v2/resize:fit:2000/1*TlnC3ryMDNetYpNSXzkkRQ.jpeg",
+                "caption": "Overview of Multimodal Agentic AI"
+            }
+        }
+    ]
+}
