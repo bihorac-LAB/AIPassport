@@ -3,6 +3,7 @@ from streamlit_timeline import timeline
 from google import genai
 from google.genai.types import GenerateContentConfig
 import json
+import aipassport_config as cfg
 
 st.title("1.1 Demystifying Artificial Intelligence (Clinical)")
 
@@ -88,7 +89,7 @@ with st.container(border=True):
     )
 
     # LLM configuration
-    gemini_model = "gemini-2.0-flash"
+    gemini_model = cfg.DEFAULT_GEMINI_MODEL
     gemini_system_instruction_filepath = "assets/llm/1.1_gemini_system_instruction.txt"
     gemini_response_schema_filepath = "assets/llm/1.1_gemini_response_schema.json"
     gemini_api_key = st.secrets["GEMINI_API_KEY"]
@@ -124,6 +125,14 @@ with st.container(border=True):
 
         # loads/dumps/loads helps address unescaped characters (like quotation marks)
         st.session_state.verdict = json.loads(json.dumps(json.loads(response.text)))
+
+        # ── Share with AI Guide ──
+        V = st.session_state.verdict
+        st.session_state["_live_state"] = (
+            f"User evaluated the statement: '{st.session_state.statement}'. "
+            f"Verdict: {V.get('verdict', 'Unknown')}. "
+            f"Explanation Summary: {V.get('verdict_explanation', {}).get('verdict_explanation_summary', 'N/A')}"
+        )
 
     init_session()
     client = genai.Client(api_key=st.secrets["GEMINI_API_KEY"])

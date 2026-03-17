@@ -10,7 +10,7 @@ _chatui_pkg = os.path.join(os.path.dirname(__file__), "packages")
 if os.path.isdir(_chatui_pkg):
     sys.path.insert(0, _chatui_pkg)
 
-from aip_streamlit_chatui import render_chat
+from aip_chat_simple import render_ai_guide
 
 st.set_page_config(
     page_title="AI Passport Notebooks (Dev)",
@@ -211,13 +211,14 @@ with st.container():
 
 # ── Context function ─────────────────────────────────────────────────────────
 def _context_fn() -> dict:
+    # 'pg' is the StreamlitPage object returned by st.navigation
+    # It has attributes like title, icon, url_path
     ctx = {
-        "page": "AI Passport",
-        "app_id": "aip-passport",
+        "current_page": getattr(pg, "title", "AIPassport Home"),
+        "url_path": getattr(pg, "url_path", ""),
+        "platform": "AI Passport",
         "description": "Educational platform for AI basics and clinical applications.",
     }
-    # Attempt to extract current page info from st.navigation
-    # st.navigation returns the selected page
     return ctx
 
 # ── Layout: Main Content + Chat ──────────────────────────────────────────────
@@ -225,11 +226,9 @@ if st.session_state["_chat_open"]:
     col_main, col_chat = st.columns([7, 1])
     with col_chat:
         st.markdown('<div id="aip-chat-panel-marker"></div>', unsafe_allow_html=True)
-        render_chat(
-            app_id="aip-passport",
+        render_ai_guide(
+            gemini_api_key=st.secrets.get("GEMINI_API_KEY"),
             context_fn=_context_fn,
-            placeholder_text="Ask the AIP Guide anything...",
-            title="AIP Guide",
         )
 else:
     col_main = st.container()
