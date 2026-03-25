@@ -26,8 +26,23 @@ def render_ai_guide(gemini_api_key: str, context_fn=None):
         with st.chat_message(message["role"]):
             st.markdown(message["content"])
 
+    # Quick-action chips — always visible above the input
+    cols = st.columns(2)
+    if cols[0].button("🖥️ What's on my screen?", use_container_width=True):
+        st.session_state["_quick_action"] = "Explain what's on my screen based on the current charts and values."
+        st.rerun()
+    if cols[1].button("💡 How do I use this activity?", use_container_width=True):
+        st.session_state["_quick_action"] = "How do I use this activity and what controls are available?"
+        st.rerun()
+
+    prompt = st.chat_input("Ask the AIP Guide anything...")
+    
+    # Check if a quick action button was clicked in the previous run
+    if "_quick_action" in st.session_state:
+        prompt = st.session_state.pop("_quick_action")
+
     # React to user input
-    if prompt := st.chat_input("Ask the AIP Guide anything..."):
+    if prompt:
         # Display user message in chat message container
         st.chat_message("user").markdown(prompt)
         # Add user message to chat history

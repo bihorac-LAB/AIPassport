@@ -110,25 +110,118 @@ if os.path.exists(demo_path):
         )
     ]
 
+# ── Notebook Wrapping & Rendering Logic ────────────────────────────────━━━━
+def render_home_page():
+    st.title("📚 AI Passport: Module Index")
+    st.info("Since the sidebar is hidden for iframe embedding, use this index to navigate to specific modules.")
+    
+    for module_name, pages in sidebar.items():
+        if module_name == "Home": continue
+        with st.expander(f"📂 {module_name}", expanded=True):
+            cols = st.columns(3)
+            for i, p in enumerate(pages):
+                with cols[i % 3]:
+                    if st.button(f"{p.title}", key=f"btn_{p.url_path}", use_container_width=True):
+                        st.switch_page(p)
+
+def render_notebook_page():
+    # 'pg' is available in the global scope where it was defined
+    current_url_path = getattr(pg, "url_path", "")
+    
+    # ── Header & Track Selector ─────────────────────────────────────────────
+    # Check if it's a microskill (standard microskills don't have '_' in title)
+    if current_url_path and "_" not in current_url_path and current_url_path != "":
+        t_col1, t_col2 = st.columns([2, 1])
+        with t_col1:
+            st.title(pg.title)
+        with t_col2:
+            current_track = st.segmented_control(
+                "Select Track",
+                options=["Clinical", "Basic"],
+                default=st.session_state["track"].capitalize(),
+                key="track_selector"
+            )
+            if current_track:
+                new_track = current_track.lower()
+                if new_track != st.session_state["track"]:
+                    st.session_state["track"] = new_track
+                    st.query_params["track"] = new_track
+                    st.rerun()
+
+    # ── Load and Run the actual notebook content ────────────────────────────
+    if current_url_path:
+        target_nb = current_url_path.strip("/")
+        track = st.session_state["track"]
+        base_dir = os.path.dirname(os.path.abspath(__file__))
+        nb_path = os.path.join(base_dir, "notebooks", track, f"{target_nb}_{track}.py")
+        
+        if os.path.exists(nb_path):
+            with open(nb_path, "r") as f:
+                code = f.read()
+                
+                # Compatibility layer for Jupyter/IPython functions
+                def display(*args, **kwargs):
+                    for arg in args:
+                        st.write(arg)
+                
+                class ImageCompatibility:
+                    def __init__(self, filename=None, data=None, width=None, height=None, **kwargs):
+                        self.filename = filename
+                        self.data = data
+                        self.width = width
+                    def _repr_png_(self): return self.data
+
+                # Create isolated global namespace for the notebook execution
+                exec_globals = globals().copy()
+                exec_globals.update({
+                    "display": display,
+                    "Image": ImageCompatibility,
+                })
+                
+                try:
+                    exec(code, exec_globals)
+                except Exception as e:
+                    st.error(f"Error executing notebook: {e}")
+                    st.exception(e)
+        elif "demo" in target_nb:
+            demo_full_path = os.path.join(base_dir, demo_path)
+            if os.path.exists(demo_full_path):
+                with open(demo_full_path, "r") as f:
+                    exec(f.read(), globals())
+            else:
+                st.error(f"Demo file not found at {demo_full_path}")
+        else:
+            st.warning(f"Notebook not found!")
+            st.info(f"Looking for: `{nb_path}`")
+            st.caption("Please ensure the module files follow the `{module}.{microskill}_{track}.py` pattern.")
+    else:
+        render_home_page()
+
+# ── Multipage Registration ──────────────────────────────────────────────────
+sidebar["Home"] = [st.Page(page=render_home_page, title="Home", icon="🏠", default=True)]
 for module_idx, module_name in enumerate(MODULE_NAMES):
     sidebar[module_name] = []
 
     for microskill_idx in range(N_MICROSKILLS_PER_MODULE):
-        for track in ["clinical", "basic"]:
-            microskill_path = (
-                f"notebooks/{track}/{module_idx + 1}.{microskill_idx + 1}_{track}.py"
+        clinical_exists = os.path.exists(f"notebooks/clinical/{module_idx + 1}.{microskill_idx + 1}_clinical.py")
+        basic_exists = os.path.exists(f"notebooks/basic/{module_idx + 1}.{microskill_idx + 1}_basic.py")
+        
+        if clinical_exists or basic_exists:
+            page = st.Page(
+                page=render_notebook_page, 
+                title=f"Microskill {module_idx + 1}.{microskill_idx + 1}",
+                icon="📝",
+                url_path=f"{module_idx + 1}.{microskill_idx + 1}",
             )
+            sidebar[module_name].append(page)
 
-            if os.path.exists(microskill_path):
-                page = st.Page(
-                    page=microskill_path,
-                    title=f"Microskill {module_idx + 1}.{microskill_idx + 1} - {track.capitalize()}",
-                    icon="📝",
-                    url_path=f"{module_idx + 1}.{microskill_idx + 1}_{track}",
-                )
-                sidebar[module_name].append(page)
+pg = st.navigation(sidebar, position="hidden")
 
-pg = st.navigation(sidebar)
+# ── Track Selection Persistence ─────────────────────────────────────────────
+# Default to clinical or whatever is in query params
+query_track = st.query_params.get("track", "clinical")
+if "track" not in st.session_state:
+    st.session_state["track"] = query_track
 
 # ── Chat Toggle State & Logic ────────────────────────────────────────────────
 if "_chat_open" not in st.session_state:
@@ -168,11 +261,20 @@ st.markdown(f"""
 #aip-toggle-tab {{
     right: {right_pos};
 }}
+
+.track-selector-container {{
+    display: flex;
+    justify-content: center;
+    margin-bottom: 2rem;
+    padding: 0.5rem;
+    background: #f0f2f6;
+    border-radius: 10px;
+}}
 </style>
 <div id="aip-toggle-tab" title="Toggle AI Guide">{arrow_char}</div>
 """, unsafe_allow_html=True)
 
-# JS to wire the custom toggle tab
+# JS for sidebar toggle
 components.html(f"""
 <script>
 (function() {{
@@ -209,18 +311,6 @@ with st.container():
         st.rerun()
     st.markdown('</div>', unsafe_allow_html=True)
 
-# ── Context function ─────────────────────────────────────────────────────────
-def _context_fn() -> dict:
-    # 'pg' is the StreamlitPage object returned by st.navigation
-    # It has attributes like title, icon, url_path
-    ctx = {
-        "current_page": getattr(pg, "title", "AIPassport Home"),
-        "url_path": getattr(pg, "url_path", ""),
-        "platform": "AI Passport",
-        "description": "Educational platform for AI basics and clinical applications.",
-    }
-    return ctx
-
 # ── Layout: Main Content + Chat ──────────────────────────────────────────────
 if st.session_state["_chat_open"]:
     col_main, col_chat = st.columns([7, 1])
@@ -228,7 +318,12 @@ if st.session_state["_chat_open"]:
         st.markdown('<div id="aip-chat-panel-marker"></div>', unsafe_allow_html=True)
         render_ai_guide(
             gemini_api_key=st.secrets.get("GEMINI_API_KEY"),
-            context_fn=_context_fn,
+            context_fn=lambda: {
+                "current_page": getattr(pg, "title", "AIPassport Home"),
+                "url_path": getattr(pg, "url_path", ""),
+                "track": st.session_state.get("track", "clinical"),
+                "platform": "AI Passport",
+            },
         )
 else:
     col_main = st.container()
