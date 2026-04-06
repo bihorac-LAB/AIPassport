@@ -180,6 +180,11 @@ def render_notebook_page():
                 
                 try:
                     exec(code, exec_globals)
+                except (ImportError, ModuleNotFoundError) as e:
+                    missing_lib = e.name if hasattr(e, "name") else str(e)
+                    st.warning(f"⚠️ **Requirement Missing**: This lab requires `{missing_lib}`, which is not installed in the cloud environment.")
+                    st.info("Some libraries (like TensorFlow) are only supported on specific Python versions. We recommend running this lab locally using an environment with the correct dependencies.")
+                    st.code(f"pip install {missing_lib}", language="bash")
                 except Exception as e:
                     st.error(f"Error executing notebook: {e}")
                     st.exception(e)
