@@ -53,24 +53,47 @@ if "experiment_feedback" not in st.session_state:
 feedback_container = st.container(border=True)
 
 
+from google.genai.errors import ClientError
+from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception
+
+def is_429(exception):
+    return isinstance(exception, ClientError) and "429" in str(exception)
+
+@retry(
+    retry=retry_if_exception(is_429),
+    stop=stop_after_attempt(3),
+    wait=wait_exponential(multiplier=1, min=2, max=10),
+    reraise=True
+)
+def generate_with_retry(client, model, contents, config):
+    return client.models.generate_content(model=model, contents=contents, config=config)
+
 def submit():
     st.session_state.experiment_idea = st.session_state.experiment_input
     st.session_state.experiment_input = ""
 
     with feedback_container:
         with st.spinner("Analyzing your experiment design...", show_time=True):
-            response = client.models.generate_content(
-                model=gemini_model,
-                contents=st.session_state.experiment_idea,
-                config=GenerateContentConfig(
-                    system_instruction=gemini_system_instruction,
-                    response_schema=gemini_response_schema,
-                    response_mime_type="application/json",
-                ),
-            )
-        st.session_state.experiment_feedback = json.loads(
-            json.dumps(json.loads(response.text))
-        )
+            try:
+                response = generate_with_retry(
+                    client=client,
+                    model=gemini_model,
+                    contents=st.session_state.experiment_idea,
+                    config=GenerateContentConfig(
+                        system_instruction=gemini_system_instruction,
+                        response_schema=gemini_response_schema,
+                        response_mime_type="application/json",
+                    ),
+                )
+                st.session_state.experiment_feedback = json.loads(
+                    json.dumps(json.loads(response.text))
+                )
+            except Exception as e:
+                if "429" in str(e):
+                    st.error("⚠️ **Rate Limit Reached**: The Gemini API is currently receiving too many requests. Please wait a few seconds and try again.")
+                else:
+                    st.error(f"Error: {e}")
+                st.session_state.experiment_feedback = ""
 
 
 statement = st.text_area(

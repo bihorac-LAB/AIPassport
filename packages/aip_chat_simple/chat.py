@@ -1,9 +1,27 @@
 import streamlit as st
 from google import genai
 from google.genai import types
+from google.genai.errors import ClientError
 import time
+from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception
 
 import aipassport_config as cfg
+
+def is_429(exception):
+    return isinstance(exception, ClientError) and "429" in str(exception)
+
+@retry(
+    retry=retry_if_exception(is_429),
+    stop=stop_after_attempt(3),
+    wait=wait_exponential(multiplier=1, min=2, max=10),
+    reraise=True
+)
+def generate_with_retry(client, model_id, contents, config):
+    return client.models.generate_content(
+        model=model_id,
+        contents=contents,
+        config=config
+    )
 
 def render_ai_guide(gemini_api_key: str, context_fn=None):
     """
@@ -86,9 +104,10 @@ def render_ai_guide(gemini_api_key: str, context_fn=None):
                 # System prompt + User prompt + Context
                 system_instruction = cfg.AI_GUIDE_SYSTEM_PROMPT
                 
-                # Fetch response from Gemini
-                response = client.models.generate_content(
-                    model=model_id,
+                # Fetch response from Gemini with retry logic
+                response = generate_with_retry(
+                    client=client,
+                    model_id=model_id,
                     contents=context_parts + screen_images,
                     config=types.GenerateContentConfig(
                         system_instruction=system_instruction,
@@ -98,13 +117,19 @@ def render_ai_guide(gemini_api_key: str, context_fn=None):
                 
                 full_response = response.text
                 # Simulate streaming for better UX
-                for chunk in full_response.split():
-                    message_placeholder.markdown(full_response[:full_response.find(chunk)+len(chunk)] + "▌")
+                words = full_response.split()
+                current_text = ""
+                for word in words:
+                    current_text += word + " "
+                    message_placeholder.markdown(current_text + "▌")
                     time.sleep(0.01)
                 message_placeholder.markdown(full_response)
                 
             except Exception as e:
-                full_response = f"Sorry, I encountered an error: {e}"
+                if "429" in str(e):
+                    full_response = "⚠️ **Rate Limit Reached**: The Gemini API is currently receiving too many requests. Please wait a few seconds and try again."
+                else:
+                    full_response = f"Sorry, I encountered an error: {e}"
                 message_placeholder.markdown(full_response)
 
         # Add assistant response to chat history

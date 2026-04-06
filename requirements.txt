@@ -1,5 +1,5 @@
 # Core Libraries
-streamlit
+streamlit>=1.31.0
 pandas
 numpy
 matplotlib
@@ -9,13 +9,13 @@ scikit-image
 statsmodels
 plotly
 altair
-google-genai
+google-genai>=1.0.0
 streamlit-timeline
 
 # System & Utils
 psutil
 GitPython
-tenacity
+tenacity>=8.0.0
 requests
 Pillow
 pydeck
@@ -26,4 +26,4 @@ shap
 lime
 
 # Machine Learning (CPU Only for Streamlit Cloud)
-tensorflow-cpu
+tensorflow-cpu>=2.15.0
