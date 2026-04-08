@@ -13,5 +13,7 @@ jobs:
     steps:
       - name: Ping Streamlit App
         run: |
-          curl -sL https://aipassport-uf.streamlit.app/ > /dev/null
+          # We remove -L to avoid redirect loops (Error 47). 
+          # A simple request is enough to keep the app 'warm' on Streamlit Cloud.
+          curl -s --max-time 15 -A "AIPassport-KeepAlive" https://aipassport-uf.streamlit.app/ > /dev/null || true
           echo "Successfully pinged https://aipassport-uf.streamlit.app/ at $(date)"
