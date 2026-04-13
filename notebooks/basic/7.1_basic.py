@@ -34,7 +34,12 @@ system_instruction_filepath = "assets/llm/7.1_gemini_system_instruction.txt"
 navigator_api_key = st.secrets["NAVIGATOR_TOOLKIT_API_KEY"]
 
 with open(system_instruction_filepath, "r") as f:
-    system_instruction = f.read()
+    base_instruction = f.read()
+
+# Override: respond in plain readable markdown, not JSON
+system_instruction = """Respond in clear, readable markdown. Do NOT return JSON or code blocks.
+Use headers (###), bullet points, and bold text to organize your feedback.
+\n\n""" + base_instruction
 
 from openai import OpenAI
 client = OpenAI(api_key=navigator_api_key, base_url="https://api.ai.it.ufl.edu/v1")
