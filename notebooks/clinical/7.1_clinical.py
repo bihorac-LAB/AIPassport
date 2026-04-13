@@ -68,12 +68,12 @@ def submit():
                 ]
             )
             full_response = response.choices[0].message.content
-            # Stream word-by-word (same as AIP Guide)
+            # Stream line-by-line so markdown renders correctly
             curr = ""
-            for w in full_response.split():
-                curr += w + " "
+            for line in full_response.split("\n"):
+                curr += line + "\n"
                 placeholder.markdown(curr + "▌")
-                time.sleep(0.01)
+                time.sleep(0.04)
             placeholder.markdown(full_response)
             st.session_state.experiment_feedback = full_response
         except Exception as e:
