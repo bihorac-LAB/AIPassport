@@ -1,7 +1,5 @@
 import streamlit as st
 import json
-from google import genai
-from google.genai.types import GenerateContentConfig
 
 st.title("7.1 Designing Biomedical AI Experiments (Clinical)")
 
@@ -31,18 +29,19 @@ st.caption(
 )
 
 # LLM setup
-gemini_model = "gemini-2.0-flash"
-gemini_system_instruction_filepath = "assets/llm/7.1_gemini_system_instruction.txt"
+model_id = "gemma-3-27b-it"
+system_instruction_filepath = "assets/llm/7.1_gemini_system_instruction.txt"
 gemini_response_schema_filepath = "assets/llm/7.1_gemini_response_schema.json"
-gemini_api_key = st.secrets["GEMINI_API_KEY"]
+navigator_api_key = st.secrets["NAVIGATOR_TOOLKIT_API_KEY"]
 
-with open(gemini_system_instruction_filepath, "r") as f:
-    gemini_system_instruction = f.read()
+with open(system_instruction_filepath, "r") as f:
+    system_instruction = f.read()
 
 with open(gemini_response_schema_filepath, "r") as f:
     gemini_response_schema = json.load(f)
 
-client = genai.Client(api_key=gemini_api_key)
+from openai import OpenAI
+client = OpenAI(api_key=navigator_api_key, base_url="https://api.ai.it.ufl.edu/v1")
 
 if "experiment_idea" not in st.session_state:
     st.session_state.experiment_idea = ""
@@ -53,20 +52,7 @@ if "experiment_feedback" not in st.session_state:
 feedback_container = st.container(border=True)
 
 
-from google.genai.errors import ClientError
-from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception
 
-def is_429(exception):
-    return isinstance(exception, ClientError) and "429" in str(exception)
-
-@retry(
-    retry=retry_if_exception(is_429),
-    stop=stop_after_attempt(3),
-    wait=wait_exponential(multiplier=1, min=2, max=10),
-    reraise=True
-)
-def generate_with_retry(client, model, contents, config):
-    return client.models.generate_content(model=model, contents=contents, config=config)
 
 def submit():
     st.session_state.experiment_idea = st.session_state.experiment_input
@@ -77,10 +63,10 @@ def submit():
             try:
                 response = generate_with_retry(
                     client=client,
-                    model=gemini_model,
+                    model=model_id,
                     contents=st.session_state.experiment_idea,
                     config=GenerateContentConfig(
-                        system_instruction=gemini_system_instruction,
+                        system_instruction=system_instruction,
                         response_schema=gemini_response_schema,
                         response_mime_type="application/json",
                     ),
@@ -90,7 +76,7 @@ def submit():
                 )
             except Exception as e:
                 if "429" in str(e):
-                    st.error("⚠️ **Rate Limit Reached**: The Gemini API is currently receiving too many requests. Please wait a few seconds and try again.")
+                    st.error("⚠️ **Rate Limit Reached**: The NaviGator API is receiving too many requests. Please wait a few seconds and try again.")
                 else:
                     st.error(f"Error: {e}")
                 st.session_state.experiment_feedback = ""

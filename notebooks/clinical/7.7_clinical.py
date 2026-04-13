@@ -1,6 +1,4 @@
 import streamlit as st
-from google import genai
-from google.genai.types import GenerateContentConfig
 
 st.title("7.7 Responsible Biomedical AI Research")
 
@@ -17,14 +15,15 @@ st.caption(
 )
 
 # LLM setup
-gemini_model = "gemini-2.0-flash"
-gemini_system_instruction_filepath = "assets/llm/7.7_gemini_system_instruction.txt"
-gemini_api_key = st.secrets["GEMINI_API_KEY"]
+model_id = "gemma-3-27b-it"
+system_instruction_filepath = "assets/llm/7.7_gemini_system_instruction.txt"
+navigator_api_key = st.secrets["NAVIGATOR_TOOLKIT_API_KEY"]
 
-with open(gemini_system_instruction_filepath, "r") as f:
-    gemini_system_instruction = f.read()
+with open(system_instruction_filepath, "r") as f:
+    system_instruction = f.read()
 
-client = genai.Client(api_key=gemini_api_key)
+from openai import OpenAI
+client = OpenAI(api_key=navigator_api_key, base_url="https://api.ai.it.ufl.edu/v1")
 
 if "input" not in st.session_state:
     st.session_state.input = ""
@@ -35,20 +34,7 @@ if "output" not in st.session_state:
 feedback_container = st.container(border=True)
 
 
-from google.genai.errors import ClientError
-from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception
 
-def is_429(exception):
-    return isinstance(exception, ClientError) and "429" in str(exception)
-
-@retry(
-    retry=retry_if_exception(is_429),
-    stop=stop_after_attempt(3),
-    wait=wait_exponential(multiplier=1, min=2, max=10),
-    reraise=True
-)
-def generate_with_retry(client, model, contents, config):
-    return client.models.generate_content(model=model, contents=contents, config=config)
 
 def submit():
     st.session_state.input = st.session_state.experiment_input
@@ -57,18 +43,17 @@ def submit():
     with feedback_container:
         with st.spinner("Analyzing your response...", show_time=True):
             try:
-                response = generate_with_retry(
-                    client=client,
-                    model=gemini_model,
-                    contents=st.session_state.input,
-                    config=GenerateContentConfig(
-                        system_instruction=gemini_system_instruction,
-                    ),
+                response = client.chat.completions.create(
+                    model=model_id,
+                    messages=[
+                        {"role": "system", "content": system_instruction},
+                        {"role": "user", "content": st.session_state.input}
+                    ]
                 )
-                st.session_state.output = response.text
+                st.session_state.output = response.choices[0].message.content
             except Exception as e:
                 if "429" in str(e):
-                    st.error("⚠️ **Rate Limit Reached**: The Gemini API is currently receiving too many requests. Please wait a few seconds and try again.")
+                    st.error("⚠️ **Rate Limit Reached**: The NaviGator API is receiving too many requests. Please wait a few seconds and try again.")
                 else:
                     st.error(f"Error: {e}")
                 st.session_state.output = ""

@@ -1,7 +1,5 @@
 import streamlit as st
 from streamlit_timeline import timeline
-from google import genai
-from google.genai.types import GenerateContentConfig
 import json
 
 st.title("1.1 Demystifying Artificial Intelligence (Clinical)")
@@ -88,13 +86,13 @@ with st.container(border=True):
     )
 
     # LLM configuration
-    gemini_model = "gemini-2.0-flash"
-    gemini_system_instruction_filepath = "assets/llm/1.1_gemini_system_instruction.txt"
+    model_id = "gemma-3-27b-it"
+    system_instruction_filepath = "assets/llm/1.1_gemini_system_instruction.txt"
     gemini_response_schema_filepath = "assets/llm/1.1_gemini_response_schema.json"
-    gemini_api_key = st.secrets["GEMINI_API_KEY"]
+    navigator_api_key = st.secrets["NAVIGATOR_TOOLKIT_API_KEY"]
 
-    with open(gemini_system_instruction_filepath, "r") as f:
-        gemini_system_instruction = f.read()
+    with open(system_instruction_filepath, "r") as f:
+        system_instruction = f.read()
 
     with open(gemini_response_schema_filepath, "r") as f:
         gemini_response_schema = json.load(f)
@@ -112,21 +110,20 @@ with st.container(border=True):
 
         with llm_container:
             with st.spinner("Thinking...", show_time=True):
-                response = client.models.generate_content(
-                    model=gemini_model,
-                    contents=st.session_state.statement,
-                    config=GenerateContentConfig(
-                        system_instruction=gemini_system_instruction,
-                        response_schema=gemini_response_schema,
-                        response_mime_type="application/json",
-                    ),
+                response = client.chat.completions.create(
+                    model=model_id,
+                    messages=[
+                        {"role": "system", "content": system_instruction},
+                        {"role": "user", "content": st.session_state.statement}
+                    ],
+                    response_format={"type": "json_object"}
                 )
 
-        # loads/dumps/loads helps address unescaped characters (like quotation marks)
-        st.session_state.verdict = json.loads(json.dumps(json.loads(response.text)))
+        st.session_state.verdict = json.loads(response.choices[0].message.content)
 
     init_session()
-    client = genai.Client(api_key=st.secrets["GEMINI_API_KEY"])
+    from openai import OpenAI
+    client = OpenAI(api_key=navigator_api_key, base_url="https://api.ai.it.ufl.edu/v1")
 
     llm_container = st.container(border=True)
     with llm_container:
