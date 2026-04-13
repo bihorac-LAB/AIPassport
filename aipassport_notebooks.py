@@ -40,33 +40,6 @@ button[kind="primary"]:hover {
     border-color: #D6390E !important;
 }
 
-/* --- AIP Chat Panel Layout ---
-   The column containing #aip-chat-panel-marker becomes a fixed
-   flex column so the history scrolls and the input sticks to bottom.
-*/
-[data-testid="stColumn"]:has(#aip-chat-panel-marker) > div:first-child {
-    display: flex !important;
-    flex-direction: column !important;
-    height: 100% !important;
-    overflow: hidden !important;
-}
-
-/* The chat messages container should scroll, taking all available space */
-[data-testid="stColumn"]:has(#aip-chat-panel-marker) [data-testid="stVerticalBlock"] {
-    flex: 1 1 auto !important;
-    overflow-y: auto !important;
-    padding-bottom: 1rem;
-}
-
-/* Pin the chat input to the bottom of the panel */
-[data-testid="stColumn"]:has(#aip-chat-panel-marker) [data-testid="stChatInput"] {
-    position: sticky !important;
-    bottom: 0 !important;
-    background: var(--background-color, #F8F9FA) !important;
-    padding-top: 0.5rem !important;
-    z-index: 10 !important;
-}
-
 /* Chat Input border styling */
 [data-testid="stChatInput"] {
     border-color: rgba(128,128,128,0.2) !important;
@@ -100,7 +73,7 @@ button[kind="primary"]:hover {
     background-color: var(--dark-blue, #001A57);
 }
 
-/* Hide the underlying Streamlit toggle button (triggered by JS) */
+/* Hide the underlying Streamlit toggle button */
 #toggle-btn-container {
     position: fixed;
     top: -9999px;
@@ -273,7 +246,7 @@ st.markdown(f"""
     transition: padding-right 0.3s ease;
 }}
 
-/* Fixed chat panel - flex column so input sticks to bottom */
+/* Fixed chat panel: scrollable, with sticky input at bottom */
 [data-testid="stColumn"]:has(#aip-chat-panel-marker) {{
     position: fixed !important;
     top: 0 !important;
@@ -285,38 +258,21 @@ st.markdown(f"""
     flex: none !important;
     height: 100vh !important;
     background-color: #F8F9FA !important;
-    padding: 1rem 1.25rem 1rem 1.25rem !important;
+    padding: 1rem 1.25rem 0 1.25rem !important;
     border-left: 3px solid #0021A5 !important;
     box-shadow: -6px 0 20px rgba(0,0,0,0.08) !important;
     z-index: 999990 !important;
-    overflow: hidden !important;
-    display: flex !important;
-    flex-direction: column !important;
-}}
-
-/* Messages area scrolls, taking all available height */
-[data-testid="stColumn"]:has(#aip-chat-panel-marker) > div {{
-    display: flex !important;
-    flex-direction: column !important;
-    height: 100% !important;
-    overflow: hidden !important;
-}}
-
-/* Scrollable message history */
-[data-testid="stColumn"]:has(#aip-chat-panel-marker) > div > div:first-child {{
-    flex: 1 1 auto !important;
     overflow-y: auto !important;
-    min-height: 0 !important;
+    overflow-x: hidden !important;
 }}
 
-/* Pin chat input to bottom */
+/* Pin the stBottom (chat input wrapper) to the bottom of the scroll container */
 [data-testid="stColumn"]:has(#aip-chat-panel-marker) [data-testid="stBottom"] {{
     position: sticky !important;
     bottom: 0 !important;
     z-index: 10 !important;
     background-color: #F8F9FA !important;
-    padding-top: 0.5rem !important;
-    flex-shrink: 0 !important;
+    padding: 0.5rem 0 0.75rem 0 !important;
 }}
 
 #aip-toggle-tab {{
