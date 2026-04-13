@@ -61,18 +61,16 @@ def submit():
     with feedback_container:
         with st.spinner("Analyzing your experiment design...", show_time=True):
             try:
-                response = generate_with_retry(
-                    client=client,
+                response = client.chat.completions.create(
                     model=model_id,
-                    contents=st.session_state.experiment_idea,
-                    config=GenerateContentConfig(
-                        system_instruction=system_instruction,
-                        response_schema=gemini_response_schema,
-                        response_mime_type="application/json",
-                    ),
+                    messages=[
+                        {"role": "system", "content": system_instruction},
+                        {"role": "user", "content": st.session_state.experiment_idea}
+                    ],
+                    response_format={"type": "json_object"}
                 )
                 st.session_state.experiment_feedback = json.loads(
-                    json.dumps(json.loads(response.text))
+                    response.choices[0].message.content
                 )
             except Exception as e:
                 if "429" in str(e):
