@@ -85,8 +85,3 @@ if st.session_state._pending:
         except Exception as e:
             st.error(f"Error: {e}")
             st.session_state.experiment_feedback = ""
-
-if st.session_state.experiment_feedback:
-    st.markdown("---")
-    st.markdown("# :material/lightbulb: AI Feedback on Your Experimental Design")
-    st.markdown(st.session_state.experiment_feedback)

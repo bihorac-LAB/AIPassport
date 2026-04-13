@@ -69,8 +69,3 @@ if st.session_state._pending:
         except Exception as e:
             st.error(f"Error: {e}")
             st.session_state.output = ""
-
-if st.session_state.output:
-    st.markdown("---")
-    st.markdown("### Evaluation")
-    st.markdown(st.session_state.output)
