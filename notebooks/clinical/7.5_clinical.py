@@ -38,7 +38,6 @@ feedback_container = st.container(border=True)
 
 def submit():
     st.session_state.input = st.session_state.experiment_input
-    st.session_state.experiment_input = ""
 
     with feedback_container:
         with st.spinner("Generating critique...", show_time=True):

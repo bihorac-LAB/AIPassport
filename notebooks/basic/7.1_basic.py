@@ -55,7 +55,6 @@ feedback_container = st.container(border=True)
 
 def submit():
     st.session_state.experiment_idea = st.session_state.experiment_input
-    st.session_state.experiment_input = ""
 
     with feedback_container:
         placeholder = st.empty()
