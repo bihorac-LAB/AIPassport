@@ -31,32 +31,8 @@ if "input" not in st.session_state:
 if "output" not in st.session_state:
     st.session_state.output = ""
 
-feedback_container = st.container(border=True)
-
-
-
-
-def submit():
-    st.session_state.input = st.session_state.experiment_input
-
-    with feedback_container:
-        with st.spinner("Analyzing your text...", show_time=True):
-            try:
-                response = client.chat.completions.create(
-                    model=model_id,
-                    messages=[
-                        {"role": "system", "content": system_instruction},
-                        {"role": "user", "content": st.session_state.input}
-                    ]
-                )
-                st.session_state.output = response.choices[0].message.content
-            except Exception as e:
-                if "429" in str(e):
-                    st.error("⚠️ **Rate Limit Reached**: The NaviGator API is receiving too many requests. Please wait a few seconds and try again.")
-                else:
-                    st.error(f"Error: {e}")
-                st.session_state.output = ""
-
+if "_pending" not in st.session_state:
+    st.session_state._pending = False
 
 statement = st.text_area(
     "Enter your research text (e.g., manuscript abstract, full article text, etc.)",
@@ -65,9 +41,35 @@ statement = st.text_area(
 )
 
 if st.button("✅ Submit", type="primary", use_container_width=True):
-    submit()
+    st.session_state.input = st.session_state.experiment_input
+    st.session_state._pending = True
+    st.rerun()
 
-if st.session_state.output != "":
+if st.session_state._pending:
+    st.session_state._pending = False
+    with st.container(border=True):
+        placeholder = st.empty()
+        try:
+            response = client.chat.completions.create(
+                model=model_id,
+                messages=[
+                    {"role": "system", "content": system_instruction},
+                    {"role": "user", "content": st.session_state.input}
+                ]
+            )
+            full_response = response.choices[0].message.content
+            curr = ""
+            for line in full_response.split("\n"):
+                curr += line + "\n"
+                placeholder.markdown(curr + "▌")
+                import time; time.sleep(0.04)
+            placeholder.markdown(full_response)
+            st.session_state.output = full_response
+        except Exception as e:
+            st.error(f"Error: {e}")
+            st.session_state.output = ""
+
+if st.session_state.output:
     st.markdown("---")
     st.markdown("### Elevator Pitch Summary:")
     st.markdown(st.session_state.output)
