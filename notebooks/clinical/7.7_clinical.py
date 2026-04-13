@@ -73,9 +73,11 @@ st.markdown("**Q2. Which of Dr. Johnson's and/or Dr. Smith's actions were unethi
 statement = st.text_area(
     "Provide your responses to Q1 and Q2:",
     key="experiment_input",
-    height=200,
-    on_change=submit,
+    height=200
 )
+
+if st.button("✅ Submit", type="primary", use_container_width=True):
+    submit()
 
 if st.session_state.output != "":
     st.markdown("---")

@@ -85,9 +85,11 @@ statement = st.text_area(
     "Describe your idea for a biomedical research experiment involving AI. **The more details, the better.**",
     placeholder="e.g., I want to use deep learning to predict postoperative complications based on EHR data and imaging...",
     key="experiment_input",
-    height=200,
-    on_change=submit,
+    height=200
 )
+
+if st.button("✅ Submit", type="primary", use_container_width=True):
+    submit()
 
 if st.session_state.experiment_feedback:
     st.markdown("---")

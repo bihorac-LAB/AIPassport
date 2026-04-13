@@ -62,9 +62,11 @@ def submit():
 statement = st.text_area(
     "Describe your research idea. **The more details, the better.**",
     key="experiment_input",
-    height=200,
-    on_change=submit,
+    height=200
 )
+
+if st.button("✅ Submit", type="primary", use_container_width=True):
+    submit()
 
 if st.session_state.output != "":
     st.markdown("---")
