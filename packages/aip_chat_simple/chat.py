@@ -47,23 +47,14 @@ def render_ai_guide(navigator_api_key: str, context_fn=None):
     if "chat_error" not in st.session_state:
         st.session_state.chat_error = None
 
-    # ── 1. Quick-action buttons (rendered FIRST so they stay at the top) ─────
-    cols = st.columns(2)
-    if cols[0].button("🖥️ What's on my screen?", use_container_width=True):
-        st.session_state["_quick_action"] = "Explain what's on my screen based on the current charts and values."
-        st.rerun()
-    if cols[1].button("💡 How do I use this activity?", use_container_width=True):
-        st.session_state["_quick_action"] = "How do I use this activity and what controls are available?"
-        st.rerun()
-
-    # ── 2. Error banner ───────────────────────────────────────────────────────
+    # ── 1. Error banner ───────────────────────────────────────────────────────
     if st.session_state.chat_error:
         st.error(st.session_state.chat_error)
         if st.button("Dismiss Error"):
             st.session_state.chat_error = None
             st.rerun()
 
-    # ── 3. Message history ────────────────────────────────────────────────────
+    # ── 2. Message history ────────────────────────────────────────────────────
     if not st.session_state.messages:
         with st.chat_message("assistant"):
             st.markdown("Hello! I am your AIP Guide. How can I help you today?")
@@ -83,7 +74,16 @@ def render_ai_guide(navigator_api_key: str, context_fn=None):
             else:
                 st.markdown(content)
 
-    # ── 4. Chat input (st.chat_input always renders in stBottom at the bottom) ─
+    # ── 3. Quick-action buttons (just above chat input) ───────────────────────
+    cols = st.columns(2)
+    if cols[0].button("🖥️ What's on my screen?", use_container_width=True):
+        st.session_state["_quick_action"] = "Explain what's on my screen based on the current charts and values."
+        st.rerun()
+    if cols[1].button("💡 How do I use this activity?", use_container_width=True):
+        st.session_state["_quick_action"] = "How do I use this activity and what controls are available?"
+        st.rerun()
+
+    # ── 4. Chat input (renders in stBottom — always at the true bottom) ───────
     prompt = st.chat_input(cfg.AI_GUIDE_PLACEHOLDER)
 
     # Consume quick action if set
