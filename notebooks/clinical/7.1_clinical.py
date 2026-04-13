@@ -1,5 +1,5 @@
 import streamlit as st
-import json
+import time
 
 st.title("7.1 Designing Biomedical AI Experiments (Clinical)")
 
@@ -14,7 +14,7 @@ But designing a strong AI-enabled experiment requires more than just selecting a
 hypotheses, understanding data limitations, selecting appropriate AI techniques, and planning for baseline and
 comparative evaluations.
 
-In this activity, you’ll receive personalized, automated feedback on your **experiment design ideas**. Whether you have
+In this activity, you'll receive personalized, automated feedback on your **experiment design ideas**. Whether you have
 a specific project in mind or are brainstorming how to integrate AI into your existing work, this tool will help you
 refine your thinking and increase the feasibility and clarity of your approach.
 
@@ -31,14 +31,10 @@ st.caption(
 # LLM setup
 model_id = "gemma-3-27b-it"
 system_instruction_filepath = "assets/llm/7.1_gemini_system_instruction.txt"
-gemini_response_schema_filepath = "assets/llm/7.1_gemini_response_schema.json"
 navigator_api_key = st.secrets["NAVIGATOR_TOOLKIT_API_KEY"]
 
 with open(system_instruction_filepath, "r") as f:
     system_instruction = f.read()
-
-with open(gemini_response_schema_filepath, "r") as f:
-    gemini_response_schema = json.load(f)
 
 from openai import OpenAI
 client = OpenAI(api_key=navigator_api_key, base_url="https://api.ai.it.ufl.edu/v1")
@@ -52,32 +48,32 @@ if "experiment_feedback" not in st.session_state:
 feedback_container = st.container(border=True)
 
 
-
-
 def submit():
     st.session_state.experiment_idea = st.session_state.experiment_input
     st.session_state.experiment_input = ""
 
     with feedback_container:
-        with st.spinner("Analyzing your experiment design...", show_time=True):
-            try:
-                response = client.chat.completions.create(
-                    model=model_id,
-                    messages=[
-                        {"role": "system", "content": system_instruction},
-                        {"role": "user", "content": st.session_state.experiment_idea}
-                    ],
-                    response_format={"type": "json_object"}
-                )
-                st.session_state.experiment_feedback = json.loads(
-                    response.choices[0].message.content
-                )
-            except Exception as e:
-                if "429" in str(e):
-                    st.error("⚠️ **Rate Limit Reached**: The NaviGator API is receiving too many requests. Please wait a few seconds and try again.")
-                else:
-                    st.error(f"Error: {e}")
-                st.session_state.experiment_feedback = ""
+        placeholder = st.empty()
+        try:
+            response = client.chat.completions.create(
+                model=model_id,
+                messages=[
+                    {"role": "system", "content": system_instruction},
+                    {"role": "user", "content": st.session_state.experiment_idea}
+                ]
+            )
+            full_response = response.choices[0].message.content
+            # Stream word-by-word (same as AIP Guide)
+            curr = ""
+            for w in full_response.split():
+                curr += w + " "
+                placeholder.markdown(curr + "▌")
+                time.sleep(0.01)
+            placeholder.markdown(full_response)
+            st.session_state.experiment_feedback = full_response
+        except Exception as e:
+            st.error(f"Error: {e}")
+            st.session_state.experiment_feedback = ""
 
 
 statement = st.text_area(
@@ -88,34 +84,7 @@ statement = st.text_area(
     on_change=submit,
 )
 
-if st.session_state.experiment_feedback != "":
-    F = st.session_state.experiment_feedback
-
+if st.session_state.experiment_feedback:
     st.markdown("---")
     st.markdown("# :material/lightbulb: AI Feedback on Your Experimental Design")
-
-    if F["summary_sentiment"] == "positive":
-        st.success(F["summary"])
-    elif F["summary_sentiment"] == "neutral":
-        st.warning(F["summary"])
-    elif F["summary_sentiment"] == "negative":
-        st.error(F["summary"])
-    else:
-        st.info(F["summary"])
-
-    st.markdown("### Hypothesis")
-    st.markdown(F["hypothesis"])
-    st.markdown("### AI Techniques")
-    st.markdown(F["ai_methods"])
-    st.markdown("### Evaluation Plan")
-    st.markdown(F["baselines"])
-    st.markdown("### Feasibility")
-    st.markdown(F["feasibility"])
-    st.markdown("### Suggested Improvements")
-    st.markdown(F["suggestions"])
-    st.markdown("### Potential Pitfalls")
-    st.markdown(F["pitfalls"])
-    st.markdown("### Relevant Datasets")
-    st.markdown(F["datasets"])
-    st.markdown("### Related Work")
-    st.markdown(F["related_work"])
+    st.markdown(st.session_state.experiment_feedback)
