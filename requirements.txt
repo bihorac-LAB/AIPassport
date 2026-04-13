@@ -10,6 +10,7 @@ statsmodels
 plotly
 altair
 google-genai>=1.0.0
+openai
 streamlit-timeline
 
 # System & Utils
@@ -25,5 +26,4 @@ pyarrow
 shap
 lime
 
-# Machine Learning (CPU Only for Streamlit Cloud)
-tensorflow-cpu>=2.15.0
+openai

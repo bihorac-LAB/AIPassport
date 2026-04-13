@@ -322,7 +322,7 @@ if st.session_state["_chat_open"]:
     with col_chat:
         st.markdown('<div id="aip-chat-panel-marker"></div>', unsafe_allow_html=True)
         render_ai_guide(
-            gemini_api_key=st.secrets.get("GEMINI_API_KEY"),
+            navigator_api_key=st.secrets.get("NAVIGATOR_TOOLKIT_API_KEY"),
             context_fn=lambda: {
                 "current_page": getattr(pg, "title", "AIPassport Home"),
                 "url_path": getattr(pg, "url_path", ""),

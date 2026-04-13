@@ -1,7 +1,8 @@
 # AI Passport Central Configuration
 
 # Model Settings
-DEFAULT_GEMINI_MODEL = "gemini-2.5-flash"
+DEFAULT_MODEL = "gemma-3-27b-it"
+NAVIGATOR_TOOLKIT_BASE_URL = "https://api.ai.it.ufl.edu/v1"
 
 # UI Settings
 AI_GUIDE_TITLE = "AIP Guide"
