@@ -66,13 +66,14 @@ if st.session_state._pending:
     with st.container(border=True):
         placeholder = st.empty()
         try:
-            response = client.chat.completions.create(
-                model=model_id,
-                messages=[
-                    {"role": "system", "content": system_instruction},
-                    {"role": "user", "content": st.session_state.experiment_idea}
-                ]
-            )
+            with st.spinner("⏳ Generating response...", show_time=True):
+                response = client.chat.completions.create(
+                    model=model_id,
+                    messages=[
+                        {"role": "system", "content": system_instruction},
+                        {"role": "user", "content": st.session_state.experiment_idea}
+                    ]
+                )
             full_response = response.choices[0].message.content
             curr = ""
             for line in full_response.split("\n"):
