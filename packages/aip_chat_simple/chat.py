@@ -3,6 +3,7 @@ from openai import OpenAI
 import time
 from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception
 import base64
+import streamlit.components.v1 as components
 
 import aipassport_config as cfg
 
@@ -24,35 +25,51 @@ def generate_with_retry(client, model_id, messages):
 
 def render_ai_guide(navigator_api_key: str, context_fn=None):
     """
-    Renders a direct NaviGator-powered chat interface in the current Streamlit container.
+    Renders a NaviGator-powered chat interface.
+    Render order:
+      1. Quick-action buttons (pinned at top)
+      2. Message history (scrollable)
+      3. st.chat_input (stBottom — always stays at the true bottom)
     """
     if not navigator_api_key:
         st.error("Missing NAVIGATOR_TOOLKIT_API_KEY in secrets.")
         return
 
-    # Initialize client
     client = OpenAI(
         api_key=navigator_api_key,
         base_url=cfg.NAVIGATOR_TOOLKIT_BASE_URL
     )
     model_id = cfg.DEFAULT_MODEL
 
-    # Initialize chat history and errors in session state
+    # ── Session state ────────────────────────────────────────────────────────
     if "messages" not in st.session_state:
         st.session_state.messages = []
-    
     if "chat_error" not in st.session_state:
         st.session_state.chat_error = None
 
-    # Display welcome message if history is empty
+    # ── 1. Quick-action buttons (rendered FIRST so they stay at the top) ─────
+    cols = st.columns(2)
+    if cols[0].button("🖥️ What's on my screen?", use_container_width=True):
+        st.session_state["_quick_action"] = "Explain what's on my screen based on the current charts and values."
+        st.rerun()
+    if cols[1].button("💡 How do I use this activity?", use_container_width=True):
+        st.session_state["_quick_action"] = "How do I use this activity and what controls are available?"
+        st.rerun()
+
+    # ── 2. Error banner ───────────────────────────────────────────────────────
+    if st.session_state.chat_error:
+        st.error(st.session_state.chat_error)
+        if st.button("Dismiss Error"):
+            st.session_state.chat_error = None
+            st.rerun()
+
+    # ── 3. Message history ────────────────────────────────────────────────────
     if not st.session_state.messages:
         with st.chat_message("assistant"):
             st.markdown("Hello! I am your AIP Guide. How can I help you today?")
 
-    # Display chat messages from history on app rerun
     for message in st.session_state.messages:
         role = message["role"]
-        # Skip system messages for UI display
         if role == "system":
             continue
         with st.chat_message(role):
@@ -66,38 +83,22 @@ def render_ai_guide(navigator_api_key: str, context_fn=None):
             else:
                 st.markdown(content)
 
-    # Prompt user
+    # ── 4. Chat input (st.chat_input always renders in stBottom at the bottom) ─
     prompt = st.chat_input(cfg.AI_GUIDE_PLACEHOLDER)
-    
-    # Handle Quick Actions
-    cols = st.columns(2)
-    if cols[0].button("🖥️ What's on my screen?", use_container_width=True):
-        st.session_state["_quick_action"] = "Explain what's on my screen based on the current charts and values."
-        st.rerun()
-    if cols[1].button("💡 How do I use this activity?", use_container_width=True):
-        st.session_state["_quick_action"] = "How do I use this activity and what controls are available?"
-        st.rerun()
 
+    # Consume quick action if set
     if "_quick_action" in st.session_state:
         prompt = st.session_state.pop("_quick_action")
 
-    # Error Display
-    if st.session_state.chat_error:
-        st.error(st.session_state.chat_error)
-        if st.button("Dismiss Error"):
-            st.session_state.chat_error = None
-            st.rerun()
-
-    # React to user input
+    # ── 5. Handle prompt ──────────────────────────────────────────────────────
     if prompt:
-        # Display user message
+        # Temporarily display the user message while the API call is in progress
         with st.chat_message("user"):
             st.markdown(prompt)
-        
-        # Build message history
-        messages = [{"role": "system", "content": cfg.AI_GUIDE_SYSTEM_PROMPT}]
-        
-        # Add context if available
+
+        # Build messages list for API
+        api_messages = [{"role": "system", "content": cfg.AI_GUIDE_SYSTEM_PROMPT}]
+
         context_str = ""
         if context_fn:
             try:
@@ -109,48 +110,40 @@ def render_ai_guide(navigator_api_key: str, context_fn=None):
         if live_state := st.session_state.get("_live_state"):
             context_str += f"\n[Live Screen State: {live_state}]"
 
-        # Construct current user content (Vision support)
         user_content = [{"type": "text", "text": prompt + context_str}]
-        
+
         if img_data := st.session_state.get("_screen_image"):
             try:
-                if isinstance(img_data, bytes):
-                    b64_img = base64.b64encode(img_data).decode('utf-8')
-                else:
-                    b64_img = img_data # Assume already b64
-                user_content.append({
-                    "type": "image_url",
-                    "image_url": {"url": f"data:image/png;base64,{b64_img}"}
-                })
+                b64_img = base64.b64encode(img_data).decode("utf-8") if isinstance(img_data, bytes) else img_data
+                user_content.append({"type": "image_url", "image_url": {"url": f"data:image/png;base64,{b64_img}"}})
             except Exception as e:
-                user_content[0]["text"] += f"\n[Image Processing Error: {e}]"
+                user_content[0]["text"] += f"\n[Image Error: {e}]"
 
-        # Append history (limited to avoid token blow-up, e.g., last 10 messages)
-        # Convert existing messages to OpenAI format if needed, but here they already are
-        messages.extend(st.session_state.messages[-10:])
-        messages.append({"role": "user", "content": user_content})
+        # Include last 10 historical messages to avoid token blowup
+        api_messages.extend(st.session_state.messages[-10:])
+        api_messages.append({"role": "user", "content": user_content})
 
-        # Generate response
+        # Generate response inline
         with st.chat_message("assistant"):
-            message_placeholder = st.empty()
+            placeholder = st.empty()
             try:
-                response = generate_with_retry(client, model_id, messages)
+                response = generate_with_retry(client, model_id, api_messages)
                 full_response = response.choices[0].message.content
-                
-                # Simple streaming simulation for UX consistency
-                words = full_response.split()
+
+                # Simulate streaming
                 curr = ""
-                for w in words:
+                for w in full_response.split():
                     curr += w + " "
-                    message_placeholder.markdown(curr + "▌")
+                    placeholder.markdown(curr + "▌")
                     time.sleep(0.01)
-                message_placeholder.markdown(full_response)
-                
-                # Save to history
+                placeholder.markdown(full_response)
+
+                # Save to history and rerun so the history loop re-renders cleanly
                 st.session_state.messages.append({"role": "user", "content": prompt})
                 st.session_state.messages.append({"role": "assistant", "content": full_response})
                 st.session_state.chat_error = None
-                
+                st.rerun()
+
             except Exception as e:
                 st.session_state.chat_error = f"Sorry, I encountered an error: {e}"
                 st.rerun()
