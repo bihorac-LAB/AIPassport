@@ -1,2 +1,5 @@
 venv/
 .streamlit/secrets.toml
+
+ignore
+__pycache__
