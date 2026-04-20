@@ -1,8 +1,27 @@
 import pandas as pd
 import logging
 import os
+import re
 
 from .tools.consts import module_names, EXPECTED_QUESTIONS, survey_responses
+
+
+MODULE_NUMBER_PATTERN = re.compile(r"module\s*(\d+)", flags=re.IGNORECASE)
+
+
+def _extract_module_number_from_path(file_path: str) -> int:
+    match = MODULE_NUMBER_PATTERN.search(os.path.basename(file_path))
+    if not match:
+        raise ValueError(f"Unable to parse module number from file name: {file_path}")
+    return int(match.group(1))
+
+
+def _find_case_insensitive_column(df: pd.DataFrame, expected: str) -> str | None:
+    expected_lower = expected.strip().lower()
+    for col in df.columns:
+        if str(col).strip().lower() == expected_lower:
+            return col
+    return None
 
 def get_variable_name(variable_type: str, module_num: int, survey_type: str = None, microskill_num: int = None) -> str:
     """ 
@@ -76,35 +95,73 @@ def create_survey_variables(
     module_dfs: list[pd.DataFrame] = []
     user_dfs: list[pd.DataFrame] = [] # 'id' and 'name' columns
 
-    for i, pre_survey_file in enumerate(pre_survey_files):
-        module_num = i + 1
-        module_name: str = module_names.get(module_num)
+    pre_by_module = { _extract_module_number_from_path(path): path for path in pre_survey_files }
+    post_by_module = { _extract_module_number_from_path(path): path for path in end_of_module_files }
+
+    for module_num in sorted(pre_by_module):
+        pre_survey_file = pre_by_module[module_num]
+        module_name: str = module_names.get(module_num, f"Module {module_num}")
         logger.info(f" ----- COLLECTING MODULE {module_name.upper()} RESULTS ----- ")
 
         survey_type_to_survey: dict[str, pd.DataFrame] = { "Pre" : pd.read_csv(pre_survey_file) }
 
         # Saving this to merge into post if applicable
         pre_module_df: pd.DataFrame = None
+        module_result_df: pd.DataFrame | None = None
 
         # The end of module is not guaranteed to exist for the latest one
-        if len(end_of_module_files) > i:
-            survey_type_to_survey["Post"] = pd.read_csv(end_of_module_files[i])
+        if module_num in post_by_module:
+            survey_type_to_survey["Post"] = pd.read_csv(post_by_module[module_num])
 
         for survey_type, survey_df in survey_type_to_survey.items():
-            logger.info(f" - {survey_type}-survey has responses from {survey_df["id"].nunique():,} unique users")
+            name_col = _find_case_insensitive_column(survey_df, "name")
+            id_col = _find_case_insensitive_column(survey_df, "id")
+            if name_col is None or id_col is None:
+                logger.warning(
+                    "Skipping %s %s-survey: expected name/id columns (case-insensitive)",
+                    module_name,
+                    survey_type,
+                )
+                continue
+
+            user_df = survey_df[[name_col, id_col]].copy(deep=True).dropna(subset=[name_col, id_col])
+            user_df = user_df.rename(columns={name_col: "name", id_col: "id"})
+            user_df["name"] = user_df["name"].astype(str).str.strip()
+            user_df["id"] = pd.to_numeric(user_df["id"], errors="coerce")
+            user_df = user_df.dropna(subset=["name", "id"])
+            user_df["id"] = user_df["id"].astype(int)
+            user_df = user_df.drop_duplicates(subset=["name", "id"])
+            user_dfs.append(user_df[["name", "id"]])
+
+            logger.info(f" - {survey_type}-survey has responses from {user_df['id'].nunique():,} unique users")
 
             # They all should have seven, and the order seems to be relevant.
-            question_cols: list[str] = [col for col in survey_df.columns if "Please rate" in col]
+            question_cols: list[str] = [col for col in survey_df.columns if "please rate" in str(col).lower()]
             if len(question_cols) != EXPECTED_QUESTIONS:
-                raise ValueError(f"Expected {EXPECTED_QUESTIONS} questions, not {len(question_cols):,}")
+                logger.warning(
+                    "Skipping variable derivation for %s %s-survey: expected %s confidence questions, found %s",
+                    module_name,
+                    survey_type,
+                    EXPECTED_QUESTIONS,
+                    len(question_cols),
+                )
+                continue
 
-            module_df: pd.DataFrame = survey_df[["name", "id"] + question_cols].copy(deep=True).dropna(subset=["name", "id"])
+            module_df: pd.DataFrame = survey_df[[name_col, id_col] + question_cols].copy(deep=True).dropna(subset=[name_col, id_col])
+            module_df = module_df.rename(columns={name_col: "name", id_col: "id"})
             module_df["name"] = module_df["name"].astype(str)
+            module_df["id"] = pd.to_numeric(module_df["id"], errors="coerce")
+            module_df = module_df.dropna(subset=["id"])
             module_df["id"] = module_df["id"].astype(int)
-            user_dfs.append(module_df[["name", "id"]])
 
             # Merging pre columns to calculate deltas
             if survey_type == "Post":
+                if pre_module_df is None:
+                    logger.warning(
+                        "Skipping %s post-survey variable derivation because pre-survey confidence schema was unavailable",
+                        module_name,
+                    )
+                    continue
                 # If the module has a post survey, it will have a delta mean variable
                 delta_mean_variable = get_variable_name(variable_type="delta_mean", module_num=module_num)
                 microskill_rows.append({
@@ -193,13 +250,19 @@ def create_survey_variables(
             module_df[standard_deviation_variable] = module_df[numeric_microskill_variables].std(axis=1).round(2)
             if survey_type == "Pre":
                 pre_module_df = module_df.copy(deep=True)
+                module_result_df = module_df.copy(deep=True)
             elif survey_type == "Post":
                 pre_mean_variable: str = get_variable_name(variable_type="mean", module_num=module_num, survey_type="Pre")
                 module_df[delta_mean_variable] = (module_df[mean_variable] - module_df[pre_mean_variable]).round(2)
+                module_result_df = module_df.copy(deep=True)
 
-        module_dfs.append(module_df)
+        if module_result_df is not None:
+            module_dfs.append(module_result_df)
 
-    all_users = pd.concat(user_dfs).drop_duplicates().sort_values(by=["name"], ascending=True)
+    if user_dfs:
+        all_users = pd.concat(user_dfs).drop_duplicates().sort_values(by=["name"], ascending=True)
+    else:
+        all_users = pd.DataFrame(columns=["name", "id"])
 
     for module_df in module_dfs:
         all_users = all_users.merge(module_df, how="left", on=["name", "id"])

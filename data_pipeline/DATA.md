@@ -16,3 +16,12 @@ pip install -r requirements.txt
 python -m data_pipeline --input "path_to_raw_input_folder"
 ```
 
+### Notes
+
+- The pipeline discovers module surveys, Qualtrics exports, the enrollment workbook, and the optional combined survey workbook automatically.
+- It creates an auto-filled workbook copy in `<input>/output/` named like:
+	- `*_Master_Data_AUTOFILLED.xlsx`
+- It also writes matching/mapping audits to help review identity resolution decisions:
+	- `name_match_audit.csv`
+	- `qualtrics_column_mapping.csv`
+

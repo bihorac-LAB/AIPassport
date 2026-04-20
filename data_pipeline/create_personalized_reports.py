@@ -2,7 +2,10 @@ import logging
 import os
 import pandas as pd
 
-import inflect # used to convert numbers to words
+try:
+    import inflect  # used to convert numbers to words
+except ImportError:
+    inflect = None
 
 from dataclasses import dataclass
 from docx import Document
@@ -59,11 +62,11 @@ def create_personalized_reports(final_data_fp: str, microskill_fp: str, output_d
     # This dataframe is one row per person
     final_data = pd.read_csv(final_data_fp)
 
-    logger.info(f" ----- CREATING ALL PERSONALIZED REPORTS FOR {final_data["name"].nunique():,} STUDENTS -----")
+    logger.info(f" ----- CREATING ALL PERSONALIZED REPORTS FOR {final_data['name'].nunique():,} STUDENTS -----")
 
     for idx, row in final_data.iterrows():
         student_name: str = row["name"]
-        document_fp = os.path.join(report_dir, f"{student_name.replace(" ", "_")}_Personalized_Report.docx")
+        document_fp = os.path.join(report_dir, f"{student_name.replace(' ', '_')}_Personalized_Report.docx")
 
         def has_value(x):
             return not (pd.isna(x) or x == 0)
@@ -76,9 +79,12 @@ def create_personalized_reports(final_data_fp: str, microskill_fp: str, output_d
             if has_value(pre) and has_value(post):
                 max_module = max(max_module, module_num)
     
-        # This engine can convert numbers to words
-        inflect_engine = inflect.engine()
-        max_module_str = inflect_engine.number_to_words(max_module)
+        # Convert numbers to words when inflect is available.
+        if inflect is not None:
+            inflect_engine = inflect.engine()
+            max_module_str = inflect_engine.number_to_words(max_module)
+        else:
+            max_module_str = str(max_module)
 
         first_name = student_name.split(" ")[0]
 
@@ -163,7 +169,7 @@ def create_personalized_reports(final_data_fp: str, microskill_fp: str, output_d
             for i in range(1, len(table.rows)):
                 if i % 2 == 1:
                     for cell in table.rows[i].cells:
-                        shading = parse_xml(f'<w:shd {nsdecls("w")} w:fill="{'#D9E1F2'.lstrip("#")}"/>')
+                        shading = parse_xml(f'<w:shd {nsdecls("w")} w:fill="D9E1F2"/>')
                         cell._element.get_or_add_tcPr().append(shading)
 
             # 5.2c. Fill in microskill text
@@ -226,7 +232,8 @@ def create_personalized_reports(final_data_fp: str, microskill_fp: str, output_d
 
             # 5.3 Add a small label displaying means and delta
             if not isinstance(delta_value, str):
-                label_text = f"Average across microskills: {pre_survey_mean} → {post_survey_mean}   (Δ {"+" if module_delta_mean > 0 else ""}{module_delta_mean} on the 1-5 confidence scale)"
+                delta_prefix = "+" if module_delta_mean > 0 else ""
+                label_text = f"Average across microskills: {pre_survey_mean} → {post_survey_mean}   (Δ {delta_prefix}{module_delta_mean} on the 1-5 confidence scale)"
                 label_style = TextStyling(font_size=9, color="#555555", italic=True)
                 add_styled_paragraph(doc=doc, text=label_text, style=label_style)
             else:
