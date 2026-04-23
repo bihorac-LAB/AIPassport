@@ -19,6 +19,9 @@ from .discovery import DiscoveredInputs
 NON_ALNUM_PATTERN = re.compile(r"[^a-z0-9]+")
 MODULE_PRE_MEAN_PATTERN = re.compile(r"^M(\d+)_Pre_Mean$")
 MODULE_MEAN_PATTERN = re.compile(r"^M(\d+)_(Pre|Post)_Mean$")
+MODULE_SURVEY_COLUMN_PATTERN = re.compile(
+    r"^M(?P<module>\d+)_(?:(?P<phase>Pre|Post)_(?:MS(?P<microskill>\d+)(?P<numeric>_N)?|(?P<stat>Mean|SD))|Delta_(?:MS(?P<delta_microskill>\d+)|(?P<delta_stat>Mean)))$"
+)
 DEFAULT_MASTER_WORKBOOK_STEM = "AIP_Spring2026_Master_Data"
 CORE_MASTER_COLUMNS = [
     "Name",
@@ -762,13 +765,74 @@ def read_template_master_headers(template_fp: str | None, logger: logging.Logger
         workbook.close()
 
 
+def is_module_survey_column(column_name: str) -> bool:
+    return bool(MODULE_SURVEY_COLUMN_PATTERN.match(str(column_name).strip()))
+
+
+def module_survey_column_sort_key(column_name: str) -> tuple[int, int, int, int, int, str]:
+    column_text = str(column_name).strip()
+    match = MODULE_SURVEY_COLUMN_PATTERN.match(column_text)
+    if not match:
+        return 99, 99_999, 99, 99, 99_999, column_text.lower()
+
+    module_number = int(match.group("module"))
+    phase = match.group("phase")
+    phase_order = 0 if phase == "Pre" else 1
+    microskill = match.group("microskill")
+
+    if phase and microskill and not match.group("numeric"):
+        return 0, module_number, phase_order, 0, int(microskill), column_text.lower()
+
+    if phase and microskill and match.group("numeric"):
+        return 1, module_number, phase_order, 0, int(microskill), column_text.lower()
+
+    stat = match.group("stat")
+    if phase and stat:
+        stat_order = 1 if stat == "Mean" else 2
+        return 1, module_number, phase_order, stat_order, 0, column_text.lower()
+
+    delta_microskill = match.group("delta_microskill")
+    if delta_microskill:
+        return 2, module_number, 0, 0, int(delta_microskill), column_text.lower()
+
+    return 2, module_number, 0, 1, 0, column_text.lower()
+
+
+def order_module_survey_columns(columns: list[str]) -> list[str]:
+    return sorted(
+        {str(column_name).strip() for column_name in columns if str(column_name).strip()},
+        key=module_survey_column_sort_key,
+    )
+
+
+def order_microskill_key_rows(microskill_df: pd.DataFrame) -> pd.DataFrame:
+    if microskill_df.empty or "Variable" not in microskill_df.columns:
+        return microskill_df
+
+    ordered_rows = microskill_df.to_dict("records")
+    ordered_rows.sort(key=lambda row: module_survey_column_sort_key(row.get("Variable", "")))
+    return pd.DataFrame(ordered_rows, columns=microskill_df.columns)
+
+
 def build_master_headers(
     template_headers: list[str],
     qualtrics_agg: dict[str, pd.DataFrame],
     module_agg: pd.DataFrame,
 ) -> list[str]:
-    module_columns = sorted(
-        {column_name for column_name in module_agg.columns if column_name not in {"Canvas_ID_module"}},
+    template_headers = [header for header in template_headers if str(header).strip()]
+    module_columns = order_module_survey_columns(
+        [
+            column_name
+            for column_name in list(template_headers) + list(module_agg.columns)
+            if column_name not in {"Canvas_ID_module"} and is_module_survey_column(column_name)
+        ]
+    )
+    supplemental_module_columns = sorted(
+        {
+            column_name
+            for column_name in module_agg.columns
+            if column_name not in {"Canvas_ID_module"} and not is_module_survey_column(column_name)
+        },
         key=lambda value: value.lower(),
     )
     qualtrics_columns = sorted(
@@ -781,13 +845,21 @@ def build_master_headers(
         key=lambda value: value.lower(),
     )
 
-    master_headers = [header for header in template_headers if str(header).strip()]
+    first_module_header_idx = next(
+        (idx for idx, header in enumerate(template_headers) if is_module_survey_column(header)),
+        None,
+    )
+    master_headers = [header for header in template_headers if not is_module_survey_column(header)]
     if not master_headers:
         master_headers = CORE_MASTER_COLUMNS.copy()
 
-    for column_name in CORE_MASTER_COLUMNS + qualtrics_columns + module_columns:
+    for column_name in CORE_MASTER_COLUMNS + qualtrics_columns + supplemental_module_columns:
         if column_name not in master_headers:
             master_headers.append(column_name)
+
+    if module_columns:
+        insert_at = first_module_header_idx if first_module_header_idx is not None else len(master_headers)
+        master_headers[insert_at:insert_at] = [column_name for column_name in module_columns if column_name not in master_headers]
 
     if "Name" not in master_headers:
         master_headers.insert(0, "Name")
@@ -1464,6 +1536,8 @@ def create_master_workbook(
         microskill_df = pd.read_csv(microskill_fp)
     else:
         microskill_df = pd.DataFrame()
+
+    microskill_df = order_microskill_key_rows(microskill_df)
 
     if not microskill_headers:
         if not microskill_df.empty:
