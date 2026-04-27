@@ -3,3 +3,4 @@ venv/
 
 ignore
 __pycache__
+.env

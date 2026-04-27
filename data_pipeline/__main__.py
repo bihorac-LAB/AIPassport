@@ -6,6 +6,7 @@ import os
 from .discovery import discover_input_files
 from .load_names import create_name_master_file
 from .create_survey_variables import create_survey_variables
+from .create_reflection_journal_results import create_reflection_journal_results
 from .create_personalized_reports import create_personalized_reports
 from .create_master_workbook import create_master_workbook
 
@@ -62,19 +63,26 @@ if __name__ == "__main__":
         logger=logger
     )
 
-
-    # 2. Create the latest, most updated survey variables using all module pre/post surveys.
-    final_data_fp, microskill_fp = create_survey_variables(pre_survey_files=pre_survey_files, end_of_module_files=end_of_module_files, output_dir=output_dir, logger=logger)
+    # 2. Obtain reflection journal results. Can return None if there is an issue with Canvas API
+    reflection_journal_fp, reflection_journal_keys_fp = create_reflection_journal_results(inmd_dir=inmd_dir, logger=logger)
     
-    # 3. Create a personalized report document for each student that took at least one module survey.
+    # 3. Create the latest, most updated survey variables using all module pre/post surveys.
+    final_data_fp, microskill_fp = create_survey_variables(
+        pre_survey_files=pre_survey_files, end_of_module_files=end_of_module_files, 
+        reflection_journal_fp=reflection_journal_fp,
+        output_dir=output_dir, logger=logger
+    )
+    
+    # 4. Create a personalized report document for each student that took at least one module survey.
     create_personalized_reports(final_data_fp=final_data_fp, microskill_fp=microskill_fp, output_dir=output_dir, logger=logger)
 
-    # 4. Build a copy of the master workbook and auto-populate Master_Data + Microskill_Key.
+    # 5. Build a copy of the master workbook and auto-populate Master_Data + Microskill_Key.
     create_master_workbook(
         input_dir=input_dir,
         output_dir=output_dir,
         final_data_fp=final_data_fp,
         microskill_fp=microskill_fp,
+        reflection_journal_keys_fp=reflection_journal_keys_fp, 
         discovered_inputs=discovered_inputs,
         logger=logger,
     )

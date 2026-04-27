@@ -60,6 +60,7 @@ def get_variable_name(variable_type: str, module_num: int, survey_type: str = No
 def create_survey_variables(
     pre_survey_files: list[str], 
     end_of_module_files: list[str], 
+    reflection_journal_fp: str | None,
     output_dir: str, 
     logger: logging.Logger
 ) -> tuple[str, str]:
@@ -266,6 +267,13 @@ def create_survey_variables(
 
     for module_df in module_dfs:
         all_users = all_users.merge(module_df, how="left", on=["name", "id"])
+
+    if isinstance(reflection_journal_fp, str):
+        reflection_journal = pd.read_csv(reflection_journal_fp).drop(columns=["user_name"]).rename(columns={"user_id" : "id"})
+        all_users = all_users.merge(reflection_journal, how="left", on=["id"], validate="one_to_one")
+        logger.info("Appended reflection journal to all_users")
+    else:
+        logger.warning("No reflection journal to append to all_users")
 
     final_data_fp = os.path.join(output_dir, "final_data.csv")
     all_users.to_csv(final_data_fp, index=False)

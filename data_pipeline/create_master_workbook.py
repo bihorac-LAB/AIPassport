@@ -1002,13 +1002,15 @@ def compute_progress_metrics(
     for module_number in sorted(module_numbers):
         pre_col = f"M{module_number}_Pre_Mean"
         post_col = f"M{module_number}_Post_Mean"
+        pass_col = f"M{module_number}_RJ_Passed"
 
         pre_taken = source_df[pre_col].reindex(master_df.index).notna() if pre_col in source_df.columns else pd.Series(False, index=master_df.index)
         post_taken = source_df[post_col].reindex(master_df.index).notna() if post_col in source_df.columns else pd.Series(False, index=master_df.index)
-
-        any_activity = pre_taken | post_taken
+        rj_passed = source_df[pass_col].reindex(master_df.index).fillna(0) == 1 if pass_col in source_df.columns else pd.Series(False, index=master_df.index)
+    
+        any_activity = pre_taken | post_taken | rj_passed
         highest = highest.where(~any_activity, module_number)
-        completed = completed + (pre_taken & post_taken).astype("Int64")
+        completed = completed + (pre_taken & post_taken & rj_passed).astype("Int64")
 
     completion_rate = pd.Series(pd.NA, index=master_df.index, dtype="object")
     has_progress = highest > 0
@@ -1266,6 +1268,7 @@ def create_master_workbook(
     output_dir: str,
     final_data_fp: str,
     microskill_fp: str,
+    reflection_journal_keys_fp: str | None,
     discovered_inputs: DiscoveredInputs,
     logger: logging.Logger,
 ) -> str | None:
@@ -1507,6 +1510,8 @@ def create_master_workbook(
         workbook.create_sheet("Microskill_Key")
     if "Audit_Notes" not in workbook.sheetnames:
         workbook.create_sheet("Audit_Notes")
+    if "Reflection_Journal_Key" not in workbook.sheetnames:
+        workbook.create_sheet("Reflection_Journal_Key")
 
     master_sheet = workbook["Master_Data"]
     yes_style, no_style = extract_yes_no_styles(master_sheet)
@@ -1536,6 +1541,21 @@ def create_master_workbook(
         microskill_df = pd.read_csv(microskill_fp)
     else:
         microskill_df = pd.DataFrame()
+
+    if reflection_journal_keys_fp and os.path.exists(reflection_journal_keys_fp):
+        reflection_journal_keys = pd.read_csv(reflection_journal_keys_fp)
+    else:
+        reflection_journal_keys = pd.DataFrame()
+    rj_sheet = workbook["Reflection_Journal_Key"]
+
+    if not reflection_journal_keys.empty:
+        rj_headers = [str(col) for col in reflection_journal_keys.columns]
+
+        ensure_sheet_headers(rj_sheet, rj_headers)
+        write_dataframe_to_sheet(rj_sheet, reflection_journal_keys, rj_headers)
+    else:
+        rj_headers = ["Variable", "Description", "Module Number"]
+        ensure_sheet_headers(rj_sheet, rj_headers)
 
     microskill_df = order_microskill_key_rows(microskill_df)
 
