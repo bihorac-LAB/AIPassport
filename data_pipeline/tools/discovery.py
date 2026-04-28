@@ -45,7 +45,7 @@ def _is_pre_module_file(file_name: str) -> bool:
 
 def _is_post_module_file(file_name: str) -> bool:
     lower = file_name.lower()
-    return "module" in lower and (("end-of-module" in lower) or ("post" in lower)) and "survey" in lower
+    return ("module" in lower) and ("end-of-module" in lower) and ("survey" in lower)
 
 
 def _looks_like_qualtrics(file_path: str) -> bool:

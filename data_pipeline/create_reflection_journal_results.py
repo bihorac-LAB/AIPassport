@@ -11,6 +11,8 @@ from canvasapi.course import Course
 from canvasapi.discussion_topic import DiscussionEntry, DiscussionTopic
 from canvasapi.paginated_list import PaginatedList
 
+from .tools.consts import reflection_journal_col
+
 logging.getLogger("canvasapi").setLevel(logging.WARNING)
 logging.getLogger("requests").setLevel(logging.WARNING)
 logging.getLogger("urllib3").setLevel(logging.WARNING)
@@ -21,14 +23,6 @@ load_dotenv()
 API_KEY = os.getenv("API_KEY", None)
 CANVAS_URL = os.getenv("CANVAS_URL", None)
 COURSE_ID = os.getenv("COURSE_ID", None)
-
-def reflection_journal_col(module_num: str, col_type: Literal["post", "reply", "passed"]) -> str:
-    if col_type == "post":
-        return f"M{module_num}_RJ_Posted"
-    elif col_type == "reply":
-        return f"M{module_num}_RJ_Reply_Count"
-    elif col_type == "passed":
-        return f"M{module_num}_RJ_Passed"
 
 def get_all_replies(entry: DiscussionEntry) -> list[DiscussionEntry]:
     """

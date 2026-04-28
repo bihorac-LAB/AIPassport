@@ -3,7 +3,7 @@ import sys
 
 import os
 
-from .discovery import discover_input_files
+from .tools.discovery import discover_input_files
 from .load_names import create_name_master_file
 from .create_survey_variables import create_survey_variables
 from .create_reflection_journal_results import create_reflection_journal_results

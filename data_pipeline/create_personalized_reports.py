@@ -13,8 +13,7 @@ from docx.shared import Pt, RGBColor
 from docx.oxml import parse_xml
 from docx.oxml.ns import nsdecls
 
-from .tools.consts import module_names, get_microskill_description
-from .create_survey_variables import get_variable_name
+from .tools.consts import module_names, get_microskill_description, get_variable_name
 
 def hex_to_rgb(hex_color: str) -> RGBColor:
     hex_color = hex_color.lstrip("#")
@@ -64,27 +63,32 @@ def create_personalized_reports(final_data_fp: str, microskill_fp: str, output_d
 
     logger.info(f" ----- CREATING ALL PERSONALIZED REPORTS FOR {final_data['name'].nunique():,} STUDENTS -----")
 
-    for idx, row in final_data.iterrows():
+    for _, row in final_data.iterrows():
         student_name: str = row["name"]
         document_fp = os.path.join(report_dir, f"{student_name.replace(' ', '_')}_Personalized_Report.docx")
 
         def has_value(x):
-            return not (pd.isna(x) or x == 0)
+            return not (pd.isna(x) or x == 0 or x is None)
 
-        max_module = 0
+        max_module_started = 0
+        max_module_completed = 0
+
         for module_num in modules:
             pre = row[get_variable_name("mean", module_num, "Pre")]
-            post = row[get_variable_name("mean", module_num, "Post")]
+            post_mean_col = get_variable_name("mean", module_num, "Post")
+            post = row[post_mean_col] if post_mean_col in row.index else None
 
-            if has_value(pre) and has_value(post):
-                max_module = max(max_module, module_num)
+            if has_value(pre):
+                max_module_started = max(max_module_started, module_num)
+            if has_value(post):
+                max_module_completed = max(max_module_completed, module_num)
     
         # Convert numbers to words when inflect is available.
         if inflect is not None:
             inflect_engine = inflect.engine()
-            max_module_str = inflect_engine.number_to_words(max_module)
+            max_module_str = inflect_engine.number_to_words(max_module_started)
         else:
-            max_module_str = str(max_module)
+            max_module_str = str(max_module_started)
 
         first_name = student_name.split(" ")[0]
 
@@ -103,10 +107,12 @@ def create_personalized_reports(final_data_fp: str, microskill_fp: str, output_d
         add_styled_paragraph(doc=doc, text=name_text, style=name_text_style)
 
         # 3. An italic message showing the module number completed
-        if max_module <= 0:
+        if max_module_started <= 0:
             module_completer_text = "Limited engagement"
+        elif max_module_completed < max_module_started:
+            module_completer_text = f"Engaged through module {max_module_started}"
         else:
-            module_completer_text = f"Module {max_module} completer"
+            module_completer_text = f"Module {max_module_completed} completer"
             # Another example: Engaged through Module 5 (didnt really do much in module 5, but did all the rest.)
     
         module_summary_text = f"Spring 2026 Cohort  • {module_completer_text}"
@@ -133,18 +139,19 @@ def create_personalized_reports(final_data_fp: str, microskill_fp: str, output_d
             pre_survey_mean = row[pre_survey_mean_col]
 
             post_survey_mean_col = get_variable_name(variable_type="mean", module_num=module_num, survey_type="Post")
-            post_survey_mean = row[post_survey_mean_col]
+            post_survey_mean = row[post_survey_mean_col] if post_survey_mean_col in row.index else None
 
             module_delta_mean_col = get_variable_name(variable_type="delta_mean", module_num=module_num)
-            module_delta_mean = row[module_delta_mean_col]
+            module_delta_mean = row[module_delta_mean_col] if module_delta_mean_col in row.index else None
 
             # Module tables are only created if the pre survey is taken, at the minimum
             if not has_value(pre_survey_mean) and not has_value(post_survey_mean):
                 continue
             
             pre_survey_mean = round(pre_survey_mean, 1)
-            post_survey_mean = round(post_survey_mean, 1)
-            module_delta_mean = round(module_delta_mean, 1)
+            if has_value(post_survey_mean):
+                post_survey_mean = round(post_survey_mean, 1)
+                module_delta_mean = round(module_delta_mean, 1)
 
             # 5.1. The table header
             table_header_text = module_names.get(module_num)
@@ -181,13 +188,21 @@ def create_personalized_reports(final_data_fp: str, microskill_fp: str, output_d
                 delta_value_col = get_variable_name(variable_type="delta_microskill", module_num=module_num, microskill_num=microskill_num)
 
                 before_value: str = row[before_value_col]
-                after_value: str | None = row[after_value_col]
-                delta_value: int | None = row[delta_value_col]
+                after_value: str | None = row[after_value_col] if after_value_col in row.index else None
+                delta_value: int | None = row[delta_value_col] if delta_value_col in row.index else None
 
-                if pd.isna(after_value):
+
+                # if "ivan" in first_name.lower():
+                #     print(f" {first_name} M{module_num} MS{microskill_num} before_value: {after_value} ({type(after_value)})")
+                if not has_value(before_value):
+                    before_value = "—"
+
+                # if pd.isna(after_value):
+                if not has_value(after_value):
                     after_value = "—"
 
-                if pd.isna(delta_value):
+                # if pd.isna(delta_value):
+                if not has_value(delta_value):
                     delta_value = "—"
                 else:
                     delta_value = int(delta_value)
@@ -247,7 +262,7 @@ def create_personalized_reports(final_data_fp: str, microskill_fp: str, output_d
         add_styled_paragraph(doc=doc, text=last_header_text, style=last_header_style)
 
         # 7. Last Paragraph
-        if max_module < overall_max_module:
+        if max_module_completed < overall_max_module:
             last_paragraph_text = (
                 "You are invited to continue on our Rolling Completion Track: 90 days of Canvas access to the remaining modules, "
                 "no required live sessions, and the same completion certificate as cohort completers. For each module you finish, "
