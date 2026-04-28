@@ -2,6 +2,7 @@ import pandas as pd
 import os
 import logging
 
+from .tools.data_utils import find_case_insensitive_column
 
 def _find_registry_header_row(registry_fp: str, sheet_name: str) -> int:
     """Finds the header row in an enrollment workbook by scanning for key fields."""
@@ -55,12 +56,7 @@ def _select_best_name_column_pair(
     return best_pair[0], best_pair[1], best_score[0], best_score[1]
 
 
-def _find_case_insensitive_column(df: pd.DataFrame, expected: str) -> str | None:
-    expected_lower = expected.strip().lower()
-    for col in df.columns:
-        if str(col).strip().lower() == expected_lower:
-            return col
-    return None
+
 
 def load_module_names(end_of_module_files: list[str], pre_survey_files: list[str], logger: logging.Logger) -> list[dict]:
     """
@@ -92,8 +88,8 @@ def load_module_names(end_of_module_files: list[str], pre_survey_files: list[str
 
         for file in files:
             df = pd.read_csv(file)
-            name_col = _find_case_insensitive_column(df, "name")
-            id_col = _find_case_insensitive_column(df, "id")
+            name_col = find_case_insensitive_column(df, "name")
+            id_col = find_case_insensitive_column(df, "id")
 
             if name_col is None or id_col is None:
                 logger.warning(

@@ -3,8 +3,8 @@ import logging
 import os
 import re
 
-from .tools.consts import module_names, EXPECTED_QUESTIONS, survey_responses
-
+from .tools.consts import module_names, EXPECTED_QUESTIONS, survey_responses, get_variable_name
+from .tools.data_utils import find_case_insensitive_column
 
 MODULE_NUMBER_PATTERN = re.compile(r"module\s*(\d+)", flags=re.IGNORECASE)
 
@@ -16,50 +16,10 @@ def _extract_module_number_from_path(file_path: str) -> int:
     return int(match.group(1))
 
 
-def _find_case_insensitive_column(df: pd.DataFrame, expected: str) -> str | None:
-    expected_lower = expected.strip().lower()
-    for col in df.columns:
-        if str(col).strip().lower() == expected_lower:
-            return col
-    return None
-
-def get_variable_name(variable_type: str, module_num: int, survey_type: str = None, microskill_num: int = None) -> str:
-    """ 
-    Returns the name of the variable for the given parameters.
-
-    Variables types are listed as follows:
-        - delta_mean: The change in mean between post and pre survey mean for the given module
-        - mean: The mean response value of the survey type for the given module
-        - standard_deviation: The standard deviation of the survey type for the given module
-        - microskill: The response provided for the microskill of the survey type for the given module
-        - numeric_microskill: The numeric version (1-5) of the response provided for the microskill of the survey type for the given module
-        - delta_microskill: The difference between the post and pre surveys' numeric microskill value
-    """
-
-    variable_type_to_variable_name = {
-        "delta_mean" : f"M{module_num}_Delta_Mean",
-        "mean" : f"M{module_num}_{survey_type}_Mean",
-        "standard_deviation" : f"M{module_num}_{survey_type}_SD",
-        "microskill": f"M{module_num}_{survey_type}_MS{microskill_num}",
-        "numeric_microskill": f"M{module_num}_{survey_type}_MS{microskill_num}_N",
-        "delta_microskill": f"M{module_num}_Delta_MS{microskill_num}"
-    }
-
-    if variable_type not in variable_type_to_variable_name.keys():
-        raise ValueError("Invalid variable type.")
-
-    if "microskill" in variable_type and microskill_num is None:
-        raise ValueError("Must provide microskill_num for a microskill variable name.")
-
-    if survey_type is None and "delta" not in variable_type:
-        raise ValueError("Must provide survey_type for non-delta variable names.")
-
-    return variable_type_to_variable_name.get(variable_type)
-
-
 def create_survey_variables(
     pre_survey_files: list[str], 
     end_of_module_files: list[str], 
+    reflection_journal_fp: str | None,
     output_dir: str, 
     logger: logging.Logger
 ) -> tuple[str, str]:
@@ -114,8 +74,8 @@ def create_survey_variables(
             survey_type_to_survey["Post"] = pd.read_csv(post_by_module[module_num])
 
         for survey_type, survey_df in survey_type_to_survey.items():
-            name_col = _find_case_insensitive_column(survey_df, "name")
-            id_col = _find_case_insensitive_column(survey_df, "id")
+            name_col = find_case_insensitive_column(survey_df, "name")
+            id_col = find_case_insensitive_column(survey_df, "id")
             if name_col is None or id_col is None:
                 logger.warning(
                     "Skipping %s %s-survey: expected name/id columns (case-insensitive)",
@@ -266,6 +226,13 @@ def create_survey_variables(
 
     for module_df in module_dfs:
         all_users = all_users.merge(module_df, how="left", on=["name", "id"])
+
+    if isinstance(reflection_journal_fp, str):
+        reflection_journal = pd.read_csv(reflection_journal_fp).drop(columns=["user_name"]).rename(columns={"user_id" : "id"})
+        all_users = all_users.merge(reflection_journal, how="left", on=["id"], validate="one_to_one")
+        logger.info("Appended reflection journal to all_users")
+    else:
+        logger.warning("No reflection journal to append to all_users")
 
     final_data_fp = os.path.join(output_dir, "final_data.csv")
     all_users.to_csv(final_data_fp, index=False)
