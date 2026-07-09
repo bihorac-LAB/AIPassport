@@ -1,0 +1,25 @@
+{
+  "title": "Genomic AI Reproducibility",
+  "module": "Module 3 - Data Stewardship",
+  "microskill": "3.3",
+  "track": "basic",
+  "audience": "Basic science learners studying how annotation disagreement affects genomic AI reliability.",
+  "objectives": [
+    "Simulate or upload researcher annotation data.",
+    "Measure annotation agreement with ICC.",
+    "Train a random forest model on consensus labels.",
+    "Inspect researcher variance, AI predictions, and raw data."
+  ],
+  "sections": [
+    {"name": "Research Setup", "purpose": "Choose simulation or CSV upload and configure annotation variability."},
+    {"name": "Annotation Consistency", "purpose": "Use ICC to quantify researcher agreement."},
+    {"name": "AI Model Training", "purpose": "Train on consensus labels and inspect prediction error."},
+    {"name": "Visual Inspection", "purpose": "Compare annotations, model predictions, and raw data."}
+  ],
+  "chatbot_guidance": [
+    "Explain ICC as a reproducibility signal.",
+    "Connect high annotation variability to weaker model reliability.",
+    "Tell learners not to upload sensitive genetic or patient data.",
+    "Keep answers short and step-by-step."
+  ]
+}

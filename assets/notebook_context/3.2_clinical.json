@@ -1,0 +1,26 @@
+{
+  "title": "Ethical Data Acquisition Audit",
+  "module": "Module 3 - Data Stewardship",
+  "microskill": "3.2",
+  "track": "clinical",
+  "audience": "Clinical learners auditing whether patient-facing datasets are ethically acquired and fit for AI use.",
+  "objectives": [
+    "Review autonomy, justice, privacy, and beneficence as clinical data acquisition pillars.",
+    "Revise consent language for clearer patient understanding.",
+    "Evaluate representation gaps and recruitment strategies.",
+    "Select privacy controls and return-of-value practices."
+  ],
+  "sections": [
+    {"name": "Intro: The Four Pillars", "purpose": "Frame the ethical audit target and learner role."},
+    {"name": "Autonomy: Consent Audit", "purpose": "Compare legalistic consent language with patient-centered language."},
+    {"name": "Justice: Representation Audit", "purpose": "Use recruitment strategies to close representation gaps."},
+    {"name": "Privacy: Security Audit", "purpose": "Select layered security controls and inspect risk status."},
+    {"name": "Beneficence: Impact Audit", "purpose": "Complete the ethical data cycle by returning value to patients and communities."}
+  ],
+  "chatbot_guidance": [
+    "Guide learners through the audit activity selector.",
+    "Explain the four pillars in practical clinical data terms.",
+    "Help interpret pass or fail states without overcomplicating the answer.",
+    "Keep answers short and step-by-step."
+  ]
+}

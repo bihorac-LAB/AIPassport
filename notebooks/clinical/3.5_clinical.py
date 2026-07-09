@@ -1,33 +1,10 @@
 import streamlit as st
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
-import seaborn as sns
+import plotly.express as px
 from scipy.stats import zscore
 from sklearn.impute import SimpleImputer
 from sklearn.preprocessing import StandardScaler, MinMaxScaler
-import psutil
-import os
-
-# --- PAGE CONFIG ---
-st.set_page_config(
-    page_title="Cardiovascular Risk Data Preprocessing",
-    layout="wide",
-    initial_sidebar_state="expanded"
-)
-
-# --- MONITORING UTILITY ---
-def display_performance_monitor():
-    """Tracks CPU and RAM usage of the current Streamlit process."""
-    process = psutil.Process(os.getpid())
-    mem_mb = process.memory_info().rss / (1024 * 1024)
-    cpu_percent = process.cpu_percent(interval=0.1)
-    
-    st.sidebar.markdown("---")
-    st.sidebar.caption("**System Health Monitor**")
-    c1, c2 = st.sidebar.columns(2)
-    c1.metric("CPU Load", f"{cpu_percent}%")
-    c2.metric("RAM", f"{mem_mb:.1f} MB")
 
 # --- DATA GENERATION (Fixed Seed for Reproducibility) ---
 @st.cache_data
@@ -49,56 +26,53 @@ def load_data():
 raw_df = load_data()
 df = raw_df.copy()
 
-# --- SIDEBAR CONTROLS ---
-st.sidebar.title("Preprocessing Controls")
-
-st.sidebar.markdown("### 1. Outlier Handling")
-enable_outlier_handling = st.sidebar.checkbox(
-    "Apply Winsorization", 
-    value=True,
-    help="Caps extreme values at specified percentiles to reduce the impact of outliers without removing data points."
-)
-
-if enable_outlier_handling:
-    winsor_lower = st.sidebar.slider(
-        "Lower Percentile Cap", 0, 10, 5, 
-        help="Values below this percentile will be replaced with the value at this percentile."
-    )
-    winsor_upper = st.sidebar.slider(
-        "Upper Percentile Cap", 90, 100, 95,
-        help="Values above this percentile will be replaced with the value at this percentile."
-    )
-
-st.sidebar.markdown("### 2. Missing Data")
-imputation_strategy = st.sidebar.radio(
-    "Imputation Strategy",
-    options=["Mean", "Median", "Drop Rows"],
-    index=0,
-    help="Choose how to handle missing values in 'Missing_Feature'. Mean is sensitive to outliers; Median is more robust."
-)
-
-st.sidebar.markdown("### 3. Feature Scaling")
-scaling_method = st.sidebar.selectbox(
-    "Scaling Method",
-    options=["StandardScaler (Z-Score)", "MinMaxScaler (0-1)", "None"],
-    index=0,
-    help="StandardScaler centers data around 0 (good for outliers). MinMaxScaler squeezes data between 0 and 1."
-)
-
-display_performance_monitor()
-
 # --- MAIN UI ---
-st.title("Cardiovascular Risk: Data Preprocessing Lab")
+st.title("3.5 Cardiovascular Risk Data Preprocessing Lab")
 
 with st.expander("**Read Case Study & Instructions**", expanded=True):
     st.markdown("""
     **The Case:** A hospital's AI model failed to predict a severe cardiac event because it was fed noisy data containing equipment errors (outliers) and missing test results.
     
-    **Your Task:** Use the controls in the sidebar to clean the dataset.
+    **Your Task:** Use the controls below to clean the dataset.
     1.  **Outliers:** extreme values in Blood Pressure or Cholesterol skew the mean. Use **Winsorization** to cap them.
     2.  **Missing Data:** Some patient records have gaps. Choose an **Imputation** method to fill them.
     3.  **Scaling:** Algorithms struggle when variables have different units (e.g., Age vs. Glucose). Apply **Scaling** to normalize them.
-    """)
+	    """)
+
+with st.expander("Preprocessing Controls", expanded=True):
+    enable_outlier_handling = st.checkbox(
+        "Apply Winsorization",
+        value=True,
+        help="Caps extreme values at specified percentiles to reduce the impact of outliers without removing data points."
+    )
+
+    c1, c2, c3 = st.columns(3)
+    if enable_outlier_handling:
+        winsor_lower = c1.slider(
+            "Lower Percentile Cap", 0, 10, 5,
+            help="Values below this percentile will be replaced with the value at this percentile."
+        )
+        winsor_upper = c2.slider(
+            "Upper Percentile Cap", 90, 100, 95,
+            help="Values above this percentile will be replaced with the value at this percentile."
+        )
+    else:
+        winsor_lower = 5
+        winsor_upper = 95
+
+    imputation_strategy = c3.radio(
+        "Imputation Strategy",
+        options=["Mean", "Median", "Drop Rows"],
+        index=0,
+        help="Choose how to handle missing values in Missing_Feature."
+    )
+
+    scaling_method = st.selectbox(
+        "Scaling Method",
+        options=["StandardScaler (Z-Score)", "MinMaxScaler (0-1)", "None"],
+        index=0,
+        help="StandardScaler centers data around 0. MinMaxScaler squeezes data between 0 and 1."
+    )
 
 # --- PREPROCESSING LOGIC ---
 
@@ -167,14 +141,11 @@ with col1:
 
 with col2:
     st.subheader("Feature Distributions")
-    
-    fig, ax = plt.subplots(figsize=(10, 6))
-    
-    # Main Boxplot
-    sns.boxplot(data=df[clinical_features], ax=ax, palette="viridis")
-    ax.set_title(f"Distribution of Clinical Metrics ({scaling_method})")
-    ax.set_ylabel("Value (Scaled)" if scaling_method != "None" else "Value (Original Units)")
-    st.pyplot(fig)
+
+    plot_df = df[clinical_features].melt(var_name="Feature", value_name="Value")
+    fig = px.box(plot_df, x="Feature", y="Value", color="Feature", title=f"Distribution of Clinical Metrics ({scaling_method})")
+    fig.update_layout(height=460, showlegend=False, margin=dict(l=40, r=20, t=55, b=45))
+    st.plotly_chart(fig, use_container_width=True)
     
     st.markdown("""
     > **Observation:** > * Without **Winsorization**, notice how the box plots are "squashed" by the extreme outliers at the top.

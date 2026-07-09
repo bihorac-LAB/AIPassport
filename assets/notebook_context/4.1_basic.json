@@ -1,0 +1,12 @@
+{
+  "module": "4",
+  "microskill": "4.1",
+  "track": "basic",
+  "title": "Shared Biomedical AI Vocabulary",
+  "summary": "Introduces core machine-learning vocabulary through data exploration, preprocessing, decision-tree training, and cross-validation.",
+  "guide_notes": [
+    "Help learners connect model terminology to the visible activity stage.",
+    "Point out that the page uses the bundled diabetes dataset.",
+    "Emphasize train/test split, overfitting, interpretability, and evaluation metrics."
+  ]
+}

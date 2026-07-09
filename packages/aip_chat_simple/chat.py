@@ -35,6 +35,16 @@ def render_ai_guide(navigator_api_key: str, context_fn=None):
         st.error("Missing NAVIGATOR_TOOLKIT_API_KEY in secrets.")
         return
 
+    st.markdown(
+        """
+        <div style="padding: 0.25rem 0 0.75rem 0; border-bottom: 1px solid rgba(0,0,0,0.08); margin-bottom: 0.75rem;">
+            <div style="font-size: 1.15rem; font-weight: 700; color: #0021A5;">AIP Guide</div>
+            <div style="font-size: 0.85rem; color: #555; margin-top: 0.15rem;">Notebook help and activity guidance</div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
     client = OpenAI(
         api_key=navigator_api_key,
         base_url=cfg.NAVIGATOR_TOOLKIT_BASE_URL
@@ -75,12 +85,15 @@ def render_ai_guide(navigator_api_key: str, context_fn=None):
                 st.markdown(content)
 
     # ── 3. Quick-action buttons (just above chat input) ───────────────────────
-    cols = st.columns(2)
-    if cols[0].button("🖥️ What's on my screen?", use_container_width=True):
+    st.markdown("**Quick help**")
+    if st.button("How do I use this activity?", use_container_width=True):
+        st.session_state["_quick_action"] = "How do I use this activity and what controls are available?"
+        st.rerun()
+    if st.button("What's on my screen?", use_container_width=True):
         st.session_state["_quick_action"] = "Explain what's on my screen based on the current charts and values."
         st.rerun()
-    if cols[1].button("💡 How do I use this activity?", use_container_width=True):
-        st.session_state["_quick_action"] = "How do I use this activity and what controls are available?"
+    if st.button("Let's do this step by step", use_container_width=True):
+        st.session_state["_quick_action"] = "Walk me through this notebook step by step. Start with what I should do first, then wait for my next question."
         st.rerun()
 
     # ── 4. Chat input (renders in stBottom — always at the true bottom) ───────

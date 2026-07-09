@@ -1,10 +1,5 @@
 import streamlit as st
 
-st.set_page_config(
-    page_title="The Fundamental Principles of Bioethics Notebook - Clinician",
-    layout="centered"
-)
-
 st.title("2.1 The Fundamental Principles of Bioethics")
 st.subheader("Navigating AI and Bioethical Principles in Clinical Practice")
 st.markdown("---")
@@ -30,7 +25,7 @@ it could lead to discrimination, financial harm, and loss of privacy.
 """)
 st.markdown("---")
 
-st.header("1️⃣ Which of the four principles of bioethics apply here?")
+st.header("1. Which of the four principles of bioethics apply here?")
 
 bioethics_options = [
     "Autonomy (respecting patient choice and privacy)",
@@ -55,7 +50,7 @@ if st.button("Show Example - Principles"):
 
 st.markdown("---")
 
-st.header("2️⃣ Which principles are in conflict? Why?")
+st.header("2. Which principles are in conflict? Why?")
 
 conflict_response = st.text_area("Explain which principles may come into conflict and describe how:", height=140)
 if st.button("Show Example - Conflicts"):
@@ -67,7 +62,7 @@ if st.button("Show Example - Conflicts"):
 
 st.markdown("---")
 
-st.header("3️⃣ On your view, which principle should take precedence? Why?")
+st.header("3. On your view, which principle should take precedence? Why?")
 
 precedence_response = st.text_area("Defend your view: which principle should guide clinicians and hospital policy here, and why?", height=140)
 if st.button("Show Example - Precedence"):
@@ -77,7 +72,7 @@ if st.button("Show Example - Precedence"):
 
 st.markdown("---")
 
-st.header("💬 Reflection")
+st.header("Reflection")
 
 st.markdown("""
 - What new questions do you have about the use of AI and patient data in healthcare?

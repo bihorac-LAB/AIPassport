@@ -1,0 +1,12 @@
+{
+  "module": "4",
+  "microskill": "4.2",
+  "track": "basic",
+  "title": "Applied Fundamentals of ML and DL",
+  "summary": "Explores data inspection, neural-network optimization, cross-validation trade-offs, and model-selection strategy.",
+  "guide_notes": [
+    "Explain neural-network concepts without assuming TensorFlow is running.",
+    "Mention that interactive training uses a lightweight sklearn MLP implementation.",
+    "Help learners compare performance, interpretability, sensitivity, and specificity."
+  ]
+}

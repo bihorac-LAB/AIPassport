@@ -5,19 +5,19 @@ import matplotlib.pyplot as plt
 import statsmodels.formula.api as smf
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import roc_auc_score
-import psutil
 import os
 
 # --- 1. SETUP & CACHING ---
-st.set_page_config(
-    page_title="Evaluating Machine Learning Models",
-    layout="wide",
-    initial_sidebar_state="expanded"
-)
-
 @st.cache_data
 def build_eicu_data():
     """Loads and merges the raw eICU data."""
+    local_path = os.path.join("assets", "datasets", "csv", "eicu_demo.csv")
+    if os.path.exists(local_path):
+        df = pd.read_csv(local_path)
+        if "weight" in df.columns and "weight_admission" not in df.columns:
+            df = df.rename(columns={"weight": "weight_admission"})
+        return df
+
     # Load patient information
     patient_cols = ['patientunitstayid', 'hospitalid', 'gender', 'age', 'ethnicity', 'admissionheight', 'admissionweight', 'dischargeweight',
                 'hospitaladmitsource', 'hospitaldischargelocation', 'hospitaldischargestatus', 'unittype', 'uniquepid', 'unitvisitnumber',
@@ -116,38 +116,25 @@ def get_processed_data(df_raw):
     return x
 
 # --- 2. SIDEBAR NAVIGATION ---
-st.sidebar.title("Evaluating Machine Learning Models")
+st.title("Evaluating Machine Learning Models")
 
-track = st.sidebar.radio(
+track = st.radio(
     "Select Science Track:", 
     ["Clinical Science", "Foundational Science"],
     help="Toggle between a clinical healthcare focus or a foundational data science focus."
 )
 
-st.sidebar.markdown("---")
+st.markdown("---")
 
 # Define pages
 pages = ["1. Data Processing", "2. Exploratory Analysis", "3. Univariate Analysis", "4. Multivariate Analysis"]
 
 # Main Menu
-page = st.sidebar.radio(
+page = st.radio(
     "Select Stage:", 
     pages,
     help="Navigate through the 4 steps of the analysis pipeline."
 )
-
-# --- SYSTEM MONITOR (Bottom of Sidebar) ---
-st.sidebar.markdown("---")
-st.sidebar.subheader("System Monitor")
-pid = os.getpid()
-py = psutil.Process(pid)
-memory_use = py.memory_info().rss / 1024 / 1024  # Memory in MB
-cpu_use = psutil.cpu_percent(interval=None)     # CPU Percent (non-blocking)
-
-col1, col2 = st.sidebar.columns(2)
-col1.metric("CPU", f"{cpu_use}%")
-col2.metric("RAM", f"{memory_use:.0f} MB")
-st.sidebar.caption("Real-time resource usage of this app instance.")
 
 # --- 3. PAGE LOGIC ---
 

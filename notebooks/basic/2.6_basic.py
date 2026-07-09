@@ -2,10 +2,6 @@ import streamlit as st
 
 st.title("2.6 Human-AI Collaboration in Biomedicine (Basic)")
 
-# header_cols = st.columns(3)
-# with header_cols[1]:
-#     st.image("module_1_fundamentals/resources/1.1_header.png", width=300)
-
 with st.container(border=True):
     st.markdown("### Question 1")
     st.markdown(
@@ -15,7 +11,7 @@ with st.container(border=True):
     benefits and drawbacks? Explain how you manage these systems, and the data created from them."""
     )
 
-    a1 = st.text_area("", key="a1", height=200)
+    a1 = st.text_area("Your response to Question 1", key="a1", height=200, label_visibility="collapsed")
 
 st.markdown("---")
 
@@ -41,4 +37,4 @@ with st.container(border=True):
     considering the benefits and drawbacks in going forward with using the tool.**"""
     )
 
-    a2 = st.text_area("", key="a2", height=200)
+    a2 = st.text_area("Your response to Question 2", key="a2", height=200, label_visibility="collapsed")

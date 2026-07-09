@@ -1,43 +1,25 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
-import psutil
 import os
 from sklearn.model_selection import KFold
 from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import confusion_matrix
-from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Input, Dense, Dropout
-from tensorflow.keras.optimizers import Adam
-
-# --- MONITORING UTILITY ---
-def display_performance_monitor():
-    """Tracks CPU and RAM usage of the current Streamlit process."""
-    process = psutil.Process(os.getpid())
-    mem_mb = process.memory_info().rss / (1024 * 1024)
-    cpu_percent = process.cpu_percent(interval=0.1)
-    
-    st.sidebar.markdown("---")
-    st.sidebar.subheader("System Monitor")
-    st.sidebar.caption("Tracks the resource usage of this app in real-time.")
-    c1, c2 = st.sidebar.columns(2)
-    c1.metric("CPU Load", f"{cpu_percent}%", help="Current CPU usage of the Streamlit server.")
-    c2.metric("RAM Usage", f"{mem_mb:.1f} MB", help="Current RAM memory allocated to this app.")
+from sklearn.neural_network import MLPClassifier
+from sklearn.metrics import accuracy_score
 
 # ---------------------------------
 # Page Config & Sidebar
 # ---------------------------------
-st.set_page_config(page_title="Applied Fundamentals of ML and DL", layout="wide")
-
-st.sidebar.markdown("### 1. Select Perspective")
-perspective = st.sidebar.radio(
+st.markdown("### 1. Select Perspective")
+perspective = st.radio(
     "View demonstration through the lens of:",
     ["Clinical Science", "Foundational Science"],
     help="Toggle this to see how the same machine learning pipeline is interpreted differently depending on the scientific domain."
 )
 
-st.sidebar.markdown("### 2. Navigation")
-activity = st.sidebar.radio(
+st.markdown("### 2. Navigation")
+activity = st.radio(
     "Go to:",
     [
         "Activity 1 - Data Exploration",
@@ -47,8 +29,6 @@ activity = st.sidebar.radio(
     ],
     help="Select an activity to interact with the corresponding stage of the pipeline."
 )
-
-display_performance_monitor()
 
 # ---------------------------------
 # Context Variables
@@ -67,7 +47,7 @@ st.write(app_desc)
 @st.cache_data
 def load_data():
     try:
-        df = pd.read_csv("data/diabetes.csv")
+        df = pd.read_csv("assets/datasets/csv/diabetes.csv")
     except FileNotFoundError:
         try:
             df = pd.read_csv("diabetes.csv")
@@ -156,9 +136,9 @@ elif activity == "Activity 2 - Model Optimization":
     st.markdown("### Instructions")
     st.write("Configure the optimization parameters to dictate how the network updates its internal weights. Execute the training pipeline and evaluate the resulting learning curve.")
     
-    st.sidebar.subheader("Training Parameters")
-    epochs = st.sidebar.slider("Epochs", 5, 50, 50, help="Total passes through the training data.")
-    batch_size = st.sidebar.select_slider("Batch Size", options=[8, 16, 32], value=16, help="Samples processed before weights are updated.")
+    st.subheader("Training Parameters")
+    epochs = st.slider("Epochs", 5, 50, 50, help="Total passes through the training data.")
+    batch_size = st.select_slider("Batch Size", options=[8, 16, 32], value=16, help="Samples processed before weights are updated.")
 
     col1, col2 = st.columns([1, 1.5])
     
@@ -182,21 +162,10 @@ model = Sequential([
             scaler = StandardScaler()
             X_scaled = scaler.fit_transform(X)
             
-            model = Sequential([
-                Input(shape=(X_scaled.shape[1],)),
-                Dense(128, activation='relu'),
-                Dropout(0.3),
-                Dense(64, activation='relu'),
-                Dropout(0.2),
-                Dense(32, activation='relu'),
-                Dense(1, activation='sigmoid')
-            ])
-            model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
-            
+            model = MLPClassifier(hidden_layer_sizes=(128, 64, 32), max_iter=epochs, batch_size=batch_size, random_state=42)
             with st.spinner("Executing model training..."):
-                history = model.fit(X_scaled, y, epochs=epochs, batch_size=batch_size, validation_split=0.2, verbose=0)
-            
-            st.session_state['act2_history'] = history.history
+                model.fit(X_scaled, y)
+            st.session_state['act2_history'] = {'accuracy': [accuracy_score(y, model.predict(X_scaled))]}
             st.success("Training Complete")
             
     with col2:
@@ -243,18 +212,9 @@ elif activity == "Activity 3 - Cross-Validation Analysis":
             X_val = scaler.transform(X[val_idx])
             y_train, y_val = y[train_idx], y[val_idx]
             
-            model = Sequential([
-                Input(shape=(X_train.shape[1],)),
-                Dense(128, activation='relu'),
-                Dropout(0.3),
-                Dense(64, activation='relu'),
-                Dropout(0.2),
-                Dense(32, activation='relu'),
-                Dense(1, activation='sigmoid')
-            ])
-            model.compile(optimizer=Adam(0.001), loss='binary_crossentropy', metrics=['accuracy'])
-            model.fit(X_train, y_train, epochs=15, batch_size=32, verbose=0)
-            y_prob = model.predict(X_val, verbose=0)
+            model = MLPClassifier(hidden_layer_sizes=(128, 64, 32), max_iter=15, batch_size=32, random_state=42)
+            model.fit(X_train, y_train)
+            y_prob = model.predict_proba(X_val)[:, 1]
             results.append((y_val, y_prob))
             progress_bar.progress((fold + 1) / 5)
         

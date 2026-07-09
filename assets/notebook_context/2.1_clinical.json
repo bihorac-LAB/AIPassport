@@ -1,0 +1,47 @@
+{
+  "id": "2.1_clinical",
+  "module": "Module 2 - Alignment",
+  "microskill": "2.1",
+  "track": "clinical",
+  "title": "The Fundamental Principles of Bioethics",
+  "audience": "Clinical learners applying bioethical principles to AI and patient data",
+  "objectives": [
+    "Identify the four principles of bioethics in a clinical AI privacy case.",
+    "Explain conflicts between AI accuracy, patient privacy, harm prevention, and fairness.",
+    "Justify which principle should guide hospital policy when re-identification risk exists.",
+    "Reflect on rare groups, de-identification limits, and trust in clinical AI."
+  ],
+  "sections": [
+    {
+      "name": "Clinical Case",
+      "purpose": "Introduce a hospital AI system using de-identified data with re-identification risk.",
+      "how_to_use": "Read the case and notice the tension between detailed data for accuracy and privacy risks."
+    },
+    {
+      "name": "Bioethical Principles",
+      "purpose": "Map the case to autonomy, beneficence, non-maleficence, and justice.",
+      "how_to_use": "Select all relevant principles, then optionally compare with the example."
+    },
+    {
+      "name": "Principle Conflicts",
+      "purpose": "Explain ethical tensions around detailed clinical data use.",
+      "how_to_use": "Describe how improving care can conflict with privacy, harm prevention, and fairness."
+    },
+    {
+      "name": "Precedence",
+      "purpose": "Practice defending an ethical clinical policy position.",
+      "how_to_use": "Choose which principle should guide clinicians and hospital policy, then justify the tradeoff."
+    },
+    {
+      "name": "Reflection",
+      "purpose": "Connect bioethics to patient trust and vulnerable groups.",
+      "how_to_use": "Reflect on rare demographic groups, privacy safeguards, and questions raised by AI data use."
+    }
+  ],
+  "chatbot_guidance": [
+    "When asked how to use this notebook, guide the learner through the clinical case, principles, conflicts, precedence, and reflection.",
+    "For clinical users, emphasize patient privacy, re-identification, trust, discrimination risks, and population benefit.",
+    "Help learners distinguish de-identification from guaranteed anonymity.",
+    "Keep answers short and practical."
+  ]
+}

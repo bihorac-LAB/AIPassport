@@ -1,10 +1,5 @@
 import streamlit as st
 
-st.set_page_config(
-    page_title="1.7 Mentorship and Peer Review in Biomedical AI",
-    layout="centered"
-)
-
 st.title("1.7 Mentorship and Peer Review in Biomedical AI")
 
 st.markdown("""
@@ -28,7 +23,7 @@ Tensions are rising, and both parties are growing frustrated.
 st.markdown("----")
 
 # PART 1: IDENTIFY THE CHALLENGES
-st.header("1️⃣ Identify the Challenges")
+st.header("1. Identify the Challenges")
 st.markdown("""
 Identify the problems in this mentoring relationship.  
 Consider aspects such as communication, expectations, and role dynamics.
@@ -53,7 +48,7 @@ if st.button("Show Example – Challenges", key="show_challenges_btn"):
 st.markdown("----")
 
 # PART 2: WRITE THE RESOLUTION PLAN / PROFESSIONAL EMAIL
-st.header("2️⃣ Draft a Professional Communication")
+st.header("2. Draft a Professional Communication")
 
 st.markdown("""
 Imagine you are **Dr. Witmer**.  
@@ -85,7 +80,7 @@ Dr. Witmer""")
 st.markdown("----")
 
 # PART 3: REFLECTION AND FEEDBACK
-st.header("3️⃣ Reflection")
+st.header("3. Reflection")
 
 st.markdown("""
 - What do you think is the most important skill for maintaining a healthy mentor-mentee relationship?

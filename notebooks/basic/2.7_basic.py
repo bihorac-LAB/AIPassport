@@ -1,23 +1,23 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
-import matplotlib.pyplot as plt
+import plotly.express as px
+import plotly.graph_objects as go
 import statsmodels.formula.api as smf
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import roc_auc_score
-import psutil
 import os
-
-# --- 1. SETUP & CACHING ---
-st.set_page_config(
-    page_title="Module 2: Sex-Specific Modeling",
-    layout="wide",
-    initial_sidebar_state="expanded"
-)
 
 @st.cache_data
 def build_eicu_data():
     """Loads and merges the raw eICU data."""
+    local_path = os.path.join("assets", "datasets", "csv", "eicu_demo.csv")
+    if os.path.exists(local_path):
+        df = pd.read_csv(local_path)
+        if "weight" in df.columns and "weight_admission" not in df.columns:
+            df = df.rename(columns={"weight": "weight_admission"})
+        return df
+
     # Load patient information
     patient_cols = ['patientunitstayid', 'hospitalid', 'gender', 'age', 'ethnicity', 'admissionheight', 'admissionweight', 'dischargeweight',
                 'hospitaladmitsource', 'hospitaldischargelocation', 'hospitaldischargestatus', 'unittype', 'uniquepid', 'unitvisitnumber',
@@ -109,41 +109,25 @@ def get_processed_data(df_raw):
     
     return x
 
-# --- 2. SIDEBAR NAVIGATION ---
-st.sidebar.title("Module Navigation")
-
 # Define pages
 pages = ["1. Data Processing", "2. Exploratory Analysis", "3. Univariate Analysis", "4. Multivariate Analysis"]
 
-# Main Menu with Tooltip
-page = st.sidebar.radio(
-    "Go to:", 
+st.title("2.7 Sex-Specific Modeling")
+
+page = st.selectbox(
+    "Choose analysis step",
     pages,
-    help="Navigate through the 4 steps of the analysis pipeline. Hover over the info box below for more details on your current selection."
+    help="Navigate through the 4 steps of the analysis pipeline."
 )
 
-# Dynamic Info Box (Acts as a tooltip description for the active page)
 if page == "1. Data Processing":
-    st.sidebar.info("Clean the raw dataset, remove identifiers, and handle missing values.")
+    st.info("Clean the raw dataset, remove identifiers, and handle missing values.")
 elif page == "2. Exploratory Analysis":
-    st.sidebar.info("Visualize patient demographics and answer key conceptual questions.")
+    st.info("Visualize patient demographics and answer key conceptual questions.")
 elif page == "3. Univariate Analysis":
-    st.sidebar.info("Calculate Odds Ratios for individual variables to see sex-specific risk factors.")
+    st.info("Calculate odds ratios for individual variables to see sex-specific risk factors.")
 elif page == "4. Multivariate Analysis":
-    st.sidebar.info("Train and evaluate complex models. Compare AUROC performance between sexes.")
-
-# --- SYSTEM MONITOR (Bottom of Sidebar) ---
-st.sidebar.markdown("---")
-st.sidebar.subheader("System Monitor")
-pid = os.getpid()
-py = psutil.Process(pid)
-memory_use = py.memory_info().rss / 1024 / 1024  # Memory in MB
-cpu_use = psutil.cpu_percent(interval=None)     # CPU Percent (non-blocking)
-
-col1, col2 = st.sidebar.columns(2)
-col1.metric("CPU", f"{cpu_use}%")
-col2.metric("RAM", f"{memory_use:.0f} MB")
-st.sidebar.caption("Real-time resource usage of this app instance.")
+    st.info("Train and evaluate models. Compare AUROC performance between sexes.")
 
 # --- 3. PAGE LOGIC ---
 
@@ -170,6 +154,10 @@ if page == "1. Data Processing":
     with st.spinner("Loading Raw Data..."):
         df_raw = build_eicu_data()
 
+    st.subheader("Raw Data Preview")
+    st.dataframe(df_raw.head(10), height=260, use_container_width=True)
+    st.caption(f"Loaded {df_raw.shape[0]:,} rows and {df_raw.shape[1]:,} columns before preprocessing.")
+
     if st.button("Run Preprocessing Pipeline", help="Clean the data, impute missing values, and prepare it for modeling."):
         st.session_state.proc_run = True
 
@@ -178,11 +166,11 @@ if page == "1. Data Processing":
             df_processed = get_processed_data(df_raw)
             
         st.success("Preprocessing Complete!")
-        st.write(f"Processed Data Shape: {df_processed.shape}")
+        st.metric("Processed data shape", f"{df_processed.shape[0]:,} rows x {df_processed.shape[1]:,} columns")
         
         st.subheader("Processed Data Preview")
-        st.dataframe(df_processed.head(), use_container_width=True)
-        st.caption("A preview of the first 5 rows of the clean dataset.")
+        st.dataframe(df_processed.head(10), height=260, use_container_width=True)
+        st.caption("First 10 rows after dropping identifiers, one-hot encoding categorical fields, and imputing missing numeric values.")
 
 # === 2. EXPLORATORY ANALYSIS ===
 elif page == "2. Exploratory Analysis":
@@ -272,13 +260,28 @@ elif page == "2. Exploratory Analysis":
         df_plot.set_index(['Year', 'index'], inplace=True)
         df0 = df_plot.reorder_levels(['index', 'Year']).sort_index().unstack(level=-1)
 
-        colors = plt.cm.Paired.colors
-        fig, ax = plt.subplots(figsize=(10, 6))
-        (df0['Female'] + df0['Male']).plot(kind='barh', color=[colors[3], colors[2]], rot=0, ax=ax)
-        df0['Male'].plot(kind='barh', color=[colors[5], colors[4]], rot=0, ax=ax)
-        ax.legend([f'{val} ({context})' for val, context in df0.columns])
-        ax.set_title("Mean Values by Mortality Status (Stacked by Sex)")
-        st.pyplot(fig)
+        chart_df = df0.reset_index()
+        chart_df.columns = [
+            "_".join([str(part) for part in col if part]).strip("_")
+            if isinstance(col, tuple) else col
+            for col in chart_df.columns
+        ]
+        long_df = chart_df.melt(
+            id_vars="index",
+            var_name="Group",
+            value_name="Mean value",
+        )
+        fig = px.bar(
+            long_df,
+            x="Mean value",
+            y="index",
+            color="Group",
+            orientation="h",
+            barmode="group",
+            title="Mean Values by Mortality Status and Sex",
+        )
+        fig.update_layout(height=max(420, 80 * len(selected_variables)), margin=dict(l=40, r=20, t=55, b=45))
+        st.plotly_chart(fig, use_container_width=True)
         
         # Accessibility: Data Table
         with st.expander("View Chart Data as Table"):
@@ -352,23 +355,23 @@ elif page == "3. Univariate Analysis":
 
         progress_bar.empty()
 
-        fig, ax = plt.subplots(figsize=(12, len(selected_variables) * 0.6 + 2))
-        bar_width = 0.25
-        r1 = np.arange(len(selected_variables))
-        r2 = [x + bar_width for x in r1]
-        r3 = [x + bar_width for x in r2]
-        
-        ax.barh(r1, vals_female, bar_width, label='Female', color='tab:orange', alpha=0.8)
-        ax.barh(r2, vals_male, bar_width, label='Male', color='tab:blue', alpha=0.8)
-        ax.barh(r3, vals_full, bar_width, label='All Cohort', color='tab:green', alpha=0.8)
-        
-        ax.set_xlabel('Odds Ratio (OR)')
-        ax.set_yticks([r + bar_width for r in range(len(selected_variables))])
-        ax.set_yticklabels(selected_variables)
-        ax.set_title('Univariate Analysis: Odds Ratios')
-        ax.legend()
-        ax.axvline(x=1, color='gray', linestyle='--', linewidth=0.8)
-        st.pyplot(fig)
+        df_or_plot = pd.DataFrame({
+            "Variable": selected_variables * 3,
+            "Group": ["Female"] * len(selected_variables) + ["Male"] * len(selected_variables) + ["All Cohort"] * len(selected_variables),
+            "Odds Ratio": vals_female + vals_male + vals_full,
+        })
+        fig = px.bar(
+            df_or_plot,
+            x="Odds Ratio",
+            y="Variable",
+            color="Group",
+            orientation="h",
+            barmode="group",
+            title="Univariate Analysis: Odds Ratios",
+        )
+        fig.add_vline(x=1, line_dash="dash", line_color="gray")
+        fig.update_layout(height=max(420, 70 * len(selected_variables)), margin=dict(l=40, r=20, t=55, b=45))
+        st.plotly_chart(fig, use_container_width=True)
         
         # Accessibility: Data Table
         with st.expander("View OR Data as Table"):
@@ -438,33 +441,23 @@ elif page == "4. Multivariate Analysis":
             reg = smf.logit(f"in_hospital_mortality ~ " + " + ".join(selected_predictors), data=train_dat).fit(disp=0)
             vals_full.append(roc_auc_score(test_dat['in_hospital_mortality'], reg.predict(test_dat[selected_predictors])))
             
-            # Plot
-            fig, ax = plt.subplots(figsize=(8, 5))
-            r = np.arange(1)
-            width = 0.25
-            
-            plt.bar(r, vals_female, width, label='Female', color='tab:orange')
-            plt.bar(r + width, vals_male, width, label='Male', color='tab:blue')
-            plt.bar(r + 2*width, vals_full, width, label='All Cohort', color='tab:green')
-            
-            plt.ylabel('AUROC')
-            plt.title('Multivariate Analysis Performance')
-            plt.xticks([])
-            plt.ylim(0.5, 1.0)
-            plt.legend(loc='lower right')
-            
-            # Add labels
-            plt.text(r - 0.05, vals_female[0] + 0.01, f"{vals_female[0]:.3f}")
-            plt.text(r + width - 0.05, vals_male[0] + 0.01, f"{vals_male[0]:.3f}")
-            plt.text(r + 2*width - 0.05, vals_full[0] + 0.01, f"{vals_full[0]:.3f}")
-            
-            st.pyplot(fig)
+            res_df = pd.DataFrame({
+                "Group": ["Female", "Male", "All Cohort"],
+                "AUROC": [vals_female[0], vals_male[0], vals_full[0]]
+            })
+            fig = px.bar(
+                res_df,
+                x="Group",
+                y="AUROC",
+                color="Group",
+                text=res_df["AUROC"].map(lambda value: f"{value:.3f}"),
+                title="Multivariate Analysis Performance",
+                range_y=[0.5, 1.0],
+            )
+            fig.update_layout(height=430, showlegend=False, margin=dict(l=40, r=20, t=55, b=45))
+            st.plotly_chart(fig, use_container_width=True)
             
             with st.expander("View Results as Table"):
-                res_df = pd.DataFrame({
-                    "Group": ["Female", "Male", "All Cohort"],
-                    "AUROC": [vals_female[0], vals_male[0], vals_full[0]]
-                })
                 st.dataframe(res_df, use_container_width=True)
 
         except Exception as e:

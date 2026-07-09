@@ -1,47 +1,11 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
-import matplotlib.pyplot as plt
-import seaborn as sns
+import plotly.express as px
+import plotly.graph_objects as go
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import roc_auc_score, confusion_matrix
 from sklearn.calibration import calibration_curve
-import psutil
-import os
-
-# --- Page Config ---
-st.set_page_config(page_title="Biomedical AI Quality & Safety", layout="wide")
-
-# ==========================================
-# SYSTEM MONITOR (Memory/CPU)
-# ==========================================
-def display_system_stats():
-    """
-    Displays real-time CPU and Memory usage in the sidebar.
-    """
-    # --- CPU Usage ---
-    # interval=0 makes it non-blocking (instant read)
-    cpu_percent = psutil.cpu_percent(interval=0)
-    
-    # --- Memory Usage ---
-    # Process memory (specific to this app's current process)
-    process = psutil.Process(os.getpid())
-    mem_info = process.memory_info()
-    memory_usage_mb = mem_info.rss / 1024 / 1024  # Convert bytes to MB
-    
-    # --- Display Metrics in Sidebar ---
-    st.sidebar.markdown("### 🛠 System Monitor")
-    
-    col1, col2 = st.sidebar.columns(2)
-    col1.metric("CPU", f"{cpu_percent}%")
-    col2.metric("RAM", f"{memory_usage_mb:.0f} MB")
-    
-    # Show warning if getting close to Free Tier limit (approx 1GB)
-    if memory_usage_mb > 800:
-        st.sidebar.warning("⚠️ High Memory Usage! Nearing 1GB limit.")
-
-# Call the monitor immediately so it sits at the top of the sidebar
-display_system_stats()
 
 # --- Custom Styling ---
 st.markdown("""
@@ -152,15 +116,26 @@ with tab1:
 
     with col_viz:
         st.subheader("Visualizing Covariate Shift")
-        
-        # Plot Distributions
-        fig, ax = plt.subplots(figsize=(8, 4))
-        sns.kdeplot(df_train['Lactate'], fill=True, label="Original Training Data", color="blue", alpha=0.3, ax=ax)
-        sns.kdeplot(df_current['Lactate'], fill=True, label="Current Patient Data", color="red", alpha=0.3, ax=ax)
-        ax.set_title(f"Lactate Distribution Shift (Month {months})")
-        ax.set_xlabel("Lactate Level")
-        ax.legend()
-        st.pyplot(fig)
+
+        dist_df = pd.concat(
+            [
+                pd.DataFrame({"Lactate": df_train["Lactate"], "Dataset": "Original Training Data"}),
+                pd.DataFrame({"Lactate": df_current["Lactate"], "Dataset": "Current Patient Data"}),
+            ],
+            ignore_index=True,
+        )
+        fig = px.histogram(
+            dist_df,
+            x="Lactate",
+            color="Dataset",
+            nbins=35,
+            histnorm="probability density",
+            opacity=0.55,
+            barmode="overlay",
+            title=f"Lactate Distribution Shift (Month {months})",
+        )
+        fig.update_layout(height=420, margin=dict(l=40, r=20, t=55, b=45))
+        st.plotly_chart(fig, use_container_width=True)
         
         st.info("This graph demonstrates **Covariate Shift**: The input data (Lactate) has changed distribution, confusing the original model.")
 
@@ -199,14 +174,29 @@ with tab2:
         
         prob_true, prob_pred = calibration_curve(df_local['Readmission'], local_probs, n_bins=10)
         
-        fig2, ax_cal = plt.subplots(figsize=(8, 5))
-        ax_cal.plot([0, 1], [0, 1], '--', color='gray', label='Perfectly Calibrated')
-        ax_cal.plot(prob_pred, prob_true, 'o-', color='purple', label='Vendor Model')
-        ax_cal.set_xlabel("Predicted Probability")
-        ax_cal.set_ylabel("Actual Risk")
-        ax_cal.set_title("Calibration Curve")
-        ax_cal.legend()
-        st.pyplot(fig2)
+        fig2 = go.Figure()
+        fig2.add_trace(go.Scatter(
+            x=[0, 1],
+            y=[0, 1],
+            mode="lines",
+            line=dict(color="gray", dash="dash"),
+            name="Perfectly Calibrated",
+        ))
+        fig2.add_trace(go.Scatter(
+            x=prob_pred,
+            y=prob_true,
+            mode="lines+markers",
+            line=dict(color="purple"),
+            name="Vendor Model",
+        ))
+        fig2.update_layout(
+            title="Calibration Curve",
+            xaxis_title="Predicted Probability",
+            yaxis_title="Actual Risk",
+            height=430,
+            margin=dict(l=40, r=20, t=55, b=45),
+        )
+        st.plotly_chart(fig2, use_container_width=True)
         
         st.info("""
         **How to read this:**
@@ -234,7 +224,7 @@ with tab3:
         st.subheader("Preview: Model Card")
         st.markdown(f"""
         <div style="background-color:#f9f9f9; padding:20px; border-radius:10px; border:1px solid #ddd;">
-            <h3>📄 Model Card: {mc_name}</h3>
+            <h3>Model Card: {mc_name}</h3>
             <p><strong>Developer:</strong> {mc_dev}</p>
             <hr>
             <h4>1. Intended Use</h4>
@@ -243,7 +233,7 @@ with tab3:
             <p><strong>Primary Metric:</strong> AUC (Discrimination)</p>
             <p><strong>Secondary Metric:</strong> Calibration Slope</p>
             <h4>3. Caveats & Limitations</h4>
-            <p style="color:red;">⚠️ {mc_limits}</p>
+            <p style="color:red;">{mc_limits}</p>
             <h4>4. Ethical Considerations</h4>
             <p>{mc_ethics}</p>
         </div>

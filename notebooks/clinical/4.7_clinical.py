@@ -3,7 +3,6 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
-import psutil
 import os
 import shap
 import lime
@@ -12,33 +11,11 @@ from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score, recall_score, confusion_matrix, roc_auc_score
 
-# --- VERSION COMPATIBILITY CHECK ---
-def check_compatibility():
-    major_version = int(np.__version__.split('.')[0])
-    if major_version >= 2:
-        st.error(f"Incompatibility Detected: Current NumPy version is {np.__version__}.")
-        st.warning("The SHAP library requires NumPy < 2.0.0. Please update your requirements.txt.")
-        st.stop()
-
-# --- MONITORING UTILITY ---
-def display_performance_monitor():
-    process = psutil.Process(os.getpid())
-    mem_mb = process.memory_info().rss / (1024 * 1024)
-    cpu_percent = process.cpu_percent(interval=0.1)
-    
-    st.sidebar.markdown("---")
-    st.sidebar.subheader("Sandbox Performance")
-    c1, c2 = st.sidebar.columns(2)
-    c1.metric("CPU Load", f"{cpu_percent}%")
-    c2.metric("RAM Usage", f"{mem_mb:.1f} MB")
-
 # --- Page Configuration ---
-st.set_page_config(page_title="Healthcare AI Fairness Sandbox", layout="wide")
-
 # --- Data Loading & Model Training ---
 @st.cache_resource
 def load_and_train():
-    file_path = os.path.join("assets", "diabetes.csv")
+    file_path = os.path.join("assets", "datasets", "csv", "diabetes.csv")
     if not os.path.exists(file_path):
         st.error(f"File Not Found: Ensure 'diabetes.csv' is in the 'assets' directory.")
         st.stop()
@@ -53,13 +30,11 @@ def load_and_train():
     
     return df, X_train, X_test, y_train, y_test, model
 
-# Initialize
-check_compatibility()
 df, X_train, X_test, y_train, y_test, model = load_and_train()
 
 # --- SIDEBAR NAVIGATION ---
-st.sidebar.title("Navigation")
-activity = st.sidebar.radio(
+st.title("Navigation")
+activity = st.radio(
     "Select an Activity:",
     [
         "Activity 1: Data & Fairness Metrics", 
@@ -69,8 +44,6 @@ activity = st.sidebar.radio(
     ],
     help="Navigate through the stages of algorithmic accountability."
 )
-
-display_performance_monitor()
 
 # ==========================================
 # ACTIVITY 1: DATA & FAIRNESS

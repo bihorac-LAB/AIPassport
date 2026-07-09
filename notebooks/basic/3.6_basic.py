@@ -1,69 +1,44 @@
 import streamlit as st
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
-import seaborn as sns
+import plotly.express as px
 from scipy.stats import zscore
 from sklearn.impute import SimpleImputer
 from sklearn.preprocessing import StandardScaler, MinMaxScaler
-import psutil
-import os
 
-# --- MONITORING UTILITY ---
-def display_performance_monitor():
-    """Tracks CPU and RAM usage of the current Streamlit process."""
-    process = psutil.Process(os.getpid())
-    mem_mb = process.memory_info().rss / (1024 * 1024)
-    cpu_percent = process.cpu_percent(interval=0.1)
-    
-    st.sidebar.markdown("---")
-    st.sidebar.subheader("System Health")
-    c1, c2 = st.sidebar.columns(2)
-    c1.metric("CPU Load", f"{cpu_percent}%")
-    c2.metric("Memory", f"{mem_mb:.1f} MB")
-
-# --- APP CONFIG ---
-st.set_page_config(page_title="Multi-Institutional Data Sharing Simulation", layout="wide")
-
-# --- SIDEBAR & SETUP ---
-st.sidebar.header("Simulation Settings")
-
-# 1. Track Selection
-track_choice = st.sidebar.radio(
-    "Select Research Track:",
-    ["Clinical (IC3 COVID-19)", "Basic Science (ImmPort)"],
-    help="Choose the dataset scenario. Clinical simulates hospital patient records; Basic Science simulates laboratory immunology data."
-)
-
-st.sidebar.subheader("Data Parameters")
-
-# 2. Interactive Data Controls
-sample_size = st.sidebar.slider(
-    "Sample Size (per Institution)", 
-    min_value=50, 
-    max_value=500, 
-    value=200,
-    step=50,
-    help="Adjusting the sample size simulates larger or smaller datasets, affecting computation time and statistical significance."
-)
-
-outlier_rate = st.sidebar.slider(
-    "Outlier Contamination",
-    min_value=0.0,
-    max_value=0.10,
-    value=0.02,
-    step=0.01,
-    format="%f",
-    help="Percentage of the dataset that contains erroneous or extreme values (outliers)."
-)
-
-display_performance_monitor()
-
-# --- MAIN CONTENT ---
-
-st.title("Navigating Multi-Institutional Data Sharing Challenges")
+# --- SETUP ---
+st.title("3.6 Multi-Institutional Data Sharing Simulation")
 st.markdown("### Interactive Federated Learning Simulation")
 
+with st.expander("Simulation Settings", expanded=True):
+    track_choice = st.radio(
+        "Select Research Track:",
+        ["Clinical (IC3 COVID-19)", "Basic Science (ImmPort)"],
+        horizontal=True,
+        help="Choose the dataset scenario. Clinical simulates hospital patient records; Basic Science simulates laboratory immunology data."
+    )
+
+    c1, c2 = st.columns(2)
+    sample_size = c1.slider(
+        "Sample Size (per Institution)",
+        min_value=50,
+        max_value=500,
+        value=200,
+        step=50,
+        help="Adjusting the sample size simulates larger or smaller datasets."
+    )
+
+    outlier_rate = c2.slider(
+        "Outlier Contamination",
+        min_value=0.0,
+        max_value=0.10,
+        value=0.02,
+        step=0.01,
+        format="%f",
+        help="Percentage of the dataset that contains erroneous or extreme values."
+    )
+
+# --- MAIN CONTENT ---
 # Instructions
 st.info(
     "INSTRUCTIONS: This simulation guides you through the process of preparing a local dataset "
@@ -179,18 +154,20 @@ with col_controls:
     apply_filter = st.checkbox("Apply Filter and Proceed", value=False, help="Check this box to remove the detected outliers from the dataset.")
 
 with col_viz:
-    
-    fig, ax = plt.subplots(figsize=(8, 4))
-    
-    # Plot clean data
-    sns.scatterplot(data=clean_data, x=clean_data.index, y='Feature_Target', color='green', label='Valid Data', alpha=0.6, ax=ax)
-    # Plot outliers
-    sns.scatterplot(data=outliers, x=outliers.index, y='Feature_Target', color='red', label='Outliers', s=100, marker='x', ax=ax)
-    
-    ax.axhline(y=df_processing['Feature_Target'].mean(), color='blue', linestyle='--', label='Mean')
-    ax.set_title(f"Distribution of {col_labels['target']}")
-    ax.legend()
-    st.pyplot(fig)
+    plot_df = df_processing.reset_index().rename(columns={"index": "Row"})
+    plot_df["Status"] = np.where(np.abs(plot_df["z_score"]) > z_threshold, "Outlier", "Valid Data")
+    fig = px.scatter(
+        plot_df,
+        x="Row",
+        y="Feature_Target",
+        color="Status",
+        symbol="Status",
+        title=f"Distribution of {col_labels['target']}",
+        labels={"Feature_Target": col_labels["target"]},
+    )
+    fig.add_hline(y=df_processing["Feature_Target"].mean(), line_dash="dash", line_color="blue", annotation_text="Mean")
+    fig.update_layout(height=430, margin=dict(l=40, r=20, t=55, b=45))
+    st.plotly_chart(fig, use_container_width=True)
 
 if not apply_filter:
     st.warning("Please check 'Apply Filter and Proceed' to move to the next step.")

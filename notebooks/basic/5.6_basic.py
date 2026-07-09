@@ -1,14 +1,30 @@
 import streamlit as st
-import streamlit.components.v1 as components
 
 st.title("5.6 Consistency in Biomedical Image Analysis (Basic)")
 
-# header_cols = st.columns(3)
-# with header_cols[1]:
-#     st.image("module_1_fundamentals/resources/1.1_header.png", width=300)
+st.info(
+    "The original embedded HTML export is not present in this repository. "
+    "This page now provides a stable in-app consistency checklist instead of failing at runtime."
+)
 
+st.header("Consistency Checklist")
 
-with open("reference/raw-notebook-files/5.6 jupyter basic.html", "r") as f:
-    html_string = f.read()
+checks = {
+    "Acquisition settings are documented": st.checkbox("Acquisition settings are documented"),
+    "Preprocessing is applied consistently": st.checkbox("Preprocessing is applied consistently"),
+    "Labels use a shared definition": st.checkbox("Labels use a shared definition"),
+    "Evaluation includes a held-out set": st.checkbox("Evaluation includes a held-out set"),
+}
 
-components.html(html_string, height=800, scrolling=True)
+score = sum(checks.values())
+st.metric("Consistency score", f"{score}/{len(checks)}")
+
+with st.expander("Reflection", expanded=True):
+    st.text_area("Which step is most likely to introduce inconsistency?", key="risk_basic_56")
+    st.text_area("How would you standardize the workflow?", key="standardize_basic_56")
+
+with st.expander("Expected considerations"):
+    st.write(
+        "Strong workflows define acquisition settings, preprocessing steps, label definitions, "
+        "quality control rules, and validation splits before model training."
+    )

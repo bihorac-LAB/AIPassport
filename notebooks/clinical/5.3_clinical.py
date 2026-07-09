@@ -9,37 +9,35 @@ import os
 # ------------------------------------------------------------
 # PAGE SETUP
 # ------------------------------------------------------------
-st.set_page_config(page_title="Biomedical Toolkit", layout="wide")
-
-st.sidebar.warning("⚠️ **Confidentiality:** Do not upload patient-identifiable images.")
+st.warning("⚠️ **Confidentiality:** Do not upload patient-identifiable images.")
 
 # ------------------------------------------------------------
 # SIDEBAR CONTROLS
 # ------------------------------------------------------------
-st.sidebar.title("Toolkit Controls")
-tool_choice = st.sidebar.radio("Active Tool", ["Texture Analysis", "Morphological Closing"])
+st.title("Toolkit Controls")
+tool_choice = st.radio("Active Tool", ["Texture Analysis", "Morphological Closing"])
 
-st.sidebar.subheader("Preprocessing")
-use_norm = st.sidebar.toggle("Standardize Intensity", value=True, help="Normalizes image to 0-255 range.")
+st.subheader("Preprocessing")
+use_norm = st.toggle("Standardize Intensity", value=True, help="Normalizes image to 0-255 range.")
 
 # ------------------------------------------------------------
 # TOOL 1: TEXTURE ANALYSIS
 # ------------------------------------------------------------
 if tool_choice == "Texture Analysis":
     st.title("Pathology Texture Analysis")
-    st.sidebar.subheader("Texture Settings")
-    dist = st.sidebar.slider("Pixel Distance", 1, 10, 1)
+    st.subheader("Texture Settings")
+    dist = st.slider("Pixel Distance", 1, 10, 1)
     
     # Selection for sample or upload
-    data_mode = st.sidebar.selectbox("Data Source", ["Sample: Malignant", "Sample: Benign", "Upload Custom"])
+    data_mode = st.selectbox("Data Source", ["Sample: Malignant", "Sample: Benign", "Upload Custom"])
     
     img_path = None
     if data_mode == "Sample: Malignant":
-        img_path = "./data/small_slide_BC.png"
+        img_path = "assets/datasets/images/small_slide_BC.png"
     elif data_mode == "Sample: Benign":
-        img_path = "./data/small_slide_noBC.png"
+        img_path = "assets/datasets/images/small_slide_noBC.png"
     else:
-        uploaded_file = st.sidebar.file_uploader("Upload Pathology Slide", type=["png", "jpg"])
+        uploaded_file = st.file_uploader("Upload Pathology Slide", type=["png", "jpg"])
 
     # Load logic
     image_to_process = None
@@ -71,20 +69,20 @@ if tool_choice == "Texture Analysis":
 else:
     st.title("Morphological Enhancement")
     
-    st.sidebar.subheader("Morphology Settings")
-    radius = st.sidebar.slider("Disk Radius", 1, 15, 5)
+    st.subheader("Morphology Settings")
+    radius = st.slider("Disk Radius", 1, 15, 5)
     
     # Toggle between sample and upload
-    use_sample = st.sidebar.checkbox("Use Sample Ultrasound", value=True)
+    use_sample = st.checkbox("Use Sample Ultrasound", value=True)
     
     img = None
     if use_sample:
-        sample_path = "./data/breast_US.png"
+        sample_path = "assets/datasets/images/breast_US.png"
         if os.path.exists(sample_path):
             img = np.array(Image.open(sample_path).convert("L"))
         else:
             # FALLBACK: Generate a synthetic ultrasound 'phantom' if file is missing
-            st.sidebar.info("Sample file not found. Generating synthetic phantom...")
+            st.info("Sample file not found. Generating synthetic phantom...")
             img = np.zeros((300, 300), dtype=np.uint8)
             # Create a 'lesion' with some noise/gaps
             rr, cc = np.ogrid[:300, :300]
@@ -94,7 +92,7 @@ else:
             noise = np.random.choice([0, 1], size=img.shape, p=[0.05, 0.95])
             img = (img * noise).astype(np.uint8)
     else:
-        uploaded_us = st.sidebar.file_uploader("Upload Ultrasound", type=["png", "jpg"])
+        uploaded_us = st.file_uploader("Upload Ultrasound", type=["png", "jpg"])
         if uploaded_us:
             img = np.array(Image.open(uploaded_us).convert("L"))
 

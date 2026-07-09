@@ -1,8 +1,6 @@
 import streamlit as st
 import pandas as pd
 
-st.set_page_config(page_title="MS5: Leveraging Multidisciplinary Team Strengths (Basic Science)", layout="wide")
-
 st.title("1.5 Leveraging Multidisciplinary Team Strengths (Basic Science)")
 
 st.markdown("""

@@ -2,9 +2,6 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 
-# --- 1. CONFIGURATION ---
-st.set_page_config(page_title="Ethical Data Acquisition Audit", layout="wide")
-
 st.markdown("""
 <style>
     .narrator-box {
@@ -44,14 +41,16 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# --- 2. SIDEBAR: TRACK & CONFIGURATION ---
-st.sidebar.title("Audit Configuration")
+# --- 2. TRACK & CONFIGURATION ---
+st.title("3.2 Ethical Data Acquisition Audit")
 
-track = st.sidebar.radio(
-    "Select Research Track:",
-    ["Clinical Track (IC3 COVID-19)", "Basic Science Track (ImmPort)"],
-    help="Select the dataset context for this audit session."
-)
+with st.expander("Audit Configuration", expanded=True):
+    track = st.radio(
+        "Select Research Track:",
+        ["Clinical Track (IC3 COVID-19)", "Basic Science Track (ImmPort)"],
+        horizontal=True,
+        help="Select the dataset context for this audit session."
+    )
 
 # Set Variables based on Track
 if "Clinical" in track:
@@ -67,11 +66,10 @@ else:
     sample_term = "Biological Specimen"
     underserved_example = "Donors of non-European ancestry"
 
-st.sidebar.markdown("---")
-st.sidebar.info(f"**Current Context**\n\nDataset: {dataset_name}\nSubject: {subject_term}")
+st.info(f"Current context: {dataset_name} | Subject: {subject_term}")
 
 # Navigation
-section = st.sidebar.radio(
+section = st.selectbox(
     "Select Audit Activity:",
     [
         "1. Intro: The Four Pillars",
@@ -93,7 +91,7 @@ def instruction(text):
 
 # === SECTION 1: INTRO ===
 if section == "1. Intro: The Four Pillars":
-    st.title("Module MS2: Acquiring Ethically Sourced Biomedical Data")
+    st.header("Module MS2: Acquiring Ethically Sourced Biomedical Data")
     
     narrator(
         "Welcome to this educational journey. Today, we embark on an exploration of practices that honor patient autonomy, "
@@ -247,11 +245,11 @@ elif section == "4. Privacy: Security Audit":
     st.markdown("#### Simulation Results")
     
     if score == 4:
-        st.success("🛡️ **Status: SECURE.** Multi-layered protocols are active. Compliance verified.")
+        st.success("Status: SECURE. Multi-layered protocols are active. Compliance verified.")
     elif score >= 2:
-        st.warning("⚠️ **Status: VULNERABLE.** Some protections are in place, but gaps remain. High risk of breach.")
+        st.warning("Status: VULNERABLE. Some protections are in place, but gaps remain. High risk of breach.")
     else:
-        st.error("🚨 **Status: CRITICAL RISK.** Data is effectively unprotected. Protocol rejected.")
+        st.error("Status: CRITICAL RISK. Data is effectively unprotected. Protocol rejected.")
 
 # === SECTION 5: BENEFICENCE ===
 elif section == "5. Beneficence: Impact Audit":

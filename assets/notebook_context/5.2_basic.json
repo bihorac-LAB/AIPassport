@@ -1,0 +1,12 @@
+{
+  "module": "5",
+  "microskill": "5.2",
+  "track": "basic",
+  "title": "Image Processing Tools",
+  "summary": "Explores channel separation, gamma correction, contrast adjustment, histogram equalization, CLAHE, and intensity transformations.",
+  "guide_notes": [
+    "Mention that the page uses bundled local sample images by default.",
+    "Explain how each transformation changes pixel intensities.",
+    "Help learners compare original and processed images visually."
+  ]
+}

@@ -1,7 +1,5 @@
 import streamlit as st
 
-st.set_page_config(page_title="MS3 Biomedical AI Experiment Design Assignment", layout="wide")
-
 st.title("1.3 Designing Biomedical Artificial Intelligence Experiments (Clinical Research)")
 
 st.markdown(

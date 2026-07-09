@@ -1,0 +1,45 @@
+{
+  "id": "1.1_basic",
+  "module": "Module 1 - Fundamentals",
+  "microskill": "1.1",
+  "track": "basic",
+  "title": "Demystifying Artificial Intelligence",
+  "audience": "Basic science learners building foundational AI literacy",
+  "objectives": [
+    "Understand AI as a human-built tool for solving specific problems.",
+    "Recognize major milestones in AI history and how they shaped modern AI.",
+    "Practice evaluating AI claims as fact, fiction, misleading, or context-dependent."
+  ],
+  "sections": [
+    {
+      "name": "Interactive AI Timeline",
+      "purpose": "Give learners historical context for how AI capabilities developed over time.",
+      "how_to_use": "Scroll through the timeline milestones. Compare early symbolic systems, machine learning, deep learning, and generative AI."
+    },
+    {
+      "name": "AI: Fact or Fiction?",
+      "purpose": "Help learners test assumptions about AI using structured feedback.",
+      "how_to_use": "Enter a statement about AI, then review the verdict, explanation, real-world examples, limitations, datasets, AI concepts, and research directions."
+    }
+  ],
+  "chatbot_guidance": [
+    "When asked how to use the notebook, guide the learner through the timeline first, then the Fact or Fiction activity.",
+    "For basic science users, connect examples back to research design, data quality, model limits, reproducibility, and scientific discovery.",
+    "Keep answers short and practical. Ask one clarifying question only when the learner's goal is unclear.",
+    "Do not claim the Fact or Fiction verdict is definitive; remind learners it is AI-generated feedback that should be critically reviewed."
+  ],
+  "common_questions": [
+    {
+      "question": "How do I start?",
+      "answer": "Start with the timeline, then enter one AI claim in Fact or Fiction and review the feedback tabs."
+    },
+    {
+      "question": "What should I type into Fact or Fiction?",
+      "answer": "Type a clear claim such as 'AI can discover new drugs by itself' or 'AI models always need labeled data.'"
+    },
+    {
+      "question": "What should I pay attention to?",
+      "answer": "Look for the verdict, the limitations, and whether the examples actually support the claim."
+    }
+  ]
+}

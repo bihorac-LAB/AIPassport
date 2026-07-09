@@ -1,7 +1,5 @@
 import streamlit as st
 
-st.set_page_config(page_title="MS4: Training, Validation & Generalizability", layout="centered")
-
 st.title("1.4 Training, Validation & Generalizability (Clinical Research)")
 
 # --- Data & Tools ---
@@ -237,7 +235,7 @@ with st.expander("Part 6: Reflection", expanded=False):
     st.text_area("To clinical end users?")
     st.text_area("To hospital leadership?")
 
-if st.button("✅ Mark assignment as complete"):
+if st.button("Mark assignment as complete"):
     st.success("Assignment marked as complete! Review and save your responses as needed.")
 
 st.caption("You can show/hide sections as needed. Use the checklists, radios, and text entry points to structure your thinking throughout the assignment.")

@@ -1,0 +1,12 @@
+{
+  "module": "4",
+  "microskill": "4.7",
+  "track": "clinical",
+  "title": "Healthcare AI Fairness Sandbox",
+  "summary": "Explores clinical fairness metrics, global SHAP explanations, local LIME explanations, and what-if prediction simulation.",
+  "guide_notes": [
+    "Explain fairness metrics by age group and model outcome.",
+    "Describe SHAP as global feature influence and LIME as local patient-level explanation.",
+    "Help learners use the what-if sliders to reason about clinical model behavior."
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "module": "4",
+  "microskill": "4.1",
+  "track": "clinical",
+  "title": "Shared Biomedical AI Vocabulary",
+  "summary": "Introduces clinical machine-learning vocabulary through data exploration, preprocessing, decision-tree training, and cross-validation.",
+  "guide_notes": [
+    "Frame explanations around clinical prediction and patient-risk modeling.",
+    "Point out that the page uses the bundled diabetes dataset.",
+    "Emphasize train/test split, overfitting, interpretability, and evaluation metrics."
+  ]
+}

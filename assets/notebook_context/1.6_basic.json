@@ -1,0 +1,53 @@
+{
+  "id": "1.6_basic",
+  "module": "Module 1 - Fundamentals",
+  "microskill": "1.6",
+  "track": "basic",
+  "title": "Basics of Scientific Rigor and Reproducibility",
+  "audience": "Basic science learners practicing transparent outlier handling",
+  "objectives": [
+    "Visualize simulated eICU-style vital-sign data and identify outliers.",
+    "Calculate 1.5x IQR thresholds for outlier detection.",
+    "Compare summary statistics with and without outliers.",
+    "Evaluate remove, winsorize, and median-imputation strategies.",
+    "Reflect on transparent reporting for reproducibility."
+  ],
+  "sections": [
+    {
+      "name": "Dataset Overview",
+      "purpose": "Introduce simulated patient vital-sign data.",
+      "how_to_use": "Review heart rate, mean arterial pressure, and temperature values before selecting variables."
+    },
+    {
+      "name": "Visualizing Outliers",
+      "purpose": "Use box plots to spot extreme values.",
+      "how_to_use": "Select a variable, inspect the box plot points, and note possible outlier patient IDs."
+    },
+    {
+      "name": "Calculating Outlier Thresholds",
+      "purpose": "Apply the 1.5x IQR rule.",
+      "how_to_use": "Choose a variable and review Q1, Q3, IQR, lower bound, upper bound, and flagged rows."
+    },
+    {
+      "name": "Effect on Summary Statistics",
+      "purpose": "Show how outliers affect mean, standard deviation, and median.",
+      "how_to_use": "Compare all-data statistics against statistics after excluding IQR outliers."
+    },
+    {
+      "name": "Handling Outliers",
+      "purpose": "Compare common outlier-handling strategies.",
+      "how_to_use": "Choose remove, winsorize, or median imputation and compare resulting summary statistics."
+    },
+    {
+      "name": "Reflection",
+      "purpose": "Connect outlier handling to scientific rigor.",
+      "how_to_use": "Write what should be reported in methods for reproducibility."
+    }
+  ],
+  "chatbot_guidance": [
+    "When asked how to use this notebook, guide the learner from visualization to IQR thresholds, statistics comparison, handling strategy, and reflection.",
+    "For basic science users, emphasize transparent reporting and how preprocessing choices affect conclusions.",
+    "Help learners interpret outliers without automatically assuming they are errors.",
+    "Keep answers short and practical."
+  ]
+}

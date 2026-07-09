@@ -6,29 +6,27 @@ import matplotlib.pyplot as plt
 # =====================================================================
 # PAGE CONFIGURATION
 # =====================================================================
-st.set_page_config(page_title="Biomedical Imaging Demo", layout="wide")
-
 st.title("Landscape of Biomedical Imaging")
 
 # Explicit instructions for the students
-st.info("**Instructions:** Use the controls in the sidebar to adjust the simulated tissue densities. Observe how these changes affect the X-ray image below, and then generate a histogram to mathematically analyze the resulting pixel intensities.")
+st.info("**Instructions:** Use the controls below to adjust the simulated tissue densities. Observe how these changes affect the X-ray image, then generate a histogram to analyze the resulting pixel intensities.")
 
 # =====================================================================
-# INTERACTIVE CONTROLS (SIDEBAR)
+# INTERACTIVE CONTROLS
 # =====================================================================
-st.sidebar.header("Tissue Density Controls")
-st.sidebar.write("Adjust the simulated density (0 = Black/Air, 255 = White/Bone)")
+st.header("Tissue Density Controls")
+st.write("Adjust the simulated density (0 = Black/Air, 255 = White/Bone)")
 
 # Tooltips using the `help` parameter
-air_intensity = st.sidebar.slider(
+air_intensity = st.slider(
     "Lungs (Air)", 0, 100, 30,
     help="Simulates the radiodensity of air-filled spaces. Lower values absorb fewer X-rays and appear darker."
 )
-tissue_intensity = st.sidebar.slider(
+tissue_intensity = st.slider(
     "Soft Tissue", 50, 150, 100,
     help="Simulates the radiodensity of soft tissues like muscle or organs. Intermediate values appear as shades of gray."
 )
-bone_intensity = st.sidebar.slider(
+bone_intensity = st.slider(
     "Bone", 150, 255, 200,
     help="Simulates the radiodensity of dense materials. Higher values absorb more X-rays and appear brighter."
 )

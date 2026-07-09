@@ -1,0 +1,37 @@
+{
+  "id": "2.3_basic",
+  "module": "Module 2 - Alignment",
+  "microskill": "2.3",
+  "track": "basic",
+  "title": "Bias, Fairness, and Societal Impacts in Biomedical AI",
+  "audience": "Basic science learners reflecting on bias and fairness in biomedical AI research",
+  "objectives": [
+    "Imagine a useful AI system for biomedical research and identify fairness safeguards.",
+    "Analyze vectors of bias in public-health crisis algorithms.",
+    "Explain risks from demographic mismatch, income mismatch, and overreliance on algorithmic guidance.",
+    "Reflect on how to check for and prevent bias in research collaborations."
+  ],
+  "sections": [
+    {
+      "name": "Ideal AI System for Biomedical Research",
+      "purpose": "Prompt learners to design a research AI system and anticipate bias.",
+      "how_to_use": "Describe what the system would do, why it is needed, what data it would use, and how bias would be mitigated."
+    },
+    {
+      "name": "Public Health Crisis Algorithm Case Study",
+      "purpose": "Analyze bias from nonrepresentative public-health training data.",
+      "how_to_use": "Read the case and write possible bias vectors, deployment considerations, and negative outcomes."
+    },
+    {
+      "name": "Reflection and Takeaways",
+      "purpose": "Connect bias and fairness to the learner's own research practice.",
+      "how_to_use": "Write key takeaways and concrete ways to check or prevent bias in future projects."
+    }
+  ],
+  "chatbot_guidance": [
+    "When asked how to use this notebook, guide the learner through the ideal-system prompt, the case study, and reflection.",
+    "For basic science users, emphasize representation, data source mismatch, downstream societal impact, and critical interpretation.",
+    "Help learners identify who benefits, who is excluded, and who may be harmed.",
+    "Keep answers short and practical."
+  ]
+}

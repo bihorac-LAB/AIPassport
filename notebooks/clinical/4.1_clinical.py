@@ -6,37 +6,20 @@ from sklearn.model_selection import train_test_split, cross_validate
 from sklearn.tree import DecisionTreeClassifier, plot_tree, export_text
 from sklearn.metrics import accuracy_score, make_scorer, recall_score
 import plotly.express as px
-import psutil
 import os
-
-# --- MONITORING UTILITY ---
-def display_performance_monitor():
-    """Tracks CPU and RAM usage of the current Streamlit process."""
-    process = psutil.Process(os.getpid())
-    mem_mb = process.memory_info().rss / (1024 * 1024)
-    cpu_percent = process.cpu_percent(interval=0.1)
-    
-    st.sidebar.markdown("---")
-    st.sidebar.subheader("System Monitor")
-    st.sidebar.caption("Tracks the resource usage of this app in real-time.")
-    c1, c2 = st.sidebar.columns(2)
-    c1.metric("CPU Load", f"{cpu_percent}%", help="Current CPU usage of the Streamlit server.")
-    c2.metric("RAM Usage", f"{mem_mb:.1f} MB", help="Current RAM memory allocated to this app.")
 
 # ---------------------------------
 # Page Config & Sidebar
 # ---------------------------------
-st.set_page_config(page_title="Shared Biomedical AI Vocabulary", layout="wide")
-
-st.sidebar.markdown("### 1. Select Perspective")
-perspective = st.sidebar.radio(
+st.markdown("### 1. Select Perspective")
+perspective = st.radio(
     "View demonstration through the lens of:",
     ["Clinical Care", "Foundational Science"],
     help="Toggle this to see how the same machine learning pipeline is interpreted differently depending on the scientific domain."
 )
 
-st.sidebar.markdown("### 2. Navigation")
-activity = st.sidebar.radio(
+st.markdown("### 2. Navigation")
+activity = st.radio(
     "Go to:",
     [
         "Activity 1 - Data Exploration",
@@ -46,8 +29,6 @@ activity = st.sidebar.radio(
     ],
     help="Select an activity to interact with the corresponding stage of the pipeline."
 )
-
-display_performance_monitor()
 
 # ---------------------------------
 # Context Variables
@@ -69,10 +50,10 @@ st.write(app_desc)
 def load_data():
     # Attempt to load from the local data folder as specified
     try:
-        df = pd.read_csv("data/diabetes.csv")
+        df = pd.read_csv("assets/datasets/csv/diabetes.csv")
         return df
     except FileNotFoundError:
-        st.error("Error: Could not find 'data/diabetes.csv'. Please ensure the 'data' folder exists in the same directory as this script and contains the 'diabetes.csv' file.")
+        st.error("Error: Could not find bundled diabetes dataset at assets/datasets/csv/diabetes.csv.")
         st.stop()
 
 df = load_data()

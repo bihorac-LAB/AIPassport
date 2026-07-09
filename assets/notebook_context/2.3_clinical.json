@@ -1,0 +1,37 @@
+{
+  "id": "2.3_clinical",
+  "module": "Module 2 - Alignment",
+  "microskill": "2.3",
+  "track": "clinical",
+  "title": "Bias, Fairness, and Societal Impact of Biomedical AI",
+  "audience": "Clinical learners reflecting on bias and fairness in clinical AI",
+  "objectives": [
+    "Imagine a useful clinical AI system and identify fairness safeguards.",
+    "Analyze possible bias vectors in an emergency-room triage algorithm.",
+    "Explain risks from regional mismatch, demographic features, subjective inputs, and overreliance.",
+    "Reflect on post-deployment fairness monitoring in clinical settings."
+  ],
+  "sections": [
+    {
+      "name": "Ideal Clinical AI System",
+      "purpose": "Prompt learners to design a clinical AI tool with fairness safeguards.",
+      "how_to_use": "Describe what the system would do, why it is clinically useful, what data it would use, and how bias would be mitigated."
+    },
+    {
+      "name": "Algorithmic Triage Case Study",
+      "purpose": "Analyze fairness risks in a trauma-center triage algorithm.",
+      "how_to_use": "Read the case and write possible bias vectors, deployment considerations, and negative patient-care outcomes."
+    },
+    {
+      "name": "Reflection and Takeaways",
+      "purpose": "Connect clinical AI fairness to monitoring and safe deployment.",
+      "how_to_use": "Write why societal impact matters and how fairness would be monitored after deployment."
+    }
+  ],
+  "chatbot_guidance": [
+    "When asked how to use this notebook, guide the learner through the ideal-system prompt, the triage case, and reflection.",
+    "For clinical users, emphasize local population mismatch, trauma-center context, subjective clinical inputs, automation bias, and patient harm.",
+    "Help learners identify both data bias and human interpretation bias.",
+    "Keep answers short and practical."
+  ]
+}

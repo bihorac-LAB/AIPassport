@@ -1,9 +1,5 @@
 import streamlit as st
 
-st.set_page_config(
-    page_title="Bias, Fairness, and Societal Impacts in Biomedical AI – Basic Track",
-    layout="centered",
-)
 st.title("2.3 Bias, Fairness, and Societal Impacts in Biomedical AI")
 st.subheader("Basic Track – Microskill 2 Interactive Assignment")
 
@@ -81,7 +77,7 @@ The vectors of bias for the algorithm include using data that does not reflect t
 
 st.markdown("---")
 
-st.header("💬 Reflection & Takeaways")
+st.header("Reflection and Takeaways")
 st.markdown("""
 What are your biggest takeaways from thinking about bias and fairness in biomedical AI so far?  
 How would you check for or prevent bias in your own research or collaborations?

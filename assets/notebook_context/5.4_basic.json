@@ -1,0 +1,12 @@
+{
+  "module": "5",
+  "microskill": "5.4",
+  "track": "basic",
+  "title": "Biomedical Computer Vision Applications",
+  "summary": "Review activity for selecting, evaluating, and validating biomedical computer vision applications.",
+  "guide_notes": [
+    "Help learners identify whether the task is classification, segmentation, detection, or enhancement.",
+    "Emphasize image quality, labels, validation, and domain review.",
+    "Mention that this page replaced a missing embedded HTML export."
+  ]
+}

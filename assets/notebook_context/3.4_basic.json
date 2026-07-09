@@ -1,0 +1,25 @@
+{
+  "title": "EHR to OMOP CDM Simulator",
+  "module": "Module 3 - Data Stewardship",
+  "microskill": "3.4",
+  "track": "basic",
+  "audience": "Learners practicing how raw EHR-style data is transformed into an OMOP common data model structure.",
+  "objectives": [
+    "Generate a synthetic source patient cohort.",
+    "Map source demographics into OMOP person table concept IDs.",
+    "Simulate condition occurrence records using ICD-10 source codes.",
+    "Explain why common data models improve cross-site research."
+  ],
+  "sections": [
+    {"name": "Simulation Settings", "purpose": "Set patient count and random seed for reproducible synthetic data."},
+    {"name": "Raw Source Data", "purpose": "Inspect source data before transformation."},
+    {"name": "OMOP Person Table", "purpose": "Map demographics to standardized concept IDs."},
+    {"name": "Condition Occurrence", "purpose": "Map source diagnosis codes into condition records."}
+  ],
+  "chatbot_guidance": [
+    "Explain ETL as extract, transform, and load.",
+    "Clarify why names and addresses disappear from the OMOP person table.",
+    "Explain concept IDs at a high level.",
+    "Keep answers short and step-by-step."
+  ]
+}

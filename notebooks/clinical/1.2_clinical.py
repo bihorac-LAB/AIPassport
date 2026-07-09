@@ -1,10 +1,10 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
-import matplotlib.pyplot as plt
-import seaborn as sns
+import plotly.express as px
+import plotly.graph_objects as go
 
-### Custom metric functions (replace sklearn)
+
 def accuracy_score(y_true, y_pred):
     return (np.array(y_true) == np.array(y_pred)).mean()
 
@@ -20,28 +20,12 @@ def confusion_matrix(y_true, y_pred):
 def roc_auc_score(y_true, y_prob):
     y_true = np.array(y_true)
     y_prob = np.array(y_prob)
-    # Handle the case where all labels are the same (AUC not defined)
     if len(np.unique(y_true)) != 2:
         return np.nan
-    # Rank approach
+
     pos = y_prob[y_true == 1]
     neg = y_prob[y_true == 0]
-    n_pos = len(pos)
-    n_neg = len(neg)
-    if n_pos == 0 or n_neg == 0:
-        return np.nan
-    ranks = np.argsort(np.argsort(np.concatenate([pos, neg])))
-    sum_ranks_pos = np.sum(ranks[:n_pos]) + n_pos  # one-based
-    auc = (sum_ranks_pos - n_pos*(n_pos+1)/2) / (n_pos * n_neg)
-    return auc
-
-st.set_page_config(
-    page_title='MS2: AI Lifecycle (Clinical Track)',
-    layout='wide'
-)
-import streamlit as st
-
-st.set_page_config(page_title="MS3 Biomedical AI Experiment Design Assignment", layout="wide")
+    return ((pos[:, None] > neg).mean() + 0.5 * (pos[:, None] == neg).mean())
 
 st.title("1.2 Artificial Intelligence Lifecycle (Clinical Research)")
 
@@ -72,15 +56,27 @@ This scenario uses a **simulated EHR dataset** for heart disease risk, each "ver
 """)
 
 np.random.seed(2024)
+
+
 def make_patients(n, drift=False):
     age = np.random.randint(40, 82, n)
     systolic_bp = np.random.normal(132, 17, n) + (8 if drift else 0)
     cholesterol = np.random.normal(222, 52, n) + (15 if drift else 0)
     bmi = np.random.normal(28, 7, n) + (2 if drift else 0)
     smoker = np.random.binomial(1, 0.37 if drift else 0.32, n)
-    risk = (0.017*age + 0.02*systolic_bp + 0.012*cholesterol + 0.08*bmi + 0.7*smoker - 35)
+
+    if drift:
+        coef = np.array([0.03, 0.04, 0.018, 0.04, 0.2])
+        intercept = -13.0
+    else:
+        coef = np.array([0.04, 0.025, 0.012, 0.08, 0.7])
+        intercept = -11.7
+
+    features = np.column_stack([age, systolic_bp, cholesterol, bmi, smoker])
+    risk = features @ coef + intercept
     prob = 1/(1+np.exp(-risk))
-    outcome = (prob > np.where(drift, 0.45, 0.48)).astype(int)
+    outcome = np.random.binomial(1, prob)
+
     return pd.DataFrame({
         'age': age, 'systolic_bp': systolic_bp.round(),
         'cholesterol': cholesterol.round(), 'bmi': bmi.round(1),
@@ -95,14 +91,15 @@ batches = [
 batch_names = ["Deployment v1 (Initial)", "Deployment v2 (Stable)", "Deployment v3 (Data Drift)"]
 
 def fake_model_predict(X, version=1):
-    base_coef = np.array([0.015, 0.018, 0.012, 0.07, 0.52])
-    base_intercept = -32.8
+    base_coef = np.array([0.04, 0.025, 0.012, 0.08, 0.7])
+    base_intercept = -11.7
+
     if version == 2:
-        coef = base_coef + np.array([0.0002, 0.0, 0.0005, -0.005, 0.04])
-        intercept = base_intercept + 0.4
+        coef = np.array([0.041, 0.026, 0.013, 0.076, 0.6])
+        intercept = -11.5
     elif version == 3:
-        coef = base_coef + np.array([-0.002, 0.001, -0.001, 0.006, -0.11])
-        intercept = base_intercept - 0.5
+        coef = np.array([0.03, 0.04, 0.018, 0.04, 0.2])
+        intercept = -13.0
     else:
         coef = base_coef
         intercept = base_intercept
@@ -138,21 +135,47 @@ st.write(f"Evaluating **{version}** on **{batch_names[batch_ver]}**:")
 acc = accuracy_score(y_test, y_pred)
 auc = roc_auc_score(y_test, y_prob)
 cm = confusion_matrix(y_test, y_pred)
-st.metric("Accuracy", f"{acc:.2f}")
-st.metric("ROC-AUC", f"{auc:.2f}")
+metric_cols = st.columns(2)
+metric_cols[0].metric("Accuracy", f"{acc:.2f}")
+metric_cols[1].metric("ROC-AUC", "N/A" if np.isnan(auc) else f"{auc:.2f}")
 
-fig, ax = plt.subplots()
-sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', cbar=False,
-            xticklabels=['No event', 'Event'], yticklabels=['No event', 'Event'], ax=ax)
-ax.set_xlabel("Predicted"); ax.set_ylabel("True label")
-ax.set_title("Confusion Matrix")
-st.pyplot(fig)
+fig = go.Figure(
+    data=go.Heatmap(
+        z=cm,
+        x=["No event", "Event"],
+        y=["No event", "Event"],
+        colorscale="Blues",
+        showscale=False,
+        text=cm,
+        texttemplate="%{text}",
+        textfont={"size": 18},
+        hovertemplate="True: %{y}<br>Predicted: %{x}<br>Count: %{z}<extra></extra>",
+    )
+)
+fig.update_layout(
+    title="Confusion Matrix",
+    xaxis_title="Predicted",
+    yaxis_title="True label",
+    height=430,
+    margin=dict(l=40, r=20, t=55, b=45),
+)
+st.plotly_chart(fig, use_container_width=True)
 
 st.write("Distribution of predicted probabilities:")
-fig2, ax2 = plt.subplots()
-sns.histplot(y_prob, bins=20, kde=True, ax=ax2)
-ax2.set_xlabel("Predicted heart disease probability")
-st.pyplot(fig2)
+prob_df = pd.DataFrame({"Predicted heart disease probability": y_prob})
+fig2 = px.histogram(
+    prob_df,
+    x="Predicted heart disease probability",
+    nbins=20,
+    range_x=[0, 1],
+)
+fig2.update_layout(
+    yaxis_title="Patient count",
+    height=360,
+    margin=dict(l=40, r=20, t=25, b=45),
+    bargap=0.08,
+)
+st.plotly_chart(fig2, use_container_width=True)
 
 st.markdown("---\n## 3. Observe Model Drift and Decide When to Retrain")
 

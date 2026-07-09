@@ -1,15 +1,7 @@
 import streamlit as st
 
-st.set_page_config(
-    page_title="MS4. Training, Validation, and Generalizability (Basic Science)",
-    layout="wide",
-    initial_sidebar_state="expanded"
-)
-
 st.title("1.4 Training, Validation, and Generalizability (Basic Science)")
 
-# ========== Sidebar Navigation ==========
-st.sidebar.title("Navigation")
 sections = [
     "Introduction",
     "Part 1: Training & Validation Fundamentals",
@@ -19,7 +11,21 @@ sections = [
     "Part 5: Demographic & Geographic Considerations",
     "Part 6: Reflection & Communication"
 ]
-section = st.sidebar.radio("Go to", sections)
+
+with st.expander("Datasets and tools", expanded=False):
+    st.markdown("""
+**Datasets**
+- [MIMIC-CXR](https://physionet.org/content/mimic-cxr/2.0.0/)
+- [NIH Chest X-ray Dataset](https://nihcc.app.box.com/v/ChestXray-NIHCC)
+- [NIH Chest X-ray Dataset (Kaggle mirror)](https://www.kaggle.com/datasets/nih-chest-xrays/data)
+
+**Tools**
+- [Keras](https://keras.io/)
+- [ML-fairness-gym](https://github.com/google/ml-fairness-gym)
+""")
+    st.info("Download and inspect datasets above as needed. You can use Keras and ML-fairness-gym for modeling and evaluation.")
+
+section = st.selectbox("Choose section", sections)
 
 
 # ========== Introduction ==========
@@ -241,19 +247,3 @@ if section == sections[6]:
     st.text_area("Your response to Task 6.3", key="task6.3")
 
     st.success("Assignment Complete!\n\n(You can export, save, or print your responses at any time.)")
-
-# --------- Sidebar: Datasets and Tools Quick Links ---------
-st.sidebar.markdown("---")
-st.sidebar.header("Datasets")
-st.sidebar.markdown("""
-- [MIMIC-CXR](https://physionet.org/content/mimic-cxr/2.0.0/)
-- [NIH Chest X-ray (Box)](https://nihcc.app.box.com/v/ChestXray-NIHCC)
-- [NIH Chest X-ray (Kaggle)](https://www.kaggle.com/datasets/nih-chest-xrays/data)
-""")
-
-st.sidebar.header("Key Tools")
-st.sidebar.markdown("""
-- [Keras](https://keras.io/)
-- [ML-fairness-gym](https://github.com/google/ml-fairness-gym)
-""")
-st.sidebar.info("Download and inspect datasets above as needed. You can use Keras and ML-fairness-gym for modeling and evaluation.")

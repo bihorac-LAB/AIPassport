@@ -1,0 +1,37 @@
+{
+  "id": "2.5_clinical",
+  "module": "Module 2 - Alignment",
+  "microskill": "2.5",
+  "track": "clinical",
+  "title": "Biomedical AI Quality and Safety Simulator",
+  "audience": "Clinical learners exploring AI quality, safety, drift, calibration, and transparency",
+  "objectives": [
+    "Recognize covariate shift in a simulated sepsis prediction model.",
+    "Compare doing nothing versus retraining under clinical distribution shift.",
+    "Evaluate vendor model discrimination and calibration on a mismatched local population.",
+    "Build a model card documenting intended clinical use, limitations, metrics, and ethical considerations."
+  ],
+  "sections": [
+    {
+      "name": "Sepsis Drift",
+      "purpose": "Show how changing patient populations or lab distributions can affect alerts.",
+      "how_to_use": "Move the months slider, compare lactate distributions, choose a mitigation strategy, and watch false positive rate."
+    },
+    {
+      "name": "Vendor Calibration",
+      "purpose": "Evaluate whether a vendor model is reliable on the local population.",
+      "how_to_use": "Adjust population mismatch, review AUC, and inspect calibration to see whether predicted risks match actual risks."
+    },
+    {
+      "name": "Model Card Builder",
+      "purpose": "Practice clinical model documentation before deployment.",
+      "how_to_use": "Fill in intended users, caveats, and ethical considerations, then review the generated model card."
+    }
+  ],
+  "chatbot_guidance": [
+    "When asked how to use this notebook, guide the learner through the three tabs: drift, vendor calibration, and model card.",
+    "For clinical users, emphasize alert fatigue, local validation, calibration, patient population mismatch, and deployment limits.",
+    "Explain that high AUC does not guarantee reliable patient-level probabilities.",
+    "Keep answers short and practical."
+  ]
+}

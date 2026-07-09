@@ -1,0 +1,25 @@
+{
+  "title": "Cardiovascular Risk Data Preprocessing Lab",
+  "module": "Module 3 - Data Stewardship",
+  "microskill": "3.5",
+  "track": "clinical",
+  "audience": "Clinical learners cleaning simulated cardiovascular risk data before AI modeling.",
+  "objectives": [
+    "Inspect noisy clinical feature data.",
+    "Apply winsorization to cap extreme measurements.",
+    "Choose an imputation method for missing values.",
+    "Scale clinical features and inspect distribution changes."
+  ],
+  "sections": [
+    {"name": "Case Study and Instructions", "purpose": "Frame the clinical data-quality problem."},
+    {"name": "Preprocessing Controls", "purpose": "Control winsorization, imputation, and scaling."},
+    {"name": "Dataset Preview", "purpose": "Inspect cleaned rows after preprocessing."},
+    {"name": "Feature Distributions", "purpose": "Use boxplots to inspect remaining skew and outliers."}
+  ],
+  "chatbot_guidance": [
+    "Explain preprocessing as a patient-safety and model-quality step.",
+    "Clarify when mean versus median imputation matters.",
+    "Help learners interpret the remaining outlier metric.",
+    "Keep answers short and step-by-step."
+  ]
+}

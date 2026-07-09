@@ -8,45 +8,39 @@ from skimage import exposure
 import os  # Import the os module
 
 # --- Set page config for a modern look ---
-st.set_page_config(
-    page_title="Image Transformation Exercises",
-    page_icon=":camera:",
-    layout="wide",
-    initial_sidebar_state="expanded",
-)
-
 # --- Load Images ---
 @st.cache_data  # Cache the images to avoid reloading on every interaction
 def load_images():
-    IF_image_path = "assets/IFCells.jpg"
-    mandrill_image = io.imread("http://sipi.usc.edu/database/download.php?vol=misc&img=4.2.03")
+    IF_image_path = "assets/datasets/images/IFCells.jpg"
+    brightfield_image_path = "assets/datasets/images/BloodSmear.png"
     
     # Handle local file loading safely
     try:
         IF = io.imread(IF_image_path)
-        kidney_mri = io.imread("assets/kidney_mri.jpg")  
-        breast_img = cv2.imread('assets/breast.png', cv2.IMREAD_GRAYSCALE)  
-        I_low_contrast = io.imread("assets/low_contrast2.jpg")
+        brightfield_image = io.imread(brightfield_image_path)
+        kidney_mri = io.imread("assets/datasets/images/kidney_mri.jpg")  
+        breast_img = cv2.imread("assets/datasets/images/breast.png", cv2.IMREAD_GRAYSCALE)
+        I_low_contrast = io.imread("assets/datasets/images/low_contrast2.jpg")
     except FileNotFoundError:
-        st.error("One or more local images are missing. Please ensure the 'assets' folder is populated.")
-        return None, mandrill_image, None, None, None
+        st.error("One or more local images are missing. Please ensure the bundled image assets are present.")
+        return None, None, None, None, None
 
     # Ensure images have 3 channels (RGB)
     if IF is not None and IF.shape[-1] == 4:
         IF = IF[:, :, :3]
-    if mandrill_image.shape[-1] == 4:
-        mandrill_image = mandrill_image[:, :, :3]
+    if brightfield_image is not None and brightfield_image.shape[-1] == 4:
+        brightfield_image = brightfield_image[:, :, :3]
 
-    return IF, mandrill_image, kidney_mri, breast_img, I_low_contrast
+    return IF, brightfield_image, kidney_mri, breast_img, I_low_contrast
 
-IF, mandrill_image, kidney_mri, breast_img, I_low_contrast = load_images()
+IF, brightfield_image, kidney_mri, breast_img, I_low_contrast = load_images()
 
 # --- Disclaimer ---
 st.warning("This is a public application. Please do not upload any sensitive or private data.")
 
 # --- Sidebar for Section Selection ---
-st.sidebar.title("Section Selection")
-selected_section = st.sidebar.radio(
+st.title("Section Selection")
+selected_section = st.radio(
     "Choose a Section:",
     (
         "Channel Separation",
@@ -60,24 +54,24 @@ selected_section = st.sidebar.radio(
 )
 
 # --- Image Selection ---
-image_choice = st.sidebar.radio(
+image_choice = st.radio(
     "Select Image:",
-    ("Mandrill", "Fluorescence", "Kidney MRI")
+    ("Brightfield", "Fluorescence", "Kidney MRI")
 )
 
-if image_choice == "Mandrill":
-    img = mandrill_image
+if image_choice == "Brightfield":
+    img = brightfield_image
 elif image_choice == "Fluorescence":
     img = IF
 else:
     img = kidney_mri
 
 # --- Image Upload ---
-uploaded_file = st.sidebar.file_uploader("Upload an Image", type=["jpg", "jpeg", "png"])
+uploaded_file = st.file_uploader("Upload an Image", type=["jpg", "jpeg", "png"])
 
 if uploaded_file is not None:
     img = io.imread(uploaded_file)  # Load the uploaded image
-    st.sidebar.success("Image uploaded successfully!")
+    st.success("Image uploaded successfully!")
 
 # --- Section Content ---
 

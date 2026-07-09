@@ -1,0 +1,37 @@
+{
+  "id": "2.5_basic",
+  "module": "Module 2 - Alignment",
+  "microskill": "2.5",
+  "track": "basic",
+  "title": "Biomedical AI Quality and Safety Simulator",
+  "audience": "Basic science learners exploring AI quality, safety, drift, calibration, and transparency",
+  "objectives": [
+    "Recognize covariate shift in a simulated sepsis prediction model.",
+    "Compare doing nothing versus retraining under distribution shift.",
+    "Evaluate vendor model discrimination and calibration on a mismatched local population.",
+    "Build a model card documenting intended use, limitations, metrics, and ethical considerations."
+  ],
+  "sections": [
+    {
+      "name": "Sepsis Drift",
+      "purpose": "Show how input distribution changes can degrade model behavior.",
+      "how_to_use": "Move the months slider, compare original and current lactate distributions, and test whether retraining changes false positive rate."
+    },
+    {
+      "name": "Vendor Calibration",
+      "purpose": "Compare ranking performance with probability reliability.",
+      "how_to_use": "Adjust population mismatch, review AUC, and inspect whether the calibration curve follows the diagonal."
+    },
+    {
+      "name": "Model Card Builder",
+      "purpose": "Practice transparent model documentation.",
+      "how_to_use": "Fill in model name, developer, intended users, caveats, and ethical considerations, then review the generated model card."
+    }
+  ],
+  "chatbot_guidance": [
+    "When asked how to use this notebook, guide the learner through the three tabs: drift, calibration, and model card.",
+    "For basic science users, emphasize distribution shift, evaluation limits, calibration, and transparent documentation.",
+    "Explain that high AUC does not guarantee well-calibrated probabilities.",
+    "Keep answers short and practical."
+  ]
+}

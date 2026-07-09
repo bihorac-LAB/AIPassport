@@ -1,0 +1,47 @@
+{
+  "id": "1.3_basic",
+  "module": "Module 1 - Fundamentals",
+  "microskill": "1.3",
+  "track": "basic",
+  "title": "Designing Biomedical Artificial Intelligence Experiments",
+  "audience": "Basic science learners designing AI experiments for cellular imaging and phenotype discovery",
+  "objectives": [
+    "Identify literature gaps and convert them into SMART research questions.",
+    "Design a data management strategy for cellular imaging experiments.",
+    "Choose candidate AI models, evaluation metrics, and validation strategies.",
+    "Reflect on ethics, limitations, reproducibility, and multidisciplinary communication."
+  ],
+  "sections": [
+    {
+      "name": "Knowledge Gaps and Research Questions",
+      "purpose": "Help learners define why the experiment is needed.",
+      "how_to_use": "Select at least three gaps, then write one primary and two secondary SMART research questions."
+    },
+    {
+      "name": "Data Management Strategy",
+      "purpose": "Plan how image data will be selected, cleaned, processed, and split.",
+      "how_to_use": "Choose staining channels, quality criteria, preprocessing methods, feature extraction, dimensionality reduction, and split strategy."
+    },
+    {
+      "name": "Experimental Design",
+      "purpose": "Choose AI methods and evaluation criteria for classification or discovery.",
+      "how_to_use": "Select candidate models, pick a main approach, justify metrics, and explain how results will be biologically meaningful."
+    },
+    {
+      "name": "Ethical Considerations and Limitations",
+      "purpose": "Prompt responsible interpretation and transparent reporting.",
+      "how_to_use": "Select ethical issues, describe mitigation, and explain limitations that affect interpretation."
+    },
+    {
+      "name": "Reflection",
+      "purpose": "Connect the design to iteration, collaboration, and communication.",
+      "how_to_use": "Describe how findings would shape future research and how to communicate to different audiences."
+    }
+  ],
+  "chatbot_guidance": [
+    "When asked how to use this notebook, guide the learner through the five parts in order.",
+    "For basic science users, emphasize biological validity, batch effects, image quality, model interpretability, and reproducibility.",
+    "Help learners turn broad ideas into concrete SMART research questions.",
+    "Keep answers short and practical."
+  ]
+}

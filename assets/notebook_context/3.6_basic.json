@@ -1,0 +1,26 @@
+{
+  "title": "Multi-Institutional Data Sharing Simulation",
+  "module": "Module 3 - Data Stewardship",
+  "microskill": "3.6",
+  "track": "basic",
+  "audience": "Basic science learners exploring privacy-preserving multi-institutional collaboration.",
+  "objectives": [
+    "Generate simulated institutional datasets.",
+    "Detect and remove outliers before collaboration.",
+    "Impute and scale local data consistently.",
+    "Run a federated-learning-style round without sharing raw records."
+  ],
+  "sections": [
+    {"name": "Simulation Settings", "purpose": "Choose research scenario, sample size, and outlier contamination."},
+    {"name": "Local Data Inspection", "purpose": "Inspect the raw local dataset."},
+    {"name": "Outlier Detection", "purpose": "Use a z-score threshold to identify values for removal."},
+    {"name": "Standardization and Imputation", "purpose": "Prepare compatible data locally."},
+    {"name": "Federated Learning Simulation", "purpose": "Aggregate model weights instead of sharing raw data."}
+  ],
+  "chatbot_guidance": [
+    "Explain federated learning as sharing model updates, not raw records.",
+    "Guide learners to apply the outlier filter before later steps unlock.",
+    "Clarify why sites must preprocess consistently.",
+    "Keep answers short and step-by-step."
+  ]
+}

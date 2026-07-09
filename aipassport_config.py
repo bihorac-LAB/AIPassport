@@ -1,7 +1,7 @@
 # AI Passport Central Configuration
 
 # Model Settings
-DEFAULT_MODEL = "gemma-3-27b-it"
+DEFAULT_MODEL = "gemma-4-31b-it"
 NAVIGATOR_TOOLKIT_BASE_URL = "https://api.ai.it.ufl.edu/v1"
 
 # UI Settings

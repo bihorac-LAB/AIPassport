@@ -1,8 +1,9 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
-import matplotlib.pyplot as plt
-import seaborn as sns
+import os
+import plotly.graph_objects as go
+from plotly.subplots import make_subplots
 from sklearn.model_selection import train_test_split, KFold, cross_val_score, StratifiedKFold, LeaveOneOut
 from sklearn.preprocessing import StandardScaler
 from sklearn.neighbors import KNeighborsClassifier
@@ -10,10 +11,30 @@ from sklearn.metrics import accuracy_score
 from sklearn.utils import resample
 from sklearn.datasets import make_classification
 
-st.set_page_config(page_title="Model Generalizability Sandbox", layout="wide")
+
+def render_plotly_chart(fig, height=520):
+    fig.update_layout(
+        height=height,
+        margin=dict(l=20, r=20, t=60, b=40),
+        legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
+    )
+    st.plotly_chart(fig, use_container_width=True, config={"responsive": True})
+
 
 @st.cache_data
 def load_clinical_data():
+    local_path = "assets/datasets/csv/eicu_demo.csv"
+    if os.path.exists(local_path):
+        df = pd.read_csv(local_path)
+        if "weight" in df.columns and "weight_admission" not in df.columns:
+            df = df.rename(columns={"weight": "weight_admission"})
+        num_feats = ["age", "lab_glucose", "lab_creatinine", "lab_potassium"]
+        for col in num_feats:
+            df[col] = pd.to_numeric(df[col], errors="coerce")
+        df[num_feats] = df[num_feats].fillna(df[num_feats].mean())
+        df = df.dropna(subset=["in_hospital_mortality"])
+        return df.sample(n=min(200, len(df)), random_state=42).reset_index(drop=True), num_feats, "in_hospital_mortality"
+
     patient_cols = ['patientunitstayid', 'hospitalid', 'gender', 'age', 'ethnicity', 'admissionheight', 
                     'admissionweight', 'dischargeweight', 'hospitaladmitsource', 'hospitaldischargelocation', 
                     'hospitaldischargestatus', 'unittype', 'uniquepid', 'unitvisitnumber',
@@ -68,19 +89,19 @@ def load_foundational_data():
     df['cellular_apoptosis'] = y
     return df, features, 'cellular_apoptosis'
 
-st.sidebar.title("Module Navigation")
-scientific_context = st.sidebar.radio(
+st.title("Module Navigation")
+scientific_context = st.radio(
     "Select Learning Context:", 
     ["Clinical (eICU)", "Foundational Science"],
     help="Toggle the terminology and dataset to match your specific field of study."
 )
 
-st.sidebar.markdown("---")
+st.markdown("---")
 
-st.sidebar.title("Learning Activities")
-st.sidebar.info("Use the menu below to navigate between the three different activities in this module.")
+st.title("Learning Activities")
+st.info("Use the menu below to navigate between the three different activities in this module.")
 
-mode = st.sidebar.radio(
+mode = st.radio(
     "Select an Activity:",
     [
         "Activity 1: Overfitting and Underfitting", 
@@ -127,24 +148,63 @@ if mode == "Activity 1: Overfitting and Underfitting":
     k_low = c1.number_input("Complex Model (k)", 1, 50, 1, help="A low k value makes the model highly sensitive to noise.")
     k_high = c2.number_input("Simple Model (k)", 1, 50, 15, help="A high k value smooths out the boundaries.")
 
-    def draw_boundary(k_val, ax, title):
+    def boundary_data(k_val):
         X_2d = X_train_s[:, :2] 
         knn = KNeighborsClassifier(n_neighbors=k_val).fit(X_2d, y_train)
         x_min, x_max = X_2d[:, 0].min() - 1, X_2d[:, 0].max() + 1
         y_min, y_max = X_2d[:, 1].min() - 1, X_2d[:, 1].max() + 1
         xx, yy = np.meshgrid(np.arange(x_min, x_max, 0.1), np.arange(y_min, y_max, 0.1))
         Z = knn.predict(np.c_[xx.ravel(), yy.ravel()]).reshape(xx.shape)
-        
-        ax.contourf(xx, yy, Z, alpha=0.8, cmap='cividis')
-        ax.scatter(X_2d[:, 0], X_2d[:, 1], c=y_train, edgecolors='white', cmap='cividis', s=40, linewidths=0.5)
-        ax.set_title(title)
-        ax.set_xlabel(st.session_state.selected_features[0])
-        ax.set_ylabel(st.session_state.selected_features[1])
+        return X_2d, xx, yy, Z
 
-    fig_b, (ax1, ax2) = plt.subplots(1, 2, figsize=(10, 4))
-    draw_boundary(k_low, ax1, f"Overfitting (k={k_low})")
-    draw_boundary(k_high, ax2, f"Underfitting (k={k_high})")
-    st.pyplot(fig_b)
+    X_2d_low, xx_low, yy_low, z_low = boundary_data(k_low)
+    X_2d_high, xx_high, yy_high, z_high = boundary_data(k_high)
+    fig_b = make_subplots(
+        rows=1,
+        cols=2,
+        subplot_titles=(f"Overfitting (k={k_low})", f"Underfitting (k={k_high})"),
+        horizontal_spacing=0.08,
+    )
+    for col, x_2d, xx, yy, z in (
+        (1, X_2d_low, xx_low, yy_low, z_low),
+        (2, X_2d_high, xx_high, yy_high, z_high),
+    ):
+        fig_b.add_trace(
+            go.Contour(
+                x=xx[0],
+                y=yy[:, 0],
+                z=z,
+                colorscale="Cividis",
+                opacity=0.75,
+                showscale=False,
+                hoverinfo="skip",
+            ),
+            row=1,
+            col=col,
+        )
+        fig_b.add_trace(
+            go.Scatter(
+                x=x_2d[:, 0],
+                y=x_2d[:, 1],
+                mode="markers",
+                marker=dict(
+                    color=y_train,
+                    colorscale="Cividis",
+                    size=7,
+                    line=dict(color="white", width=1),
+                ),
+                showlegend=False,
+                hovertemplate=(
+                    f"{st.session_state.selected_features[0]}: %{{x:.2f}}<br>"
+                    f"{st.session_state.selected_features[1]}: %{{y:.2f}}<extra></extra>"
+                ),
+            ),
+            row=1,
+            col=col,
+        )
+        fig_b.update_xaxes(title_text=st.session_state.selected_features[0], row=1, col=col)
+        fig_b.update_yaxes(title_text=st.session_state.selected_features[1], row=1, col=col)
+    render_plotly_chart(fig_b, height=620)
     st.caption("Colorblind-accessible contour plot displaying model decision boundaries. Yellow regions predict one class outcome, while dark blue regions predict the other. White-outlined dots represent individual patient or cell sample data points.")
 
     with st.expander("Reveal Concept Summary"):
@@ -173,13 +233,12 @@ elif mode == "Activity 2: Hyperparameter Tuning":
         train_acc.append(accuracy_score(y_train, knn.predict(X_train_s)))
         test_acc.append(accuracy_score(y_test, knn.predict(X_test_s)))
 
-    fig_acc, ax_acc = plt.subplots(figsize=(8, 3))
-    ax_acc.plot(ks, train_acc, label='Train Accuracy', marker='o', color='#00204c')
-    ax_acc.plot(ks, test_acc, label='Test Accuracy', marker='x', color='#ffe945')
-    ax_acc.set_ylabel("Accuracy")
-    ax_acc.set_xlabel("Number of Neighbors (k)")
-    ax_acc.legend()
-    st.pyplot(fig_acc)
+    fig_acc = go.Figure()
+    fig_acc.add_trace(go.Scatter(x=list(ks), y=train_acc, mode="lines+markers", name="Train Accuracy", line=dict(color="#00204c")))
+    fig_acc.add_trace(go.Scatter(x=list(ks), y=test_acc, mode="lines+markers", name="Test Accuracy", line=dict(color="#d6b800")))
+    fig_acc.update_xaxes(title_text="Number of Neighbors (k)")
+    fig_acc.update_yaxes(title_text="Accuracy", range=[0, 1.05])
+    render_plotly_chart(fig_acc, height=500)
     st.caption("Line graph comparing model accuracy on training data versus testing data across different values of k. The dark blue line represents training accuracy, and the yellow line represents testing accuracy.")
 
     with st.expander("Reveal Concept Summary"):
@@ -207,11 +266,21 @@ elif mode == "Activity 3: Cross-Validation Strategies":
     X_s = StandardScaler().fit_transform(X) 
     scores = cross_val_score(knn_cv, X_s, y, cv=kf)
 
-    fig_cv, ax_cv = plt.subplots(figsize=(8, 3))
-    sns.boxplot(x=scores, color="#00204c", ax=ax_cv)
-    sns.stripplot(x=scores, color="#ffe945", size=8, jitter=True, ax=ax_cv, edgecolor='gray', linewidth=1)
-    ax_cv.set_title(f"Accuracy Distribution ({n_f} Folds)")
-    st.pyplot(fig_cv)
+    fig_cv = go.Figure()
+    fig_cv.add_trace(
+        go.Box(
+            x=scores,
+            name=f"{n_f} Folds",
+            boxpoints="all",
+            jitter=0.35,
+            pointpos=0,
+            marker_color="#d6b800",
+            line_color="#00204c",
+        )
+    )
+    fig_cv.update_xaxes(title_text="Accuracy", range=[0, 1.05])
+    fig_cv.update_layout(title=f"Accuracy Distribution ({n_f} Folds)")
+    render_plotly_chart(fig_cv, height=430)
     st.caption("Boxplot displaying the spread of accuracy scores across multiple data folds. Wider boxes indicate greater instability in the model's performance.")
 
     st.subheader("Comparing Validation Strategies")
@@ -226,11 +295,16 @@ elif mode == "Activity 3: Cross-Validation Strategies":
     means = [scores.mean(), skf_s.mean(), loo_s.mean()]
     sterr = [scores.std(), skf_s.std(), loo_s.std()]
 
-    fig_bar, ax_bar = plt.subplots(figsize=(8, 3))
-    ax_bar.bar(methods, means, yerr=sterr, capsize=10, color=['#00204c', '#575c6d', '#ffe945'], alpha=0.9)
-    ax_bar.set_ylim(0, 1.1)
-    ax_bar.set_ylabel("Mean Accuracy")
-    st.pyplot(fig_bar)
+    fig_bar = go.Figure(
+        go.Bar(
+            x=methods,
+            y=means,
+            error_y=dict(type="data", array=sterr, visible=True),
+            marker_color=["#00204c", "#575c6d", "#d6b800"],
+        )
+    )
+    fig_bar.update_yaxes(title_text="Mean Accuracy", range=[0, 1.1])
+    render_plotly_chart(fig_bar, height=500)
     st.caption("Bar chart comparing the mean accuracy of K-Fold, Stratified K-Fold, and Leave-One-Out cross-validation. Error bars represent the standard deviation of scores.")
 
     with st.expander("Reveal Concept Summary"):

@@ -4,17 +4,8 @@
 import streamlit as st
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
-import seaborn as sns
+import plotly.express as px
 
-# --------------------------------------------------------------
-# Page configuration
-# --------------------------------------------------------------
-st.set_page_config(page_title="Genomic Pre‑processing Explorer", layout="wide")
-
-# --------------------------------------------------------------
-# 1️⃣  Simulated genomic dataset (identical to the notebook)
-# --------------------------------------------------------------
 @st.cache_data
 def load_data() -> pd.DataFrame:
     np.random.seed(42)
@@ -38,28 +29,25 @@ def load_data() -> pd.DataFrame:
 
 df_raw = load_data()
 
-# --------------------------------------------------------------
-# 2️⃣  Sidebar – user‑controlled preprocessing knobs
-# --------------------------------------------------------------
-st.sidebar.header("Pre‑processing Settings")
+st.title("3.5 Genomic Data Pre-processing Explorer")
 
-lower_pct = st.sidebar.slider(
-    "Lower Winsorization Percentile", min_value=0, max_value=20, value=5, step=1
-)
-upper_pct = st.sidebar.slider(
-    "Upper Winsorization Percentile", min_value=80, max_value=100, value=95, step=1
-)
-
-impute_strategy = st.sidebar.selectbox(
-    "Missing‑Value Imputation", ["mean", "median", "most_frequent"]
-)
-
-scale_option = st.sidebar.radio(
-    "Feature Scaling", ("Standard (Z‑score)", "Min‑Max", "None")
-)
+with st.expander("Pre-processing Settings", expanded=True):
+    c1, c2, c3, c4 = st.columns(4)
+    lower_pct = c1.slider(
+        "Lower Winsorization Percentile", min_value=0, max_value=20, value=5, step=1
+    )
+    upper_pct = c2.slider(
+        "Upper Winsorization Percentile", min_value=80, max_value=100, value=95, step=1
+    )
+    impute_strategy = c3.selectbox(
+        "Missing-Value Imputation", ["mean", "median", "most_frequent"]
+    )
+    scale_option = c4.radio(
+        "Feature Scaling", ("Standard (Z-score)", "Min-Max", "None")
+    )
 
 # --------------------------------------------------------------
-# 3️⃣  Helper functions (pure pandas / NumPy)
+# Helper functions
 # --------------------------------------------------------------
 def cap_outliers(series: pd.Series, lower: int, upper: int) -> pd.Series:
     lo, hi = np.percentile(series, [lower, upper])
@@ -67,7 +55,7 @@ def cap_outliers(series: pd.Series, lower: int, upper: int) -> pd.Series:
 
 
 def manual_zscore(df: pd.DataFrame) -> pd.DataFrame:
-    """Z‑score computed with pandas (no scipy)."""
+    """Z-score computed with pandas."""
     return (df - df.mean()) / df.std(ddof=0)
 
 
@@ -82,9 +70,9 @@ def impute(series: pd.Series, strategy: str) -> pd.Series:
 
 
 def scale(series: pd.Series, method: str) -> pd.Series:
-    if method == "Standard (Z‑score)":
+    if method == "Standard (Z-score)":
         return (series - series.mean()) / series.std(ddof=0)
-    elif method == "Min‑Max":
+    elif method == "Min-Max":
         return (series - series.min()) / (series.max() - series.min())
     else:  # None
         return series
@@ -93,37 +81,28 @@ def scale(series: pd.Series, method: str) -> pd.Series:
 def preprocess(df: pd.DataFrame) -> pd.DataFrame:
     df = df.copy()
 
-    # ---- 1️⃣  Winsorize outliers ---------------------------------
     for col in ["Expression_Level", "Mutation_Frequency", "Pathway_Score"]:
         df[col] = cap_outliers(df[col], lower_pct, upper_pct)
 
-    # ---- 2️⃣  Impute missing values -------------------------------
     df["Missing_Feature"] = impute(df["Missing_Feature"], impute_strategy)
 
-    # ---- 3️⃣  Scale numeric features -------------------------------
     for col in ["Expression_Level", "Mutation_Frequency", "Pathway_Score"]:
         df[col] = scale(df[col], scale_option)
 
-    # ---- 4️⃣  Normalise the imputed feature (as in original notebook) --
-    df["Missing_Feature"] = scale(df["Missing_Feature"], "Min‑Max")
+    df["Missing_Feature"] = scale(df["Missing_Feature"], "Min-Max")
 
     return df
 
 
 df_processed = preprocess(df_raw)
 
-# --------------------------------------------------------------
-# 4️⃣  Layout – tables & visualisations
-# --------------------------------------------------------------
-st.title("Genomic Data Pre‑processing Explorer")
-
 c1, c2 = st.columns(2)
 with c1:
-    st.subheader("Raw data (first 5 rows)")
-    st.dataframe(df_raw.head())
+    st.subheader("Raw data")
+    st.dataframe(df_raw.head(10), height=260, use_container_width=True)
 with c2:
-    st.subheader("Processed data (first 5 rows)")
-    st.dataframe(df_processed.head())
+    st.subheader("Processed data")
+    st.dataframe(df_processed.head(10), height=260, use_container_width=True)
 
 st.markdown("---")
 
@@ -135,27 +114,18 @@ z_raw = manual_zscore(
 out_counts = ((z_raw > 3) | (z_raw < -3)).sum()
 st.write(out_counts)
 
-# ---- Box‑plot comparison ---------------------------------------
-st.subheader("Box‑plot: Raw vs. Processed")
-fig, axs = plt.subplots(1, 2, figsize=(14, 5), sharey=True)
-
-sns.boxplot(
-    data=df_raw[["Expression_Level", "Mutation_Frequency", "Pathway_Score"]],
-    ax=axs[0],
-    palette="pastel",
-)
-axs[0].set_title("Raw")
-
-sns.boxplot(
-    data=df_processed[
-        ["Expression_Level", "Mutation_Frequency", "Pathway_Score"]
+st.subheader("Box plot: Raw vs. Processed")
+plot_cols = ["Expression_Level", "Mutation_Frequency", "Pathway_Score"]
+plot_df = pd.concat(
+    [
+        df_raw[plot_cols].assign(Stage="Raw"),
+        df_processed[plot_cols].assign(Stage="Processed"),
     ],
-    ax=axs[1],
-    palette="muted",
-)
-axs[1].set_title("Processed")
-
-st.pyplot(fig)
+    ignore_index=True,
+).melt(id_vars="Stage", var_name="Feature", value_name="Value")
+fig = px.box(plot_df, x="Feature", y="Value", color="Stage", title="Feature Distributions Before and After Pre-processing")
+fig.update_layout(height=460, margin=dict(l=40, r=20, t=55, b=45))
+st.plotly_chart(fig, use_container_width=True)
 
 st.caption(
     "Adjust the sidebar controls to see how Winsorization, imputation, and scaling reshape the dataset."

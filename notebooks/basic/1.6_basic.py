@@ -1,12 +1,9 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
-import matplotlib.pyplot as plt
-import seaborn as sns
+import plotly.express as px
 
-st.set_page_config(page_title="MS6: Basics of Scientific Rigor and Reproducibility", layout="wide")
-
-st.title("1.6 Basics of Scientific Rigor and REproducibility (Basic Science)")
+st.title("1.6 Basics of Scientific Rigor and Reproducibility (Basic Science)")
 
 st.markdown("""
 #### **Track:** Basic Science  
@@ -52,9 +49,14 @@ select_col = st.selectbox(
     'Select variable for boxplot:', 
     ('heart_rate', 'map', 'temperature')
 )
-fig, ax = plt.subplots()
-sns.boxplot(df[select_col], ax=ax)
-st.pyplot(fig)
+fig = px.box(df, x=select_col, points="all", hover_data=["patient_id"])
+fig.update_layout(
+    height=320,
+    xaxis_title=select_col,
+    yaxis_title="",
+    margin=dict(l=40, r=20, t=25, b=35),
+)
+st.plotly_chart(fig, use_container_width=True)
 
 st.markdown("""
 **Questions:**  

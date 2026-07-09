@@ -1,0 +1,12 @@
+{
+  "module": "5",
+  "microskill": "5.1",
+  "track": "clinical",
+  "title": "Clinical Imaging Assignment",
+  "summary": "Uses X-ray edge detection and contrast adjustment to compare clinical imaging structures and modalities.",
+  "guide_notes": [
+    "Explain edge detection as a structural aid, not a diagnosis.",
+    "Frame threshold, contrast, and brightness in clinical image interpretation terms.",
+    "Remind learners not to upload protected health information."
+  ]
+}

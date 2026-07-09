@@ -1,0 +1,46 @@
+{
+  "id": "1.2_clinical",
+  "module": "Module 1 - Fundamentals",
+  "microskill": "1.2",
+  "track": "clinical",
+  "title": "Artificial Intelligence Lifecycle",
+  "audience": "Clinical learners studying AI deployment and monitoring",
+  "objectives": [
+    "Explore how deployed AI model performance changes across data batches.",
+    "Connect data drift, validation checks, and retraining decisions.",
+    "Practice interpreting accuracy, ROC-AUC, confusion matrices, and predicted probability distributions."
+  ],
+  "sections": [
+    {
+      "name": "Dataset Overview",
+      "purpose": "Introduce a simulated EHR-style heart disease risk dataset.",
+      "how_to_use": "Review the sample patient records and the outcome definition before changing model or batch selections."
+    },
+    {
+      "name": "Model Version and New Data",
+      "purpose": "Compare deployed model versions against incoming batches.",
+      "how_to_use": "Change the model version and incoming batch. Watch how accuracy, ROC-AUC, the confusion matrix, and predicted probabilities change."
+    },
+    {
+      "name": "Model Drift",
+      "purpose": "Help learners decide when model monitoring should trigger retraining.",
+      "how_to_use": "Try Model v1 on later batches, then compare against retrained versions. Use the notes box to record where performance changes."
+    },
+    {
+      "name": "Data Validation Checks",
+      "purpose": "Show why clinical AI systems need input validation before inference or retraining.",
+      "how_to_use": "Adjust age, blood pressure, cholesterol, and BMI thresholds. Review which patient rows are flagged."
+    },
+    {
+      "name": "Lifecycle Management Scenario",
+      "purpose": "Prompt learners to plan monitoring, versioning, documentation, and communication.",
+      "how_to_use": "Write a short action plan for model versioning, MLflow or DVC-style documentation, and stakeholder communication."
+    }
+  ],
+  "chatbot_guidance": [
+    "When asked how to use this notebook, tell the learner to start by comparing model versions and data batches.",
+    "Explain metrics in clinical language: accuracy is overall correctness, ROC-AUC is ranking ability, and the confusion matrix shows false positives and false negatives.",
+    "When learners see drift, connect it to population changes, changing clinical practice, and retraining governance.",
+    "Keep answers short and practical."
+  ]
+}

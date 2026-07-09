@@ -1,0 +1,12 @@
+{
+  "module": "4",
+  "microskill": "4.6",
+  "track": "basic",
+  "title": "Model Generalizability Sandbox",
+  "summary": "Demonstrates overfitting, hyperparameter tuning, and cross-validation strategies using clinical or simulated foundational data.",
+  "guide_notes": [
+    "Mention that bundled eICU demo data is used for the clinical context.",
+    "Explain k-nearest-neighbor behavior and why k changes model complexity.",
+    "Connect validation strategy to generalization risk."
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "module": "4",
+  "microskill": "4.4",
+  "track": "clinical",
+  "title": "Choosing the Right Biomedical Deep Learning Model",
+  "summary": "Shows clinical preprocessing, Conv1D architecture structure, dropout, and cross-validation result interpretation.",
+  "guide_notes": [
+    "Help learners understand why scaling matters for clinical features.",
+    "Explain the Conv1D and dropout visuals at a conceptual level.",
+    "Connect fold metrics to clinical model reliability."
+  ]
+}

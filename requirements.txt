@@ -12,6 +12,7 @@ altair
 google-genai>=1.0.0
 openai
 streamlit-timeline
+Faker
 
 # System & Utils
 psutil

@@ -3,18 +3,16 @@ import cv2
 import numpy as np
 
 # --- PAGE CONFIG & PRIVACY WARNING ---
-st.set_page_config(page_title="AI Passport: Clinical Demo", layout="wide")
+st.warning("PRIVACY NOTICE: Please do not upload any images containing Protected Health Information (PHI) or sensitive personal data.")
 
-st.sidebar.warning("PRIVACY NOTICE: Please do not upload any images containing Protected Health Information (PHI) or sensitive personal data.")
-
-st.sidebar.title("AI Passport: Clinical Assignment")
-activity = st.sidebar.radio(
+st.title("AI Passport: Clinical Assignment")
+activity = st.radio(
     "Select Activity:", 
     ["Activity 1: X-ray Edge Detection", "Activity 2: CT vs MRI Analysis"],
     help="Use this menu to navigate between the different parts of your clinical assignment."
 )
 
-st.sidebar.divider()
+st.divider()
 
 # --- SHARED FUNCTIONS & CONSTANTS ---
 def apply_edge_detection(image, low, high):
@@ -34,14 +32,14 @@ if activity == "Activity 1: X-ray Edge Detection":
     
     with st.expander("Instructions", expanded=True):
         st.markdown("""
-        1. Observe the default image below or upload your own sample image using the sidebar.
-        2. Adjust the **Low Threshold** and **High Threshold** sliders in the sidebar.
+        1. Observe the default image below or upload your own sample image.
+        2. Adjust the **Low Threshold** and **High Threshold** sliders.
         3. Observe how the edge detection algorithm highlights different structures and noise within the image.
         4. Return to Canvas to answer the question: *Why might edge detection alone be insufficient for detecting fractures in an X-ray image?*
         """)
     
-    st.sidebar.markdown("### Activity 1 Controls")
-    uploaded_file = st.sidebar.file_uploader(
+    st.markdown("### Activity 1 Controls")
+    uploaded_file = st.file_uploader(
         "Upload an X-ray (Optional)", 
         type=["jpg", "jpeg", "png"], 
         key="xray_up",
@@ -56,12 +54,12 @@ if activity == "Activity 1: X-ray Edge Detection":
             st.error("Please upload an image to begin, or ensure the default image is placed in the correct directory.")
             st.stop()
 
-    low_threshold = st.sidebar.slider(
+    low_threshold = st.slider(
         "Low Threshold (Sensitivity)", 
         0, 200, 100,
         help="Pixels with an intensity gradient below this value will be discarded. Lowering this increases the noise detected."
     )
-    high_threshold = st.sidebar.slider(
+    high_threshold = st.slider(
         "High Threshold (Edge Strength)", 
         0, 255, 150,
         help="Pixels with an intensity gradient above this value are marked as strong edges. Adjust this to isolate distinct boundaries."
@@ -80,13 +78,13 @@ elif activity == "Activity 2: CT vs MRI Analysis":
     with st.expander("Instructions", expanded=True):
         st.markdown("""
         1. Observe the side-by-side medical scans provided below.
-        2. Use the **Contrast** and **Brightness** sliders in the sidebar to adjust the right-hand image.
+        2. Use the **Contrast** and **Brightness** sliders to adjust the right-hand image.
         3. Notice how adjusting these settings impacts the visibility of dense structures versus soft tissues, simulating the visual difference between a CT scan and an MRI.
         4. Return to Canvas to list the key differences between the modalities and explain their preferred clinical scenarios.
         """)
     
-    st.sidebar.markdown("### Activity 2 Controls")
-    uploaded_file = st.sidebar.file_uploader(
+    st.markdown("### Activity 2 Controls")
+    uploaded_file = st.file_uploader(
         "Upload a Scan (Optional)", 
         type=["jpg", "jpeg", "png"], 
         key="brain_up",
@@ -101,12 +99,12 @@ elif activity == "Activity 2: CT vs MRI Analysis":
             st.error("Please upload a scan to begin, or ensure the default image is in the correct directory.")
             st.stop()
 
-    contrast = st.sidebar.slider(
+    contrast = st.slider(
         "Increase Contrast (Intensity)", 
         1.0, 3.0, 1.2,
         help="Increases the visual difference between the light and dark areas of the scan, helping to distinguish between tissue types."
     )
-    brightness = st.sidebar.slider(
+    brightness = st.slider(
         "Brightness", 
         -50, 50, 0,
         help="Adjusts the overall lightness or darkness of the image to reveal hidden details in shadowed areas."

@@ -89,7 +89,7 @@ with st.container(border=True):
 
     # LLM configuration
     model_id = cfg.DEFAULT_MODEL
-    navigator_api_key = st.secrets["NAVIGATOR_TOOLKIT_API_KEY"]
+    navigator_api_key = st.secrets.get("NAVIGATOR_TOOLKIT_API_KEY")
     system_instruction_filepath = "assets/llm/1.1_gemini_system_instruction.txt"
     response_schema_filepath = "assets/llm/1.1_gemini_response_schema.json"
 
@@ -107,6 +107,9 @@ with st.container(border=True):
             st.session_state.verdict = ""
 
     def submit():
+        if not client:
+            return
+
         st.session_state.statement = st.session_state.text_input
         st.session_state.text_input = ""
 
@@ -134,19 +137,26 @@ with st.container(border=True):
         )
 
     init_session()
-    client = OpenAI(
-        api_key=navigator_api_key,
-        base_url=cfg.NAVIGATOR_TOOLKIT_BASE_URL
+    client = (
+        OpenAI(
+            api_key=navigator_api_key,
+            base_url=cfg.NAVIGATOR_TOOLKIT_BASE_URL
+        )
+        if navigator_api_key
+        else None
     )
 
     llm_container = st.container(border=True)
     with llm_container:
+        if not navigator_api_key:
+            st.info("AI feedback is unavailable because NAVIGATOR_TOOLKIT_API_KEY is not configured.")
 
         statement = st.text_input(
             "Enter any statement about AI you'd like to evaluate.",
             placeholder="e.g., AI can think like a human.",
             key="text_input",
-            on_change=submit,
+            on_change=submit if client else None,
+            disabled=not client,
         )
 
         if st.session_state.verdict != "":

@@ -33,12 +33,10 @@ def train_rf_model(X_train, y_train, X_test):
     return model.predict(X_test)
 
 # ---------------------------------------------------------
-# App layout & Security
+# App layout
 # ---------------------------------------------------------
 
-st.set_page_config(page_title="Genomic AI Reproducibility", layout="wide")
-
-st.title("AI-Driven Basic Science: Genetic Mutation Analysis")
+st.title("3.3 Genomic AI Reproducibility")
 st.markdown("""
 This tool simulates how **human annotation inconsistencies** in genomics (e.g., classifying protein-altering mutations) 
 impact the reliability of AI models. 
@@ -47,7 +45,7 @@ impact the reliability of AI models.
 # Instructions Section
 with st.expander("How to use this tool"):
     st.markdown("""
-    1. **Select Data Source**: Use the sidebar to choose between simulating a new mutation study or uploading your own experimental CSV data.
+    1. **Select Data Source**: Choose between simulating a new mutation study or uploading your own experimental CSV data.
     2. **Configure Parameters**:
         * **Number of Researchers**: Simulates how many scientists are labeling the data. More researchers often lead to a stable consensus.
         * **Annotation Variability**: Controls the 'noise' or disagreement level between researchers.
@@ -60,52 +58,61 @@ with st.expander("How to use this tool"):
 st.warning("**Data Privacy Notice:** Do not upload genetic data containing PII (Personally Identifiable Information) or sensitive patient records. This tool is for algorithmic analysis only.")
 
 # ---------------------------------------------------------
-# Sidebar Configuration
+# Configuration
 # ---------------------------------------------------------
-
-st.sidebar.header("Research Setup")
-source = st.sidebar.radio(
-    "Data Source", 
-    ["Simulate Mutation Study", "Upload Researcher CSV"],
-    help="Simulate a study where multiple researchers label the same mutations, or upload your own experimental results."
-)
 
 df = None
 annotation_cols = []
 
-if source == "Simulate Mutation Study":
-    num_samples = st.sidebar.slider("Number of Mutations", 50, 500, 100)
-    num_raters = st.sidebar.slider("Number of Researchers", 1, 10, 3, 
-                                   help="More researchers generally lead to a more stable 'consensus' label for the AI to learn.")
-    noise_level = st.sidebar.slider("Annotation Variability (Noise)", 0.0, 5.0, 1.2, 
-                                    help="Simulates disagreement between scientists. High variability lowers the ICC.")
-    
-    # Generate ground truth mutation signal
-    x = np.linspace(0, 10, num_samples)
-    base_signal = 3 * x + 5 
-    
-    data = {"Mutation_Feature_X": x}
-    annotation_cols = []
-    
-    # Generate columns for each researcher
-    for i in range(num_raters):
-        col_name = f"Researcher_{i+1}_Score"
-        data[col_name] = base_signal + np.random.normal(0, noise_level, num_samples)
-        annotation_cols.append(col_name)
-    
-    df = pd.DataFrame(data)
-    # The 'Consensus' label is what the AI is actually trained on
-    df["Consensus_Label"] = df[annotation_cols].mean(axis=1)
+with st.expander("Research Setup", expanded=True):
+    source = st.radio(
+        "Data Source",
+        ["Simulate Mutation Study", "Upload Researcher CSV"],
+        horizontal=True,
+        help="Simulate a study where multiple researchers label the same mutations, or upload your own experimental results."
+    )
 
-else:
-    uploaded = st.file_uploader("Upload Experimental Data (CSV)", type=["csv"])
-    if uploaded:
-        df = pd.read_csv(uploaded)
-        numeric_cols = df.select_dtypes(include=[np.number]).columns.tolist()
-        annotation_cols = st.multiselect("Select Researcher Annotation Columns", numeric_cols, 
-                                         help="Select the columns containing scores or labels from different human annotators.")
-        if annotation_cols:
-            df["Consensus_Label"] = df[annotation_cols].mean(axis=1)
+    if source == "Simulate Mutation Study":
+        c1, c2, c3 = st.columns(3)
+        num_samples = c1.slider("Number of Mutations", 50, 500, 100)
+        num_raters = c2.slider(
+            "Number of Researchers", 1, 10, 3,
+            help="More researchers generally lead to a more stable consensus label for the AI to learn."
+        )
+        noise_level = c3.slider(
+            "Annotation Variability (Noise)", 0.0, 5.0, 1.2,
+            help="Simulates disagreement between scientists. High variability lowers the ICC."
+        )
+    
+        # Generate ground truth mutation signal
+        x = np.linspace(0, 10, num_samples)
+        base_signal = 3 * x + 5 
+    
+        data = {"Mutation_Feature_X": x}
+        annotation_cols = []
+    
+        # Generate columns for each researcher
+        for i in range(num_raters):
+            col_name = f"Researcher_{i+1}_Score"
+            data[col_name] = base_signal + np.random.normal(0, noise_level, num_samples)
+            annotation_cols.append(col_name)
+    
+        df = pd.DataFrame(data)
+        # The consensus label is what the AI is actually trained on.
+        df["Consensus_Label"] = df[annotation_cols].mean(axis=1)
+
+    else:
+        uploaded = st.file_uploader("Upload Experimental Data (CSV)", type=["csv"])
+        if uploaded:
+            df = pd.read_csv(uploaded)
+            numeric_cols = df.select_dtypes(include=[np.number]).columns.tolist()
+            annotation_cols = st.multiselect(
+                "Select Researcher Annotation Columns",
+                numeric_cols,
+                help="Select the columns containing scores or labels from different human annotators."
+            )
+            if annotation_cols:
+                df["Consensus_Label"] = df[annotation_cols].mean(axis=1)
 
 # ---------------------------------------------------------
 # Analysis & Modeling

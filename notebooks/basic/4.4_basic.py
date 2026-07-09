@@ -5,12 +5,10 @@ from sklearn.preprocessing import StandardScaler
 import os
 
 # --- PAGE CONFIGURATION & ACCESSIBILITY ---
-st.set_page_config(page_title="Choosing the Right Biomedical Deep Learning (DL) Model", layout="wide")
-
 # --- DATA LOADING ---
 @st.cache_data
 def load_data():
-    file_path = "data/diabetes.csv"
+    file_path = "assets/datasets/csv/diabetes.csv"
     try:
         df = pd.read_csv(file_path)
         return df
@@ -18,18 +16,18 @@ def load_data():
         return None
 
 # --- SIDEBAR NAVIGATION ---
-st.sidebar.title("Module Navigation")
+st.title("Module Navigation")
 
-st.sidebar.info("Instructions: Please use this sidebar menu below to navigate through the different phases of Activity 4. Complete each section in order before answering the final question in your Canvas submission area.")
+st.info("Instructions: Please use this sidebar menu below to navigate through the different phases of Activity 4. Complete each section in order before answering the final question in your Canvas submission area.")
 
-scientific_context = st.sidebar.radio(
+scientific_context = st.radio(
     "Select Learning Context:",
     ["Clinical (Patient Care)", "Foundational (Algorithmic & Basic Science)"],
     help="Toggle the interface terminology to match your specific track."
 )
-st.sidebar.markdown("---")
+st.markdown("---")
 
-mode = st.sidebar.radio(
+mode = st.radio(
     "Activity 4 Phases:",
     [
         "Phase 1: Data Preprocessing", 

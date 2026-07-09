@@ -1,0 +1,12 @@
+{
+  "module": "5",
+  "microskill": "5.2",
+  "track": "clinical",
+  "title": "Clinical Image Processing Suite",
+  "summary": "Explores image augmentation, edge detection, motion blur, noise, and denoising with clinical privacy warnings.",
+  "guide_notes": [
+    "Explain preprocessing as preparation for reliable model input.",
+    "Connect filters and denoising to clinical image quality.",
+    "Remind learners not to upload PHI or identifiable clinical images."
+  ]
+}

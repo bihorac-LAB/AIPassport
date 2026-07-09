@@ -8,18 +8,16 @@ import cv2
 # ==============================
 # App Setup & Global Warnings
 # ==============================
-st.set_page_config(page_title="Image Processing Suite", layout="wide")
-
-st.sidebar.title("Image Processing Suite")
+st.title("Image Processing Suite")
 
 # Data Privacy Warning
-st.sidebar.warning(
+st.warning(
     "**Privacy Notice:**\n\n"
     "This is an educational sandbox. Please **do not upload sensitive clinical data**, "
     "personally identifiable information (PII), or Protected Health Information (PHI)."
 )
 
-app_mode = st.sidebar.radio(
+app_mode = st.radio(
     "Select App Module",
     [
         "Image Processing & Augmentation",
@@ -30,24 +28,24 @@ app_mode = st.sidebar.radio(
     help="Navigate between different image preprocessing modules."
 )
 
-st.sidebar.divider()
+st.divider()
 
 # ==============================
 # GLOBAL Image Selection
 # ==============================
-st.sidebar.header("Global Image Selection")
-image_source = st.sidebar.radio(
+st.header("Global Image Selection")
+image_source = st.radio(
     "Select Image Source:",
     ("Fluorescence (IFCells)", "Brightfield (BloodSmear)", "Upload Image"),
     help="Choose an image once. It will stay loaded as you switch between the different modules above."
 )
 
-BF_PATH = "assets/BloodSmear.png"
-IF_PATH = "assets/IFCells.jpg"
+BF_PATH = "assets/datasets/images/BloodSmear.png"
+IF_PATH = "assets/datasets/images/IFCells.jpg"
 uploaded_file = None
 
 if image_source == "Upload Image":
-    uploaded_file = st.sidebar.file_uploader(
+    uploaded_file = st.file_uploader(
         "Upload an image", type=["jpg", "png"],
         help="Supported formats: JPG, PNG. Remember: No sensitive data!"
     )
@@ -66,7 +64,7 @@ def load_image(file_upload, choice):
 img = load_image(uploaded_file, image_source)
 
 if img is None:
-    st.info("Please select or upload an image in the sidebar to begin.")
+    st.info("Please select or upload an image to begin.")
     st.stop()
 
 # ==============================
@@ -82,10 +80,10 @@ if app_mode == "Image Processing & Augmentation":
             "**Augmentation:** Flipping and rotating the image changes its orientation without altering the underlying cellular features. This forces machine learning models to learn the actual shape of the cells rather than memorizing their position on the slide."
         )
 
-    normalization_factor = st.sidebar.slider("Normalization Factor", 0.0, 1.0, 1.0)
-    rotation_angle = st.sidebar.slider("Rotation Angle (degrees)", -30.0, 30.0, 0.0)
-    flip_horizontal = st.sidebar.checkbox("Flip Horizontal")
-    flip_vertical = st.sidebar.checkbox("Flip Vertical")
+    normalization_factor = st.slider("Normalization Factor", 0.0, 1.0, 1.0)
+    rotation_angle = st.slider("Rotation Angle (degrees)", -30.0, 30.0, 0.0)
+    flip_horizontal = st.checkbox("Flip Horizontal")
+    flip_vertical = st.checkbox("Flip Vertical")
 
     # True Normalization: Scale to [0.0, 1.0] float array
     img_processed = img.astype(np.float32) / 255.0
@@ -119,10 +117,10 @@ elif app_mode == "Edge Detection":
         )
         st.write("")
 
-    st.sidebar.header("Filter Settings")
-    horiz_strength = st.sidebar.slider("Horizontal Filter Strength", 0.5, 5.0, 1.0)
-    vert_strength = st.sidebar.slider("Vertical Filter Strength", 0.5, 5.0, 1.0)
-    sobel_strength = st.sidebar.slider("Sobel Filter Strength", 0.5, 5.0, 1.0)
+    st.header("Filter Settings")
+    horiz_strength = st.slider("Horizontal Filter Strength", 0.5, 5.0, 1.0)
+    vert_strength = st.slider("Vertical Filter Strength", 0.5, 5.0, 1.0)
+    sobel_strength = st.slider("Sobel Filter Strength", 0.5, 5.0, 1.0)
 
     gray = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
 
@@ -164,9 +162,9 @@ elif app_mode == "Motion Blur Simulation":
             "Changing the **Blur Angle** will alter the exact trajectory (e.g., diagonal, horizontal, or vertical) of that smear."
         )
 
-    st.sidebar.header("Motion Blur Settings")
-    blur_length = st.sidebar.slider("Blur Length", 3, 50, 20)
-    blur_angle = st.sidebar.slider("Blur Angle (degrees)", 0, 180, 45)
+    st.header("Motion Blur Settings")
+    blur_length = st.slider("Blur Length", 3, 50, 20)
+    blur_angle = st.slider("Blur Angle (degrees)", 0, 180, 45)
 
     kernel = np.zeros((blur_length, blur_length))
     kernel[int((blur_length-1)/2), :] = np.ones(blur_length)
@@ -195,16 +193,16 @@ elif app_mode == "Salt & Pepper Noise & Denoising":
         )
         st.write("")
 
-    st.sidebar.header("Noise Settings")
-    noise_amount = st.sidebar.slider("Noise Amount", 0.0, 0.2, 0.05)
+    st.header("Noise Settings")
+    noise_amount = st.slider("Noise Amount", 0.0, 0.2, 0.05)
     
-    st.sidebar.header("Denoising Filter")
-    filter_type = st.sidebar.radio("Filter Type", ["Median", "Gaussian"])
+    st.header("Denoising Filter")
+    filter_type = st.radio("Filter Type", ["Median", "Gaussian"])
     
     if filter_type == "Median":
-        filter_strength = st.sidebar.slider("Kernel Size (odd only)", 3, 11, 3, step=2)
+        filter_strength = st.slider("Kernel Size (odd only)", 3, 11, 3, step=2)
     else:
-        filter_strength = st.sidebar.slider("Gaussian Sigma", 0.5, 5.0, 1.0, step=0.5)
+        filter_strength = st.slider("Gaussian Sigma", 0.5, 5.0, 1.0, step=0.5)
 
     noisy = random_noise(img, mode="s&p", amount=noise_amount)
     noisy_u8 = img_as_ubyte(noisy)

@@ -1,6 +1,5 @@
 import streamlit as st
 
-st.set_page_config(page_title="The Fundamental Principles of Bioethics", layout="centered")
 st.title("2.1 The Fundamental Principles of Bioethics")
 st.subheader("Ethical Challenges in AI & Bioethics")
 
@@ -26,7 +25,7 @@ During testing, it becomes evident that the AI algorithm disproportionately pred
 
 st.markdown("---")
 
-st.header("1️⃣ Which of the four principles of bioethics apply here? (Select all that apply)")
+st.header("1. Which of the four principles of bioethics apply here? (Select all that apply)")
 
 principles = [
     "Autonomy (respect for persons)",
@@ -46,7 +45,7 @@ if st.button("Show Example Principles"):
 
 st.markdown("---")
 
-st.header("2️⃣ Which principles are in conflict? Explain how:")
+st.header("2. Which principles are in conflict? Explain how:")
 
 conflicts = st.text_area(
     "Describe which principles are in conflict and briefly explain why:",
@@ -60,7 +59,7 @@ if st.button("Show Example Conflicts"):
 
 st.markdown("---")
 
-st.header("3️⃣ Which principle should take precedence? Why?")
+st.header("3. Which principle should take precedence? Why?")
 
 precedence = st.text_area(
     "Which bioethical principle do you think should guide the decision here? Justify your answer:",
@@ -73,7 +72,7 @@ if st.button("Show Example Justification"):
 
 st.markdown("---")
 
-st.header("💬 Reflection")
+st.header("Reflection")
 st.markdown("""
 - If you were in Dr. Lee's position, what further steps would you consider (e.g., communicating with affected communities, auditing model bias, transparency in deployment)?
 - How might regulatory bodies or IRBs guide the decision?

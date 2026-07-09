@@ -1,7 +1,5 @@
 import streamlit as st
 
-st.set_page_config(page_title="MS3 Biomedical AI Experiment Design (Basic Science Track)", layout="centered")
-
 st.title("1.3 Designing Biomedical Artificial Intelligence Experiments (Basic Science Track)")
 
 # ======= Datasets & Tools: Real Assignment-Only =======
@@ -113,8 +111,14 @@ with st.expander("Part 3: Experimental Design", expanded=False):
         ])
     st.text_area("For each, what are their potential strengths/weaknesses with your dataset?")
 
-    selected_algo = st.radio("Which approach will you use for your main experiment?",
-                             algo)
+    if algo:
+        selected_algo = st.radio(
+            "Which approach will you use for your main experiment?",
+            algo
+        )
+    else:
+        st.info("Select at least one candidate model above before choosing your main experiment approach.")
+        selected_algo = None
     st.text_area("Justify your choice—why does it address your research questions and the knowledge gaps earlier?")
 
     st.subheader("3.2 Evaluation Framework")
@@ -176,7 +180,7 @@ with st.expander("Part 5: Reflection", expanded=False):
     st.text_area("Institutional review boards or ethics committees")
 
 # Optional: Submission "toast"
-if st.button("✅ Mark assignment as complete"):
+if st.button("Mark assignment as complete"):
     st.success("Assignment marked as complete! Review your responses and save for your reference.")
 
 st.caption("Tip: You can expand/collapse each section as you work—and come back to change your answers anytime while the app runs.")

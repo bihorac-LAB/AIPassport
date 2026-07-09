@@ -1,9 +1,7 @@
 import streamlit as st
 import numpy as np
 import pandas as pd
-import psutil
-import os
-import matplotlib.pyplot as plt
+import plotly.express as px
 
 # Optional sklearn import
 try:
@@ -14,26 +12,7 @@ try:
 except ImportError:
     SKLEARN_AVAILABLE = False
 
-# ----------------------------
-# Monitoring Utility
-# ----------------------------
-def display_performance_metrics():
-    """Captures and displays real-time resource usage."""
-    process = psutil.Process(os.getpid())
-    mem_mb = process.memory_info().rss / (1024 * 1024)
-    cpu_percent = process.cpu_percent(interval=0.1)
-    
-    st.sidebar.markdown("---")
-    st.sidebar.subheader("System Resource Monitor")
-    m1, m2 = st.sidebar.columns(2)
-    m1.metric("CPU Load", f"{cpu_percent}%")
-    m2.metric("RAM Usage", f"{mem_mb:.1f} MB")
-
-# ----------------------------
-# Streamlit App Config
-# ----------------------------
-st.set_page_config(page_title="Radiology AI Reliability", layout="wide")
-st.title("Radiology AI Reliability: Lung Cancer Detection")
+st.title("3.3 Radiology AI Reliability")
 
 # --- PRIVACY WARNING ---
 st.warning("""
@@ -53,28 +32,20 @@ st.markdown("""
 3.  **Optimize Annotators:** Determine how many radiologists are needed to train a reliable AI model.
 """)
 
-# ----------------------------
-# Sidebar: Controls
-# ----------------------------
-st.sidebar.header("Simulation Settings")
+with st.expander("Simulation Settings", expanded=True):
+    uploaded_file = st.file_uploader(
+        "Upload Radiologist Annotations (CSV)",
+        type=["csv"],
+        help="Upload a CSV where rows are X-rays and columns are radiologist diagnoses. Do not upload PII/PHI."
+    )
 
-# File upload
-uploaded_file = st.sidebar.file_uploader(
-    "Upload Radiologist Annotations (CSV)", 
-    type=["csv"],
-    help="Upload a CSV where rows are Patient X-Rays and columns are Radiologist Diagnoses (0 or 1). STRICTLY NO PII/PHI."
-)
+    c1, c2, c3 = st.columns(3)
+    num_samples = c1.slider("Number of X-Rays", 50, 1000, 200, help="Total number of chest X-ray images in the dataset.")
+    raters = c2.slider("Number of Radiologists", 2, 10, 5, help="Number of radiologists providing diagnoses.")
+    disagreement_rate = c3.slider("Disagreement Rate", 0.0, 0.5, 0.2, help="Probability that a radiologist disagrees with the ground truth.")
 
-# Simulation controls
-num_samples = st.sidebar.slider("Number of X-Rays", 50, 1000, 200, help="Total number of chest X-ray images in the dataset.")
-raters = st.sidebar.slider("Number of Radiologists", 2, 10, 5, help="Number of radiologists providing diagnoses.")
-disagreement_rate = st.sidebar.slider("Disagreement Rate", 0.0, 0.5, 0.2, help="Probability that a radiologist disagrees with the 'ground truth'.")
-
-# Model selection
-models = ["Random Forest Classifier"] if SKLEARN_AVAILABLE else ["(Scikit-learn not found)"]
-model_choice = st.sidebar.selectbox("AI Model", models, help="The machine learning model used to predict the diagnosis.")
-
-display_performance_metrics()
+    models = ["Random Forest Classifier"] if SKLEARN_AVAILABLE else ["Scikit-learn not found"]
+    model_choice = st.selectbox("AI Model", models, help="The machine learning model used to predict the diagnosis.")
 
 # ----------------------------
 # Data Preparation
@@ -136,11 +107,10 @@ with col2:
     st.subheader("Diagnosis Distribution")
     # Show how many benign vs cancerous overall
     all_ratings = numeric_data.values.flatten()
-    fig, ax = plt.subplots(figsize=(4, 3))
-    ax.hist(all_ratings, bins=[0, 0.5, 1], rwidth=0.8, color='skyblue')
-    ax.set_xticks([0.25, 0.75])
-    ax.set_xticklabels(['Benign (0)', 'Cancerous (1)'])
-    st.pyplot(fig)
+    dist_df = pd.DataFrame({"Diagnosis": np.where(all_ratings == 1, "Cancerous (1)", "Benign (0)")})
+    fig = px.histogram(dist_df, x="Diagnosis", color="Diagnosis", title="Radiologist Diagnosis Counts")
+    fig.update_layout(height=320, showlegend=False, margin=dict(l=30, r=20, t=50, b=40))
+    st.plotly_chart(fig, use_container_width=True)
 
 # ----------------------------
 # Identify Ambiguous Images

@@ -1,13 +1,7 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
-import matplotlib.pyplot as plt
-import seaborn as sns
-
-st.set_page_config(
-    page_title="MS6: Basics of Scientific Rigor and Reproducibility (Clinical Research)",
-    layout="wide"
-)
+import plotly.express as px
 
 st.title("1.6 Basics of Scientific Rigor and Reproducibility (Clinical Research)")
 
@@ -70,10 +64,14 @@ sel_plot = st.selectbox(
     "Variable for boxplot:",
     options=['age', 'length_of_stay', 'bnp', 'sodium']
 )
-fig, ax = plt.subplots(figsize=(1.5, 6))
-sns.boxplot(y=df[sel_plot], ax=ax)
-ax.set_ylabel(sel_plot)
-st.pyplot(fig)
+fig = px.box(df, x=sel_plot, points="all", hover_data=["patient_id"])
+fig.update_layout(
+    height=320,
+    xaxis_title=sel_plot,
+    yaxis_title="",
+    margin=dict(l=40, r=20, t=25, b=35),
+)
+st.plotly_chart(fig, use_container_width=True)
 
 st.markdown("""
 _What looks like a potential outlier in your chosen variable? Note their patient IDs and values below._

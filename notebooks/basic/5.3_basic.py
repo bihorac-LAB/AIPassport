@@ -3,20 +3,8 @@ import numpy as np
 import cv2
 import matplotlib.pyplot as plt
 from PIL import Image
-import psutil
-import os
-
-# --- MONITORING UTILITY ---
-def get_system_usage():
-    """Fetches CPU and Memory usage for the current process."""
-    process = psutil.Process(os.getpid())
-    mem_mb = process.memory_info().rss / (1024 * 1024)
-    cpu_percent = process.cpu_percent(interval=0.1)
-    return cpu_percent, mem_mb
 
 # --- UI CONFIGURATION ---
-st.set_page_config(page_title="Biomedical Image Analysis Monitor", layout="wide")
-
 # --- INSTRUCTIONS SECTION ---
 with st.expander("📖 Instructions & Learning Objectives", expanded=True):
     st.markdown("""
@@ -25,31 +13,23 @@ with st.expander("📖 Instructions & Learning Objectives", expanded=True):
     2. **Parameter Tuning:** Experiment with kernel sizes and thresholds to find the 'goldilocks' zone for edge detection.
     3. **Automated Segmentation:** Compare manual thresholding logic to Otsu’s automated method.
     
-    **Task:** Adjust the sliders in the sidebar and use the 'Reveal Logic' buttons under each result to check your understanding against the notebook solutions.
+    **Task:** Adjust the controls and use the 'Reveal Logic' buttons under each result to check your understanding against the notebook solutions.
     """)
 
 # Sidebar for parameters
-st.sidebar.header("Processing Parameters")
-mode = st.sidebar.radio(
+st.header("Processing Parameters")
+mode = st.radio(
     "Choose a mode:",
     ("Synthetic Image", "Upload Image"),
     help="Select 'Synthetic' to replicate the notebook rectangle or 'Upload' to test real-world robustness."
 )
 
-noise_level = st.sidebar.slider("Noise Level", 0, 100, 50, help="Controls the random intensity variation added to the pixels.")
-kernel_size = st.sidebar.slider("Sobel Kernel Size", 3, 11, 5, 2, help="Size of the derivative window. Larger kernels are smoother but less precise.")
-threshold1 = st.sidebar.slider("Canny Threshold 1", 0, 255, 100, help="Lower bound for hysteresis thresholding.")
-threshold2 = st.sidebar.slider("Canny Threshold 2", 0, 255, 200, help="Upper bound for hysteresis thresholding.")
-blur_sigma = st.sidebar.slider("Gaussian Blur Sigma", 0.0, 5.0, 1.0, help="Standard deviation for the Gaussian filter used before Otsu.")
-colormap = st.sidebar.selectbox("Colormap", ["gray", "viridis", "plasma", "magma", "inferno"], help="Visual mapping of intensity.")
-
-# --- PERFORMANCE METRICS ---
-st.sidebar.markdown("---")
-st.sidebar.subheader("App Performance")
-cpu, mem = get_system_usage()
-col_cpu, col_mem = st.sidebar.columns(2)
-col_cpu.metric("CPU Usage", f"{cpu}%")
-col_mem.metric("Memory", f"{mem:.1f} MB")
+noise_level = st.slider("Noise Level", 0, 100, 50, help="Controls the random intensity variation added to the pixels.")
+kernel_size = st.slider("Sobel Kernel Size", 3, 11, 5, 2, help="Size of the derivative window. Larger kernels are smoother but less precise.")
+threshold1 = st.slider("Canny Threshold 1", 0, 255, 100, help="Lower bound for hysteresis thresholding.")
+threshold2 = st.slider("Canny Threshold 2", 0, 255, 200, help="Upper bound for hysteresis thresholding.")
+blur_sigma = st.slider("Gaussian Blur Sigma", 0.0, 5.0, 1.0, help="Standard deviation for the Gaussian filter used before Otsu.")
+colormap = st.selectbox("Colormap", ["gray", "viridis", "plasma", "magma", "inferno"], help="Visual mapping of intensity.")
 
 # --- MAIN LOGIC ---
 st.warning("Reminder: Do not upload any sensitive or personal health data (PHI).")

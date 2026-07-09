@@ -4,12 +4,7 @@ import random
 from faker import Faker
 from datetime import datetime
 
-# ------------------------------
-# Page Configuration & Instructions
-# ------------------------------
-st.set_page_config(page_title="OMOP ETL Simulator", layout="wide")
-
-st.title("Clinical Data Simulation: EHR to OMOP CDM")
+st.title("3.4 EHR to OMOP CDM Simulator")
 
 with st.expander("How to use this app & Educational Context"):
     st.markdown("""
@@ -23,25 +18,22 @@ with st.expander("How to use this app & Educational Context"):
     *Source: [OHDSI OMOP CDM Documentation](https://www.ohdsi.org/web/wiki/doku.php?id=documentation:cdm:person)*
     """)
 
-# ------------------------------
-# Sidebar - Interactivity & Instructions
-# ------------------------------
-st.sidebar.header("Simulation Settings")
-st.sidebar.info("Adjust the parameters below to re-generate the synthetic cohort.")
+with st.expander("Simulation Settings", expanded=True):
+    st.info("Adjust the parameters below to regenerate the synthetic cohort.")
+    c1, c2 = st.columns(2)
+    num_patients = c1.slider(
+        "Number of patients",
+        min_value=5,
+        max_value=100,
+        value=10,
+        help="Determines how many unique patient rows are generated in the source data and person table."
+    )
 
-num_patients = st.sidebar.slider(
-    "Number of patients", 
-    min_value=5, 
-    max_value=100, 
-    value=10,
-    help="Determines how many unique patient rows are generated in the source data and person table."
-)
-
-seed_value = st.sidebar.number_input(
-    "Random Seed", 
-    value=123,
-    help="Ensures reproducibility. Using 123 matches the original notebook's output."
-)
+    seed_value = c2.number_input(
+        "Random Seed",
+        value=123,
+        help="Ensures reproducibility. Using 123 matches the original notebook's output."
+    )
 
 # Initialize Faker with seed
 fake = Faker()

@@ -1,10 +1,5 @@
 import streamlit as st
 
-st.set_page_config(
-    page_title="MS7: Mentorship and Peer Review in Biomedical AI (Clinical Track)",
-    layout="centered"
-)
-
 st.title("1.7 Mentorship and Peer Review in Biomedical AI (Clinical Track)")
 
 st.markdown("""
@@ -30,7 +25,7 @@ Dr. Martinez perceives Dr. Jordan as becoming overly dependent, waiting for advi
 st.markdown("----")
 
 # PART 1: IDENTIFY THE CHALLENGES
-st.header("1️⃣ Identify the Challenges")
+st.header("1. Identify the Challenges")
 st.markdown("""
 List the problems in this clinical mentoring relationship.  
 Consider issues like communication, expectations, workload, and career dynamics.
@@ -53,7 +48,7 @@ if st.button("Show Example – Challenges (Clinical Track)", key="show_clinical_
 st.markdown("----")
 
 # PART 2: DRAFT PROFESSIONAL COMMUNICATION
-st.header("2️⃣ Draft a Professional Communication")
+st.header("2. Draft a Professional Communication")
 
 st.markdown("""
 Imagine you are **Dr. Jordan**.  
@@ -88,7 +83,7 @@ Dr. Jordan
 st.markdown("----")
 
 # PART 3: REFLECTION AND FEEDBACK
-st.header("3️⃣ Reflection (Clinical AI Teams)")
+st.header("3. Reflection (Clinical AI Teams)")
 
 st.markdown("""
 - What aspects make mentorship relationships in clinical AI particularly challenging?

@@ -1,0 +1,53 @@
+{
+  "id": "1.6_clinical",
+  "module": "Module 1 - Fundamentals",
+  "microskill": "1.6",
+  "track": "clinical",
+  "title": "Basics of Scientific Rigor and Reproducibility",
+  "audience": "Clinical learners practicing transparent outlier handling in EHR-style data",
+  "objectives": [
+    "Explore simulated hospital admission and outcome data for CHF readmission analysis.",
+    "Visualize and detect outliers in age, length of stay, BNP, and sodium.",
+    "Calculate 1.5x IQR thresholds and inspect flagged patient rows.",
+    "Compare summary statistics before and after outlier exclusion.",
+    "Evaluate remove, winsorize, and median-imputation strategies in clinical context."
+  ],
+  "sections": [
+    {
+      "name": "Clinical Dataset Overview",
+      "purpose": "Introduce simulated CHF-related hospital data.",
+      "how_to_use": "Review each variable and remember that extreme clinical values may be valid, errors, or clinically important signals."
+    },
+    {
+      "name": "Visualize Outliers with Boxplots",
+      "purpose": "Spot extreme clinical values visually.",
+      "how_to_use": "Select a variable, inspect the box plot, and note patient IDs and values that look unusual."
+    },
+    {
+      "name": "Calculate Outlier Thresholds",
+      "purpose": "Apply the 1.5x IQR rule to clinical variables.",
+      "how_to_use": "Choose a variable and review Q1, Q3, IQR, bounds, and flagged patient rows."
+    },
+    {
+      "name": "Effect on Clinical Summary Statistics",
+      "purpose": "Show how outliers influence clinical summaries.",
+      "how_to_use": "Compare mean, standard deviation, and median with all values versus no outliers."
+    },
+    {
+      "name": "Outlier Handling Approaches",
+      "purpose": "Compare removal, winsorization, and imputation.",
+      "how_to_use": "Choose a strategy and explain clinical risks if valid extreme values are mishandled."
+    },
+    {
+      "name": "Reflection",
+      "purpose": "Connect outlier handling to reproducible clinical research.",
+      "how_to_use": "Write what should be reported in methods and how poor handling could affect clinical conclusions."
+    }
+  ],
+  "chatbot_guidance": [
+    "When asked how to use this notebook, guide the learner through dataset review, boxplot inspection, IQR thresholds, statistics comparison, handling strategy, and reflection.",
+    "For clinical users, emphasize that outliers can be data errors, rare but valid clinical states, or important safety signals.",
+    "Help learners avoid automatically deleting clinically extreme values.",
+    "Keep answers short and practical."
+  ]
+}

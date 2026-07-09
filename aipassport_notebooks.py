@@ -1,6 +1,7 @@
 import streamlit as st
 import os
 import sys
+import json
 import streamlit.components.v1 as components
 
 # ---------------------------------------------------------------------------
@@ -98,6 +99,45 @@ MODULE_NAMES = [
     "Module 7 - Impact Project",
 ]
 
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+
+def get_notebook_path(url_path, track):
+    target_nb = url_path.strip("/")
+    return os.path.join(BASE_DIR, "notebooks", track, f"{target_nb}_{track}.py")
+
+
+def get_available_tracks(url_path):
+    if not url_path:
+        return []
+
+    return [
+        track
+        for track in ("clinical", "basic")
+        if os.path.exists(get_notebook_path(url_path, track))
+    ]
+
+
+def load_notebook_context(url_path, track):
+    if not url_path:
+        return None
+
+    context_path = os.path.join(
+        BASE_DIR,
+        "assets",
+        "notebook_context",
+        f"{url_path.strip('/')}_{track}.json",
+    )
+
+    if not os.path.exists(context_path):
+        return None
+
+    try:
+        with open(context_path, "r") as f:
+            return json.load(f)
+    except Exception as e:
+        return {"context_error": f"Could not load notebook context: {e}"}
+
 # Streamlit demo showed during 3-12-25 Co-I meeting
 sidebar = {}
 
@@ -128,6 +168,15 @@ def render_home_page():
 def render_notebook_page():
     # 'pg' is available in the global scope where it was defined
     current_url_path = getattr(pg, "url_path", "")
+    available_tracks = get_available_tracks(current_url_path)
+
+    if (
+        current_url_path
+        and available_tracks
+        and st.session_state.get("track") not in available_tracks
+    ):
+        st.session_state["track"] = available_tracks[0]
+        st.query_params["track"] = available_tracks[0]
     
     # ── Header & Track Selector ─────────────────────────────────────────────
     # Check if it's a microskill (standard microskills don't have '_' in title)
@@ -136,25 +185,28 @@ def render_notebook_page():
         with t_col1:
             st.title(pg.title)
         with t_col2:
-            current_track = st.segmented_control(
-                "Select Track",
-                options=["Clinical", "Basic"],
-                default=st.session_state["track"].capitalize(),
-                key="track_selector"
-            )
-            if current_track:
-                new_track = current_track.lower()
-                if new_track != st.session_state["track"]:
-                    st.session_state["track"] = new_track
-                    st.query_params["track"] = new_track
-                    st.rerun()
+            track_options = [track.capitalize() for track in available_tracks]
+            if len(track_options) > 1:
+                current_track = st.segmented_control(
+                    "Select Track",
+                    options=track_options,
+                    default=st.session_state["track"].capitalize(),
+                    key="track_selector"
+                )
+                if current_track:
+                    new_track = current_track.lower()
+                    if new_track != st.session_state["track"]:
+                        st.session_state["track"] = new_track
+                        st.query_params["track"] = new_track
+                        st.rerun()
+            elif track_options:
+                st.caption(f"{track_options[0]} track")
 
     # ── Load and Run the actual notebook content ────────────────────────────
     if current_url_path:
         target_nb = current_url_path.strip("/")
         track = st.session_state["track"]
-        base_dir = os.path.dirname(os.path.abspath(__file__))
-        nb_path = os.path.join(base_dir, "notebooks", track, f"{target_nb}_{track}.py")
+        nb_path = get_notebook_path(current_url_path, track)
         
         if os.path.exists(nb_path):
             with open(nb_path, "r") as f:
@@ -190,7 +242,7 @@ def render_notebook_page():
                     st.error(f"Error executing notebook: {e}")
                     st.exception(e)
         elif "demo" in target_nb:
-            demo_full_path = os.path.join(base_dir, demo_path)
+            demo_full_path = os.path.join(BASE_DIR, demo_path)
             if os.path.exists(demo_full_path):
                 with open(demo_full_path, "r") as f:
                     exec(f.read(), globals())
@@ -209,8 +261,8 @@ for module_idx, module_name in enumerate(MODULE_NAMES):
     sidebar[module_name] = []
 
     for microskill_idx in range(N_MICROSKILLS_PER_MODULE):
-        clinical_exists = os.path.exists(f"notebooks/clinical/{module_idx + 1}.{microskill_idx + 1}_clinical.py")
-        basic_exists = os.path.exists(f"notebooks/basic/{module_idx + 1}.{microskill_idx + 1}_basic.py")
+        clinical_exists = os.path.exists(get_notebook_path(f"{module_idx + 1}.{microskill_idx + 1}", "clinical"))
+        basic_exists = os.path.exists(get_notebook_path(f"{module_idx + 1}.{microskill_idx + 1}", "basic"))
         
         if clinical_exists or basic_exists:
             page = st.Page(
@@ -355,6 +407,10 @@ if st.session_state["_chat_open"]:
                 "url_path": getattr(pg, "url_path", ""),
                 "track": st.session_state.get("track", "clinical"),
                 "platform": "AI Passport",
+                "notebook_context": load_notebook_context(
+                    getattr(pg, "url_path", ""),
+                    st.session_state.get("track", "clinical"),
+                ),
             },
         )
 else:

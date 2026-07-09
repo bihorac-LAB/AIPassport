@@ -1,14 +1,5 @@
 import streamlit as st
 import pandas as pd
-import random
-from datetime import date, timedelta
-
-# =============== PAGE CONFIG ===============
-st.set_page_config(
-    page_title="MS5 - Leveraging Multidisciplinary Team Strengths (Clinical Track)",
-    layout="wide",
-    initial_sidebar_state="expanded"
-)
 
 st.title("1.5 Leveraging Multidisciplinary Team Strengths (Clinical Research)")
 
@@ -47,35 +38,29 @@ def load_chexpert_demo():
     ])
 
 
-# ================ SIDEBAR: Datasets & Tools ===================
-st.sidebar.title("🩺 Datasets for Your Project")
-st.sidebar.markdown("""
-- [MIMIC-IV](https://physionet.org/content/mimiciv/2.2/)  
-  *ICU/EHR data. Provides patient encounters, ED visits, outcomes.*
+with st.expander("Datasets, tools, and sample data", expanded=False):
+    st.markdown("""
+**Datasets**
+- [MIMIC-IV](https://physionet.org/content/mimiciv/2.2/): ICU/EHR data with patient encounters, ED visits, and outcomes.
+- [CheXpert](https://stanfordmlgroup.github.io/competitions/chexpert/): chest X-ray dataset with multi-label findings.
 
-- [CheXpert](https://stanfordmlgroup.github.io/competitions/chexpert/)  
-  *Large chest X-ray dataset with multi-label findings.*
-
+**Collaboration tools**
+- [Microsoft Teams](https://www.microsoft.com/en-us/microsoft-teams/): chat, meetings, file sharing, channels.
+- [Trello](https://trello.com/): tasks, boards, assigned actions.
 """)
 
-if st.sidebar.checkbox("Show MIMIC-IV Demo Data"):
-    st.sidebar.dataframe(load_mimic_demo(), use_container_width=True)
+    show_mimic = st.checkbox("Show MIMIC-IV demo data")
+    show_chexpert = st.checkbox("Show CheXpert demo data")
+    if show_mimic:
+        st.dataframe(load_mimic_demo(), use_container_width=True)
+    if show_chexpert:
+        st.dataframe(load_chexpert_demo(), use_container_width=True)
 
-if st.sidebar.checkbox("Show CheXpert Demo Data"):
-    st.sidebar.dataframe(load_chexpert_demo(), use_container_width=True)
-
-st.sidebar.title("🛠️ Collaboration Tools")
-st.sidebar.markdown("""
-- [Microsoft Teams](https://www.microsoft.com/en-us/microsoft-teams/): Chat, meetings, file sharing, channels  
-- [Trello](https://trello.com/): Tasks, boards, assign actions
-""")
-
-
-st.sidebar.info("Demo datasets shown are for assignment context only. Use linked resources for full data.")
+    st.info("Demo datasets shown are for assignment context only. Use linked resources for full data.")
 
 # ============== MAIN NOTEBOOK / ASSIGNMENT NAVIGATION ==============
 
-st.title("MS5. Leveraging Multidisciplinary Team Strengths – Clinical Track")
+st.header("MS5. Leveraging Multidisciplinary Team Strengths - Clinical Track")
 
 tabs = [
     "Introduction",
@@ -86,7 +71,7 @@ tabs = [
     "Part 5: Collaboration Tools",
     "Part 6: Reflection"
 ]
-selection = st.sidebar.radio("Assignment Sections", tabs)
+selection = st.selectbox("Choose assignment section", tabs)
 
 # -------------------
 if selection == tabs[0]:
@@ -105,7 +90,7 @@ You are leading a project to develop an AI system that assists Emergency Departm
 - Address workflow integration, training, and ethical challenges
 
 ---  
-_Data previews for MIMIC-IV and CheXpert can be found in the sidebar. Leverage these real-world datasets as you respond to planning and teamwork activities below._
+_Data previews for MIMIC-IV and CheXpert are available in the dataset expander above. Leverage these real-world datasets as you respond to planning and teamwork activities below._
 
 ---
     """)
@@ -271,5 +256,4 @@ if selection == tabs[6]:
     st.markdown("Describe a process to identify, discuss, and resolve ethical issues as a multidisciplinary team.")
     st.text_area("Ethical issue resolution process", key="part6_3")
 
-st.sidebar.markdown("---")
-st.sidebar.info("For more on the real-world data: [MIMIC-IV documentation](https://physionet.org/content/mimiciv/2.2/) | [CheXpert docs](https://stanfordmlgroup.github.io/competitions/chexpert/).")
+st.info("For more on the real-world data: [MIMIC-IV documentation](https://physionet.org/content/mimiciv/2.2/) | [CheXpert docs](https://stanfordmlgroup.github.io/competitions/chexpert/).")

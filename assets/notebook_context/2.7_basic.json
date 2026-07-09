@@ -1,0 +1,38 @@
+{
+  "title": "Sex-Specific Modeling",
+  "module": "Module 2 - Alignment",
+  "microskill": "2.7",
+  "track": "basic",
+  "audience": "Learners exploring sex-specific modeling and fairness in biomedical datasets.",
+  "objectives": [
+    "Prepare an eICU-style dataset for sex-specific model analysis.",
+    "Compare variable patterns by sex and mortality status.",
+    "Calculate univariate odds ratios for female, male, and full-cohort groups.",
+    "Train multivariate models and compare AUROC across sex-specific cohorts."
+  ],
+  "sections": [
+    {
+      "name": "Data Processing",
+      "purpose": "Clean identifiers, encode categories, impute missing values, and create a model-ready dataset."
+    },
+    {
+      "name": "Exploratory Analysis",
+      "purpose": "Filter patient data and inspect how selected variables differ by sex and mortality status."
+    },
+    {
+      "name": "Univariate Analysis",
+      "purpose": "Estimate one-variable odds ratios separately for female, male, and full-cohort data."
+    },
+    {
+      "name": "Multivariate Analysis",
+      "purpose": "Train logistic models and compare model discrimination using AUROC."
+    }
+  ],
+  "chatbot_guidance": [
+    "Guide the learner through the analysis-step selector from data processing to multivariate analysis.",
+    "Explain sex-specific modeling in practical terms: the same feature can carry different predictive signal across groups.",
+    "Help interpret odds ratios, AUROC, and cohort differences without overclaiming causality.",
+    "Mention that this app uses the bundled demo dataset when available, with the remote source kept only as fallback.",
+    "Keep answers short and step-by-step."
+  ]
+}
