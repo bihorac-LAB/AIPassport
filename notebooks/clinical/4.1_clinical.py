@@ -9,16 +9,9 @@ import plotly.express as px
 import os
 
 # ---------------------------------
-# Page Config & Sidebar
+# Page Navigation
 # ---------------------------------
-st.markdown("### 1. Select Perspective")
-perspective = st.radio(
-    "View demonstration through the lens of:",
-    ["Clinical Care", "Foundational Science"],
-    help="Toggle this to see how the same machine learning pipeline is interpreted differently depending on the scientific domain."
-)
-
-st.markdown("### 2. Navigation")
+st.markdown("### Navigation")
 activity = st.radio(
     "Go to:",
     [
@@ -33,12 +26,8 @@ activity = st.radio(
 # ---------------------------------
 # Context Variables
 # ---------------------------------
-if perspective == "Clinical Care":
-    app_desc = "Interactive demonstration of a clinical analytics pipeline. Watch how a Decision Tree learns to predict in-hospital mortality using data from the eICU Collaborative Research Database."
-    outcome_label = "In-Hospital Mortality (0=Survival, 1=Death)"
-else:
-    app_desc = "Interactive demonstration of a computational biology pipeline. Watch how a Decision Tree models pathophysiological mechanisms to discover critical thresholds in physiological biomarkers."
-    outcome_label = "Systemic Failure (0=Stable, 1=Failure)"
+app_desc = "Interactive demonstration of a clinical analytics pipeline. Watch how a Decision Tree learns to predict in-hospital mortality using data from the eICU Collaborative Research Database."
+outcome_label = "In-Hospital Mortality (0=Survival, 1=Death)"
 
 st.title("Shared Biomedical Artificial Intelligence Vocabulary")
 st.write(app_desc)

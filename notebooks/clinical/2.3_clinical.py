@@ -1,7 +1,7 @@
 import streamlit as st
 
 st.title("2.3 Bias, Fairness, and Societal Impact of Biomedical AI")
-st.subheader("Clinical Track – Microskill 2 Interactive Assignment")
+st.subheader("Interactive Assignment")
 
 st.markdown("---")
 

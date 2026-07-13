@@ -9,7 +9,6 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.metrics import accuracy_score
 from sklearn.utils import resample
-from sklearn.datasets import make_classification
 
 
 def render_plotly_chart(fig, height=520):
@@ -74,28 +73,7 @@ def load_clinical_data():
     
     return balanced, num_feats, 'in_hospital_mortality'
 
-@st.cache_data
-def load_foundational_data():
-    X, y = make_classification(n_samples=200, n_features=4, n_informative=2, n_redundant=1, 
-                               n_clusters_per_class=1, flip_y=0.1, random_state=42)
-    features = ['gene_x_expression', 'protein_y_level', 'culture_ph', 'temperature_c']
-    df = pd.DataFrame(X, columns=features)
-    
-    df['gene_x_expression'] = (df['gene_x_expression'] * 10) + 50
-    df['protein_y_level'] = (df['protein_y_level'] * 5) + 20
-    df['culture_ph'] = (df['culture_ph'] * 0.5) + 7.4
-    df['temperature_c'] = (df['temperature_c'] * 1.5) + 37.0
-    
-    df['cellular_apoptosis'] = y
-    return df, features, 'cellular_apoptosis'
-
 st.title("Module Navigation")
-scientific_context = st.radio(
-    "Select Learning Context:", 
-    ["Clinical (eICU)", "Foundational Science"],
-    help="Toggle the terminology and dataset to match your specific field of study."
-)
-
 st.markdown("---")
 
 st.title("Learning Activities")
@@ -111,18 +89,15 @@ mode = st.radio(
     help="Navigate through the interactive activities to explore model generalizability."
 )
 
-if scientific_context == "Clinical (eICU)":
-    df, features, target = load_clinical_data()
-    context_desc = "Predicting in-hospital mortality using the eICU Database."
-else:
-    df, features, target = load_foundational_data()
-    context_desc = "Predicting cellular apoptosis using a simulated foundational science dataset."
+df, features, target = load_clinical_data()
+context_desc = "Predicting in-hospital mortality using the eICU Database."
 
-if 'current_context' not in st.session_state or st.session_state.current_context != scientific_context:
-    st.session_state.current_context = scientific_context
-    st.session_state.selected_features = features
+feature_state_key = "module_4_6_selected_features"
+if feature_state_key not in st.session_state:
+    st.session_state[feature_state_key] = features
 
-X = df[st.session_state.selected_features]
+selected_features = st.session_state[feature_state_key]
+X = df[selected_features]
 y = df[target]
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
 scaler = StandardScaler()
@@ -195,15 +170,15 @@ if mode == "Activity 1: Overfitting and Underfitting":
                 ),
                 showlegend=False,
                 hovertemplate=(
-                    f"{st.session_state.selected_features[0]}: %{{x:.2f}}<br>"
-                    f"{st.session_state.selected_features[1]}: %{{y:.2f}}<extra></extra>"
+                    f"{selected_features[0]}: %{{x:.2f}}<br>"
+                    f"{selected_features[1]}: %{{y:.2f}}<extra></extra>"
                 ),
             ),
             row=1,
             col=col,
         )
-        fig_b.update_xaxes(title_text=st.session_state.selected_features[0], row=1, col=col)
-        fig_b.update_yaxes(title_text=st.session_state.selected_features[1], row=1, col=col)
+        fig_b.update_xaxes(title_text=selected_features[0], row=1, col=col)
+        fig_b.update_yaxes(title_text=selected_features[1], row=1, col=col)
     render_plotly_chart(fig_b, height=620)
     st.caption("Colorblind-accessible contour plot displaying model decision boundaries. Yellow regions predict one class outcome, while dark blue regions predict the other. White-outlined dots represent individual patient or cell sample data points.")
 

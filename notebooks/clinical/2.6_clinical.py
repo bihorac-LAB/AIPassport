@@ -1,6 +1,6 @@
 import streamlit as st
 
-st.title("2.6 Human-AI Collaboration in Biomedicine (Clinical)")
+st.title("2.6 Human-AI Collaboration in Biomedicine")
 
 with st.container(border=True):
     st.markdown("### Question 1")

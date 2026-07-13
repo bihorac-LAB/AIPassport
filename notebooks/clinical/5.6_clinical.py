@@ -1,6 +1,6 @@
 import streamlit as st
 
-st.title("5.6 Consistency in Biomedical Image Analysis (Clinical)")
+st.title("5.6 Consistency in Biomedical Image Analysis")
 
 st.info(
     "The original embedded HTML export is not present in this repository. "

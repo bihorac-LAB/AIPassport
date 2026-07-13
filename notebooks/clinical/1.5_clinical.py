@@ -60,7 +60,7 @@ with st.expander("Datasets, tools, and sample data", expanded=False):
 
 # ============== MAIN NOTEBOOK / ASSIGNMENT NAVIGATION ==============
 
-st.header("MS5. Leveraging Multidisciplinary Team Strengths - Clinical Track")
+st.header("MS5. Leveraging Multidisciplinary Team Strengths")
 
 tabs = [
     "Introduction",
@@ -79,7 +79,7 @@ if selection == tabs[0]:
     st.markdown("""
 Welcome! In this assignment, you will explore strategies and best practices for **building, managing, and optimizing multidisciplinary teams** in clinical AI projects.
 
-**Clinical Track Focus:**  
+**Clinical Focus:**
 You are leading a project to develop an AI system that assists Emergency Department (ED) physicians in triaging suspected stroke patients.
 
 **You will:**  

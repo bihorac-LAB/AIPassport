@@ -32,9 +32,9 @@ st.markdown("""
 
 /* Base Primary Buttons - UF Orange */
 button[kind="primary"] {
-    background-color: var(--uf-orange) !important;
+    background-color: var(--gator-blue) !important;
     color: white !important;
-    border-color: var(--uf-orange) !important;
+    border-color: var(--gator-blue) !important;
 }
 button[kind="primary"]:hover {
     background-color: #D6390E !important;
@@ -87,7 +87,7 @@ button[kind="primary"]:hover {
 </style>
 """, unsafe_allow_html=True)
 
-N_MICROSKILLS_PER_MODULE = 7
+N_LESSONS_PER_MODULE = 7
 
 MODULE_NAMES = [
     "Module 1 - Fundamentals",
@@ -102,114 +102,123 @@ MODULE_NAMES = [
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 
-def get_notebook_path(url_path, track):
-    target_nb = url_path.strip("/")
-    return os.path.join(BASE_DIR, "notebooks", track, f"{target_nb}_{track}.py")
+def get_notebook_path(lesson_id):
+    return os.path.join(
+        BASE_DIR,
+        "notebooks",
+        "clinical",
+        f"{lesson_id}_clinical.py",
+    )
 
 
-def get_available_tracks(url_path):
-    if not url_path:
-        return []
-
+def get_module_lessons(module_number):
     return [
-        track
-        for track in ("clinical", "basic")
-        if os.path.exists(get_notebook_path(url_path, track))
+        f"{module_number}.{lesson_number}"
+        for lesson_number in range(1, N_LESSONS_PER_MODULE + 1)
+        if os.path.exists(get_notebook_path(f"{module_number}.{lesson_number}"))
     ]
 
 
-def load_notebook_context(url_path, track):
-    if not url_path:
+def load_notebook_context(lesson_id):
+    if not lesson_id:
         return None
 
     context_path = os.path.join(
         BASE_DIR,
         "assets",
         "notebook_context",
-        f"{url_path.strip('/')}_{track}.json",
+        f"{lesson_id}_clinical.json",
     )
 
     if not os.path.exists(context_path):
         return None
 
     try:
-        with open(context_path, "r") as f:
+        with open(context_path, "r", encoding="utf-8") as f:
             return json.load(f)
     except Exception as e:
         return {"context_error": f"Could not load notebook context: {e}"}
 
-# Streamlit demo showed during 3-12-25 Co-I meeting
 sidebar = {}
-
-demo_path = "reference/demos/aip_streamlit_demo.py"
-if os.path.exists(demo_path):
-    sidebar["Demo"] = [
-        st.Page(
-            page=demo_path,
-            title="Streamlit Demo (3-12-25)",
-            icon="📘",
-        )
-    ]
 
 # ── Notebook Wrapping & Rendering Logic ────────────────────────────────━━━━
 def render_home_page():
     st.title("📚 AI Passport: Module Index")
-    st.info("Since the sidebar is hidden for iframe embedding, use this index to navigate to specific modules.")
-    
-    for module_name, pages in sidebar.items():
-        if module_name == "Home": continue
-        with st.expander(f"📂 {module_name}", expanded=True):
-            cols = st.columns(3)
-            for i, p in enumerate(pages):
-                with cols[i % 3]:
-                    if st.button(f"{p.title}", key=f"btn_{p.url_path}", use_container_width=True):
-                        st.switch_page(p)
+    st.info("Choose a module to open its lessons and activities.")
 
-def render_notebook_page():
-    # 'pg' is available in the global scope where it was defined
+    cols = st.columns(2)
+    for index, page in enumerate(module_pages):
+        with cols[index % 2]:
+            if st.button(
+                page.title,
+                key=f"btn_{page.url_path}",
+                type="primary",
+                use_container_width=True,
+            ):
+                st.switch_page(page)
+
+def get_module_number(url_path):
+    if not url_path or not url_path.startswith("module-"):
+        return None
+
+    try:
+        return int(url_path.removeprefix("module-"))
+    except ValueError:
+        return None
+
+
+def get_active_lesson(url_path):
+    module_number = get_module_number(url_path)
+    if module_number is None:
+        return None
+
+    lessons = get_module_lessons(module_number)
+    if not lessons:
+        return None
+
+    selected_lesson = st.session_state.get(f"module_{module_number}_lesson")
+    return selected_lesson if selected_lesson in lessons else lessons[0]
+
+
+def get_lesson_label(lesson_id):
+    context = load_notebook_context(lesson_id)
+    if context and context.get("title"):
+        return f"{lesson_id} — {context['title']}"
+    return f"Lesson {lesson_id}"
+
+
+def render_module_page():
     current_url_path = getattr(pg, "url_path", "")
-    available_tracks = get_available_tracks(current_url_path)
+    module_number = get_module_number(current_url_path)
 
-    if (
-        current_url_path
-        and available_tracks
-        and st.session_state.get("track") not in available_tracks
-    ):
-        st.session_state["track"] = available_tracks[0]
-        st.query_params["track"] = available_tracks[0]
-    
-    # ── Header & Track Selector ─────────────────────────────────────────────
-    # Check if it's a microskill (standard microskills don't have '_' in title)
-    if current_url_path and "_" not in current_url_path and current_url_path != "":
-        t_col1, t_col2 = st.columns([2, 1])
-        with t_col1:
-            st.title(pg.title)
-        with t_col2:
-            track_options = [track.capitalize() for track in available_tracks]
-            if len(track_options) > 1:
-                current_track = st.segmented_control(
-                    "Select Track",
-                    options=track_options,
-                    default=st.session_state["track"].capitalize(),
-                    key="track_selector"
-                )
-                if current_track:
-                    new_track = current_track.lower()
-                    if new_track != st.session_state["track"]:
-                        st.session_state["track"] = new_track
-                        st.query_params["track"] = new_track
-                        st.rerun()
-            elif track_options:
-                st.caption(f"{track_options[0]} track")
+    if module_number is None or not 1 <= module_number <= len(MODULE_NAMES):
+        st.error("Module not found.")
+        return
 
-    # ── Load and Run the actual notebook content ────────────────────────────
-    if current_url_path:
-        target_nb = current_url_path.strip("/")
-        track = st.session_state["track"]
-        nb_path = get_notebook_path(current_url_path, track)
+    if st.button("← All modules", key=f"home_from_module_{module_number}"):
+        st.switch_page(home_page)
+
+    st.title(MODULE_NAMES[module_number - 1])
+    lessons = get_module_lessons(module_number)
+
+    if not lessons:
+        st.info("Lessons for this module are coming soon.")
+        return
+
+    selected_lesson = st.selectbox(
+        "Choose a lesson",
+        options=lessons,
+        format_func=get_lesson_label,
+        key=f"module_{module_number}_lesson",
+    )
+    st.divider()
+
+    # Load and run the selected lesson content.
+    if selected_lesson:
+        nb_path = get_notebook_path(selected_lesson)
         
         if os.path.exists(nb_path):
-            with open(nb_path, "r") as f:
+            with open(nb_path, "r", encoding="utf-8") as f:
                 code = f.read()
                 
                 # Compatibility layer for Jupyter/IPython functions
@@ -241,45 +250,27 @@ def render_notebook_page():
                 except Exception as e:
                     st.error(f"Error executing notebook: {e}")
                     st.exception(e)
-        elif "demo" in target_nb:
-            demo_full_path = os.path.join(BASE_DIR, demo_path)
-            if os.path.exists(demo_full_path):
-                with open(demo_full_path, "r") as f:
-                    exec(f.read(), globals())
-            else:
-                st.error(f"Demo file not found at {demo_full_path}")
         else:
             st.warning(f"Notebook not found!")
             st.info(f"Looking for: `{nb_path}`")
-            st.caption("Please ensure the module files follow the `{module}.{microskill}_{track}.py` pattern.")
-    else:
-        render_home_page()
+            st.caption("Please ensure lesson files follow the `{module}.{lesson}_clinical.py` pattern.")
 
 # ── Multipage Registration ──────────────────────────────────────────────────
-sidebar["Home"] = [st.Page(page=render_home_page, title="Home", icon="🏠", default=True)]
-for module_idx, module_name in enumerate(MODULE_NAMES):
-    sidebar[module_name] = []
+home_page = st.Page(page=render_home_page, title="Home", icon="🏠", default=True)
+module_pages = [
+    st.Page(
+        page=render_module_page,
+        title=module_name,
+        icon="📝",
+        url_path=f"module-{module_idx + 1}",
+    )
+    for module_idx, module_name in enumerate(MODULE_NAMES)
+]
 
-    for microskill_idx in range(N_MICROSKILLS_PER_MODULE):
-        clinical_exists = os.path.exists(get_notebook_path(f"{module_idx + 1}.{microskill_idx + 1}", "clinical"))
-        basic_exists = os.path.exists(get_notebook_path(f"{module_idx + 1}.{microskill_idx + 1}", "basic"))
-        
-        if clinical_exists or basic_exists:
-            page = st.Page(
-                page=render_notebook_page, 
-                title=f"Microskill {module_idx + 1}.{microskill_idx + 1}",
-                icon="📝",
-                url_path=f"{module_idx + 1}.{microskill_idx + 1}",
-            )
-            sidebar[module_name].append(page)
+sidebar["Home"] = [home_page]
+sidebar["Modules"] = module_pages
 
 pg = st.navigation(sidebar, position="hidden")
-
-# ── Track Selection Persistence ─────────────────────────────────────────────
-# Default to clinical or whatever is in query params
-query_track = st.query_params.get("track", "clinical")
-if "track" not in st.session_state:
-    st.session_state["track"] = query_track
 
 # ── Chat Toggle State & Logic ────────────────────────────────────────────────
 if "_chat_open" not in st.session_state:
@@ -331,14 +322,6 @@ st.markdown(f"""
     right: {right_pos};
 }}
 
-.track-selector-container {{
-    display: flex;
-    justify-content: center;
-    margin-bottom: 2rem;
-    padding: 0.5rem;
-    background: #f0f2f6;
-    border-radius: 10px;
-}}
 </style>
 <div id="aip-toggle-tab" title="Toggle AI Guide">{arrow_char}</div>
 """, unsafe_allow_html=True)
@@ -405,11 +388,10 @@ if st.session_state["_chat_open"]:
             context_fn=lambda: {
                 "current_page": getattr(pg, "title", "AIPassport Home"),
                 "url_path": getattr(pg, "url_path", ""),
-                "track": st.session_state.get("track", "clinical"),
+                "active_lesson": get_active_lesson(getattr(pg, "url_path", "")),
                 "platform": "AI Passport",
                 "notebook_context": load_notebook_context(
-                    getattr(pg, "url_path", ""),
-                    st.session_state.get("track", "clinical"),
+                    get_active_lesson(getattr(pg, "url_path", "")),
                 ),
             },
         )

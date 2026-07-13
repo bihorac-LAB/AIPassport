@@ -1,7 +1,7 @@
 import streamlit as st
 import time
 
-st.title("7.1 Designing Biomedical AI Experiments (Clinical)")
+st.title("7.1 Designing Biomedical AI Experiments")
 
 header_cols = st.columns(3)
 with header_cols[1]:

@@ -6,7 +6,6 @@ import plotly.express as px
 st.title("1.6 Basics of Scientific Rigor and Reproducibility (Clinical Research)")
 
 st.markdown("""
-**Track:** Clinical  
 **Dataset:** Simulated Hospital Admission/Outcome Dataset (mimicking eICU/EHR data)  
 **Tool:** [Jupyter notebook](https://jupyter.org/) (and this Streamlit app)
 

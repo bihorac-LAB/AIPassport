@@ -4,7 +4,7 @@ from openai import OpenAI
 import json
 import aipassport_config as cfg
 
-st.title("1.1 Demystifying Artificial Intelligence (Clinical)")
+st.title("1.1 Demystifying Artificial Intelligence")
 
 header_cols = st.columns(3)
 with header_cols[1]:

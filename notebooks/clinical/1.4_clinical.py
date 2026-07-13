@@ -23,7 +23,7 @@ st.markdown("---")
 ## -------- PART 1: Understanding Training & Validation Fundamentals --------
 with st.expander("Part 1: Understanding Training & Validation Fundamentals", expanded=True):
     st.markdown("""
-    **Clinical Track Case:**  
+    **Clinical Case:**
     Your institution collected **10,000 chest X-rays** from three hospitals over 3 years, using five X-ray machines, with a diverse, mostly urban patient population.
     """)
 
@@ -125,7 +125,7 @@ with st.expander("Part 2: Internal Validation Techniques", expanded=False):
 ## -------- PART 3: External Validation and Generalizability --------
 with st.expander("Part 3: External Validation & Generalizability", expanded=False):
     st.markdown("""
-    **Clinical Track Case:**  
+    **Clinical Case:**
     Your model (trained internally) will be tested on the **NIH Chest X-ray dataset**.
     """)
 

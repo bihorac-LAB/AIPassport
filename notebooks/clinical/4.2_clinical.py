@@ -9,16 +9,9 @@ from sklearn.neural_network import MLPClassifier
 from sklearn.metrics import accuracy_score
 
 # ---------------------------------
-# Page Config & Sidebar
+# Page Navigation
 # ---------------------------------
-st.markdown("### 1. Select Perspective")
-perspective = st.radio(
-    "View demonstration through the lens of:",
-    ["Clinical Science", "Foundational Science"],
-    help="Toggle this to see how the same machine learning pipeline is interpreted differently depending on the scientific domain."
-)
-
-st.markdown("### 2. Navigation")
+st.markdown("### Navigation")
 activity = st.radio(
     "Go to:",
     [
@@ -33,10 +26,7 @@ activity = st.radio(
 # ---------------------------------
 # Context Variables
 # ---------------------------------
-if perspective == "Clinical Science":
-    app_desc = "Interactive demonstration of a clinical analytics pipeline. Observe how a Deep Neural Network learns to predict in-hospital mortality using data from the eICU Collaborative Research Database."
-else:
-    app_desc = "Interactive demonstration of a computational biology pipeline. Analyze how a Deep Neural Network maps continuous input features to a binary target on a highly imbalanced dataset."
+app_desc = "Interactive demonstration of a clinical analytics pipeline. Observe how a Deep Neural Network learns to predict in-hospital mortality using data from the eICU Collaborative Research Database."
 
 st.title("Applied Fundamentals of Machine Learning (ML) and Deep Learning (DL)")
 st.write(app_desc)
@@ -76,7 +66,7 @@ if activity == "Activity 1 - Data Exploration":
     st.header("Activity 1: Exploring Data Types")
     
     st.markdown("### Instructions")
-    st.write("Complete each activity in order. In the sidebar, toggle between the Clinical Science and Foundational Science perspectives. Record your responses to the module activities exclusively in your Canvas submission area.")
+    st.write("Complete each activity in order and record your responses to the module activities exclusively in your Canvas submission area.")
     st.write("Before training a model, researchers must inspect the raw data to understand feature distributions and identify class imbalances.")
     
     st.subheader("Data Preview")
@@ -114,18 +104,11 @@ if activity == "Activity 1 - Data Exploration":
 
     st.markdown("---")
     with st.expander("Reveal: Conceptual Insights for Activity 1"):
-        if perspective == "Clinical Science":
-            st.info("""
-            **The Job Task:** The objective is to predict in-hospital mortality using demographic and lab data to support ICU triage.
-            **The Algorithmic Advantage:** A Deep Neural Network evaluates the non-linear interactions between variables. A specific blood pressure value may be safe for one patient but critical for another when combined with specific BMI and Glucose levels.
-            **Understanding the Data Format:** Features are standardized so that large numerical values do not dominate the model's weight updates, ensuring all clinical metrics are treated proportionally.
-            """)
-        else:
-            st.info("""
-            **The Job Task:** The task is binary classification, mapping continuous input arrays to a discrete target on an imbalanced dataset.
-            **The Algorithmic Advantage:** The DNN uses multiple hidden layers for automated feature extraction, capturing abstract patterns without manual feature engineering.
-            **Understanding the Data Format:** Standardizing data to a mean of 0 and variance of 1 ensures stable gradient updates during the backpropagation process.
-            """)
+        st.info("""
+        **The Job Task:** The objective is to predict in-hospital mortality using demographic and lab data to support ICU triage.
+        **The Algorithmic Advantage:** A Deep Neural Network evaluates the non-linear interactions between variables. A specific blood pressure value may be safe for one patient but critical for another when combined with specific BMI and Glucose levels.
+        **Understanding the Data Format:** Features are standardized so that large numerical values do not dominate the model's weight updates, ensuring all clinical metrics are treated proportionally.
+        """)
 
 # --------------------
 # Activity 2 - Model Optimization
@@ -178,16 +161,10 @@ model = Sequential([
 
     st.markdown("---")
     with st.expander("Reveal: Conceptual Insights for Activity 2"):
-        if perspective == "Clinical Science":
-            st.warning("""
-            **Comparison to MS1:** The DNN can reach higher accuracy than the Decision Tree by finding hidden layers of risk, but global accuracy alone is deceptive.
-            **Metric Suitability:** In mortality prediction, accuracy is an insufficient metric. Because most patients survive, the model could guess 'Survival' for everyone and still appear accurate while failing to detect at-risk patients.
-            """)
-        else:
-            st.warning("""
-            **Comparison to MS1:** The DNN has higher capacity, but researchers must check if the model is genuinely learning the minority class or simply defaulting to the majority class distribution.
-            **Metric Suitability:** Total accuracy is skewed in imbalanced datasets because the loss function is dominated by the majority class samples.
-            """)
+        st.warning("""
+        **Comparison to MS1:** The DNN can reach higher accuracy than the Decision Tree by finding hidden layers of risk, but global accuracy alone is deceptive.
+        **Metric Suitability:** In mortality prediction, accuracy is an insufficient metric. Because most patients survive, the model could guess 'Survival' for everyone and still appear accurate while failing to detect at-risk patients.
+        """)
 
 # --------------------
 # Activity 3 - Cross-Validation Analysis

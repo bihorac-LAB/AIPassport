@@ -118,12 +118,6 @@ def get_processed_data(df_raw):
 # --- 2. SIDEBAR NAVIGATION ---
 st.title("Evaluating Machine Learning Models")
 
-track = st.radio(
-    "Select Science Track:", 
-    ["Clinical Science", "Foundational Science"],
-    help="Toggle between a clinical healthcare focus or a foundational data science focus."
-)
-
 st.markdown("---")
 
 # Define pages
@@ -140,26 +134,15 @@ page = st.radio(
 
 # === 1. DATA PROCESSING ===
 if page == "1. Data Processing":
-    if track == "Clinical Science":
-        st.title("Clinical Data Processing")
-        st.markdown("""
-        ### Preparing Electronic Health Records
-        In clinical environments, raw patient records often contain missing vitals and unique hospital identifiers that offer no predictive value.
-        
-        ### Pipeline Operations
-        1. **Remove Identifiers**: Exclude random numeric identifiers (e.g., patient IDs) to maintain privacy and prevent model bias.
-        2. **Imputation**: Handle missing clinical lab results by imputing the cohort mean to preserve the patient record for analysis.
-        """)
-    else:
-        st.title("Data Cleaning Engine")
-        st.markdown("""
-        ### Dataset Feature Engineering
-        Before training, raw datasets must be standardized. Variables containing no informational value or target leakage (like discharge weight) are removed.
-        
-        ### Pipeline Operations
-        1. **One-Hot Encoding**: Transform categorical string variables into binary matrices.
-        2. **Mean Imputation**: Fill missing numerical values with the column mean to ensure matrices remain dense for mathematical convergence.
-        """)
+    st.title("Clinical Data Processing")
+    st.markdown("""
+    ### Preparing Electronic Health Records
+    In clinical environments, raw patient records often contain missing vitals and unique hospital identifiers that offer no predictive value.
+
+    ### Pipeline Operations
+    1. **Remove Identifiers**: Exclude random numeric identifiers (e.g., patient IDs) to maintain privacy and prevent model bias.
+    2. **Imputation**: Handle missing clinical lab results by imputing the cohort mean to preserve the patient record for analysis.
+    """)
 
     # Initialize state
     if 'proc_run' not in st.session_state:
@@ -181,19 +164,12 @@ if page == "1. Data Processing":
         st.subheader("Processed Data Preview")
         st.dataframe(df_processed.head(), use_container_width=True)
         
-        if track == "Clinical Science":
-            st.caption("A preview of the first 5 rows of the clean patient cohort.")
-        else:
-            st.caption("A preview of the first 5 samples of the encoded dataset.")
+        st.caption("A preview of the first 5 rows of the clean patient cohort.")
 
 # === 2. EXPLORATORY ANALYSIS ===
 elif page == "2. Exploratory Analysis":
-    if track == "Clinical Science":
-        st.title("Patient Demographics & Biomarkers")
-        st.markdown("Use this explorer to visualize clinical markers and demographic breakdowns across the hospital network.")
-    else:
-        st.title("Feature Variance & Distributions")
-        st.markdown("Use this explorer to visualize feature variance and observe data distributions prior to modeling.")
+    st.title("Patient Demographics & Biomarkers")
+    st.markdown("Use this explorer to visualize clinical markers and demographic breakdowns across the hospital network.")
     
     with st.spinner("Loading Data Explorer..."):
         df_raw = build_eicu_data()
@@ -241,12 +217,8 @@ elif page == "2. Exploratory Analysis":
     st.divider()
 
     # --- VISUALIZATION ---
-    if track == "Clinical Science":
-        st.subheader("Sex-Specific Clinical Patterns")
-        st.markdown("Do male and female patients exhibit different baseline physiological patterns? In clinical research, aggregating all patients can mask critical biological differences.")
-    else:
-        st.subheader("Class Separation by Subgroup")
-        st.markdown("Do features distribute differently depending on subgroup categorizations? Pooling disparate subgroups can hide variance and confound model weights.")
+    st.subheader("Sex-Specific Clinical Patterns")
+    st.markdown("Do male and female patients exhibit different baseline physiological patterns? In clinical research, aggregating all patients can mask critical biological differences.")
 
     available_vars = ['age', 'height','weight_admission', 'lab_bun', 'lab_hct', 'lab_hgb', 'lab_mch', 'lab_mchc', 
                       'lab_mcv', 'lab_rbc', 'lab_rdw', 'lab_albumin', 'lab_bicarbonate', 
@@ -289,12 +261,8 @@ elif page == "2. Exploratory Analysis":
 
 # === 3. UNIVARIATE ANALYSIS ===
 elif page == "3. Univariate Analysis":
-    if track == "Clinical Science":
-        st.title("Sex-Specific Clinical Risk Factors")
-        st.markdown("We will perform univariate analyses using odds ratios. This helps uncover whether specific clinical labs hold differential predictive risk for mortality in women versus men.")
-    else:
-        st.title("Univariate Feature Importance")
-        st.markdown("We will perform univariate regression to calculate odds ratios. This establishes the baseline independent predictive power of each feature before complex modeling.")
+    st.title("Sex-Specific Clinical Risk Factors")
+    st.markdown("We will perform univariate analyses using odds ratios. This helps uncover whether specific clinical labs hold differential predictive risk for mortality in women versus men.")
 
     with st.spinner("Preparing Data & Models..."):
         df_raw = build_eicu_data()
@@ -367,12 +335,8 @@ elif page == "3. Univariate Analysis":
 
 # === 4. MULTIVARIATE ANALYSIS ===
 elif page == "4. Multivariate Analysis":
-    if track == "Clinical Science":
-        st.title("Diagnostic Predictive Engine")
-        st.markdown("We will evaluate how well our multivariate models perform within each sex subgroup using the AUROC metric for diagnostic discrimination.")
-    else:
-        st.title("Machine Learning Pipeline Evaluation")
-        st.markdown("We will measure the discriminative ability of our multivariate classifiers across specific demographic splits using the AUROC metric.")
+    st.title("Diagnostic Predictive Engine")
+    st.markdown("We will evaluate how well our multivariate models perform within each sex subgroup using the AUROC metric for diagnostic discrimination.")
 
     with st.spinner("Preparing Data..."):
         df_raw = build_eicu_data()

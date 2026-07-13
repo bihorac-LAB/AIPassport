@@ -20,13 +20,6 @@ st.title("Module Navigation")
 
 st.info("Instructions: Please use this sidebar menu below to navigate through the different phases of Activity 4. Complete each section in order before answering the final question in your Canvas submission area.")
 
-scientific_context = st.radio(
-    "Select Learning Context:",
-    ["Clinical (Patient Care)", "Foundational (Algorithmic & Basic Science)"],
-    help="Toggle the interface terminology to match your specific track."
-)
-st.markdown("---")
-
 mode = st.radio(
     "Activity 4 Phases:",
     [

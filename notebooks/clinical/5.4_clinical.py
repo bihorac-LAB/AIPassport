@@ -1,6 +1,6 @@
 import streamlit as st
 
-st.title("5.4 Biomedical Computer Vision Applications (Clinical)")
+st.title("5.4 Biomedical Computer Vision Applications")
 
 st.info(
     "The original embedded HTML export is not present in this repository. "

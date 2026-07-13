@@ -41,30 +41,14 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# --- 2. TRACK & CONFIGURATION ---
+# --- 2. CLINICAL CONFIGURATION ---
 st.title("3.2 Ethical Data Acquisition Audit")
 
-with st.expander("Audit Configuration", expanded=True):
-    track = st.radio(
-        "Select Research Track:",
-        ["Clinical Track (IC3 COVID-19)", "Basic Science Track (ImmPort)"],
-        horizontal=True,
-        help="Select the dataset context for this audit session."
-    )
-
-# Set Variables based on Track
-if "Clinical" in track:
-    dataset_name = "IC3 UF Public COVID-19 Dataset"
-    dataset_link = "https://ic3.center.ufl.edu/research/resources/datasets/"
-    subject_term = "Patient"
-    sample_term = "Electronic Health Record (EHR)"
-    underserved_example = "Rural populations with limited hospital access"
-else:
-    dataset_name = "ImmPort (Immunology Database)"
-    dataset_link = "https://www.immport.org/shared/home"
-    subject_term = "Donor"
-    sample_term = "Biological Specimen"
-    underserved_example = "Donors of non-European ancestry"
+dataset_name = "IC3 UF Public COVID-19 Dataset"
+dataset_link = "https://ic3.center.ufl.edu/research/resources/datasets/"
+subject_term = "Patient"
+sample_term = "Electronic Health Record (EHR)"
+underserved_example = "Rural populations with limited hospital access"
 
 st.info(f"Current context: {dataset_name} | Subject: {subject_term}")
 
@@ -284,4 +268,4 @@ elif section == "5. Beneficence: Impact Audit":
 
 # --- FOOTER ---
 st.markdown("---")
-st.caption("Module MS2 | Course Materials | Based on REP-EQUITY Toolkit & IC3/ImmPort Datasets")
+st.caption("Module MS2 | Course Materials | Based on the REP-EQUITY Toolkit and IC3 dataset")

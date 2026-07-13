@@ -29,7 +29,7 @@ def roc_auc_score(y_true, y_prob):
 
 st.title("1.2 Artificial Intelligence Lifecycle (Clinical Research)")
 
-st.subheader("Clinical Track: Heart Disease Risk Predictor and Model Monitoring")
+st.subheader("Heart Disease Risk Predictor and Model Monitoring")
 
 st.markdown("""
 **Dataset:** Simulated Heart Disease Prediction Data (entirely included here)  

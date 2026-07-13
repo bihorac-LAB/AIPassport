@@ -27,22 +27,12 @@ This document outlines how to deploy the Gemini-powered AI Passport application 
 
 ## 📦 2. Embedding in Canvas (Iframe)
 
-To embed a specific microskill (e.g., 1.1) with a pre-selected track, use the following `<iframe>` format in the Canvas Rich Text Editor:
+To embed a module (for example, Module 1), use the following `<iframe>` format in the Canvas Rich Text Editor:
 
-### Example: Clinical Track
+### Example: Module 1
 ```html
 <iframe 
-  src="https://your-app.streamlit.app/1.1?track=clinical&embed=true" 
-  width="100%" 
-  height="900px" 
-  style="border:none;">
-</iframe>
-```
-
-### Example: Basic Track
-```html
-<iframe 
-  src="https://your-app.streamlit.app/1.1?track=basic&embed=true" 
+  src="https://your-app.streamlit.app/module-1?embed=true"
   width="100%" 
   height="900px" 
   style="border:none;">
@@ -50,8 +40,6 @@ To embed a specific microskill (e.g., 1.1) with a pre-selected track, use the fo
 ```
 
 ### URL Parameters Explained:
-- **`track=clinical`**: Pre-selects the "Clinical" version of the microskill.
-- **`track=basic`**: Pre-selects the "Basic" version.
 - **`embed=true`**: Hides the Streamlit header and sidebar for a native "app-like" look.
 
 ---
@@ -72,4 +60,4 @@ If you land on the root URL (`https://your-app.streamlit.app/`), you will see a 
 ---
 
 ## 🛠️ 4. Maintenance
-- **Updating Notebooks**: Simply drop new `.py` files into `notebooks/clinical/` or `notebooks/basic/` following the `{module}.{skill}_{track}.py` naming convention. The app will automatically detect and list them on the Home page.
+- **Updating Lessons**: Add new `.py` files to `notebooks/clinical/` using the `{module}.{lesson}_clinical.py` naming convention. The app will automatically include them in the matching module page.

@@ -11,13 +11,6 @@ st.title("3.6 Multi-Institutional Data Sharing Simulation")
 st.markdown("### Interactive Federated Learning Simulation")
 
 with st.expander("Simulation Settings", expanded=True):
-    track_choice = st.radio(
-        "Select Research Track:",
-        ["Clinical (IC3 COVID-19)", "Basic Science (ImmPort)"],
-        horizontal=True,
-        help="Choose the dataset scenario. Clinical simulates hospital patient records; Basic Science simulates laboratory immunology data."
-    )
-
     c1, c2 = st.columns(2)
     sample_size = c1.slider(
         "Sample Size (per Institution)",
@@ -46,66 +39,42 @@ st.info(
     "Follow the numbered steps below, adjusting parameters in the sidebar and main area to observe changes."
 )
 
-if track_choice == "Clinical (IC3 COVID-19)":
-    st.markdown("""
-    **Current Scenario:** Harmonizing patient data from multiple hospitals (City General vs. Mountain View) to predict COVID-19 severity.
-    **Challenge:** Outliers (measurement errors) and Missing Data (O2 Saturation) must be handled locally before the model can be shared.
-    """)
-else:
-    st.markdown("""
-    **Current Scenario:** Aggregating immunology data from different labs (Lab Alpha vs. Lab Beta) to analyze cytokine responses.
-    **Challenge:** Outliers (equipment spikes) and Missing Data (Cell Counts) must be handled locally before the model can be shared.
-    """)
+st.markdown("""
+**Current Scenario:** Harmonizing patient data from multiple hospitals (City General vs. Mountain View) to predict COVID-19 severity.
+**Challenge:** Outliers (measurement errors) and Missing Data (O2 Saturation) must be handled locally before the model can be shared.
+""")
 
 st.markdown("---")
 
 # --- DATA GENERATION ---
 @st.cache_data
-def generate_data(track, n_samples, contamination):
+def generate_data(n_samples, contamination):
     np.random.seed(42)
     
     # Calculate number of outliers
     n_outliers = int(n_samples * contamination)
     n_regular = n_samples - n_outliers
 
-    if track == "Clinical (IC3 COVID-19)":
-        # Regular Data
-        wbc_regular = np.random.normal(7000, 2000, n_regular)
-        # Outlier Data (Extreme errors)
-        wbc_outliers = np.random.uniform(50000, 250000, n_outliers)
-        
-        combined_wbc = np.append(wbc_regular, wbc_outliers)
-        np.random.shuffle(combined_wbc) # Shuffle so outliers aren't all at the end
+    # Regular Data
+    wbc_regular = np.random.normal(7000, 2000, n_regular)
+    # Outlier Data (Extreme errors)
+    wbc_outliers = np.random.uniform(50000, 250000, n_outliers)
 
-        data = {
-            'ID': [f"PT-{i:03d}" for i in range(n_samples)],
-            'Institution': np.random.choice(['City_General', 'Mountain_View_Clinic'], n_samples),
-            'Feature_Target': combined_wbc, # WBC Count
-            'Feature_Secondary': [np.nan if i % 10 == 0 else x for i, x in enumerate(np.random.normal(96, 2, n_samples))] # O2 Sat
-        }
-        labels = {'target': 'WBC Count', 'secondary': 'O2 Saturation'}
-        
-    else: # Basic Science
-        # Regular Data
-        il6_regular = np.random.gamma(2, 10, n_regular)
-        # Outlier Data
-        il6_outliers = np.random.uniform(500, 1500, n_outliers)
-        
-        combined_il6 = np.append(il6_regular, il6_outliers)
-        np.random.shuffle(combined_il6)
+    combined_wbc = np.append(wbc_regular, wbc_outliers)
+    np.random.shuffle(combined_wbc) # Shuffle so outliers aren't all at the end
 
-        data = {
-            'ID': [f"SMP-{i:03d}" for i in range(n_samples)],
-            'Institution': np.random.choice(['Lab_Alpha', 'Lab_Beta'], n_samples),
-            'Feature_Target': combined_il6, # Cytokine IL-6
-            'Feature_Secondary': [np.nan if i % 10 == 0 else x for i, x in enumerate(np.random.normal(1200, 300, n_samples))] # T-Cell
-        }
-        labels = {'target': 'Cytokine IL-6', 'secondary': 'T-Cell Count'}
+    data = {
+        'ID': [f"PT-{i:03d}" for i in range(n_samples)],
+        'Institution': np.random.choice(['City_General', 'Mountain_View_Clinic'], n_samples),
+        'Feature_Target': combined_wbc, # WBC Count
+        'Feature_Secondary': [np.nan if i % 10 == 0 else x for i, x in enumerate(np.random.normal(96, 2, n_samples))] # O2 Sat
+    }
+    labels = {'target': 'WBC Count', 'secondary': 'O2 Saturation'}
 
     return pd.DataFrame(data), labels
 
 # Generate Data based on inputs
-df_raw, col_labels = generate_data(track_choice, sample_size, outlier_rate)
+df_raw, col_labels = generate_data(sample_size, outlier_rate)
 
 # --- STEP 1: LOCAL DATA INSPECTION ---
 st.header("Step 1: Local Data Inspection")

@@ -1,6 +1,6 @@
 import streamlit as st
 
-st.title("1.7 Mentorship and Peer Review in Biomedical AI (Clinical Track)")
+st.title("1.7 Mentorship and Peer Review in Biomedical AI")
 
 st.markdown("""
 **Objective:**  
@@ -36,7 +36,7 @@ user_clinical_challenges = st.text_area(
     key="clinical_challenges_input"
 )
 
-if st.button("Show Example – Challenges (Clinical Track)", key="show_clinical_challenges_btn"):
+if st.button("Show Example – Challenges", key="show_clinical_challenges_btn"):
     st.success(
         "Example:\n\n"
         "- **Communication breakdown:** Dr. Martinez frequently reschedules/shortens meetings, but hasn't clearly communicated new availability or reasons, leaving Dr. Jordan uncertain.\n\n"
@@ -64,7 +64,7 @@ user_clinical_email = st.text_area(
     height=220, key="clinical_email_input"
 )
 
-if st.button("Show Example – Professional Communication (Clinical)", key="show_clinical_email_btn"):
+if st.button("Show Example – Professional Communication", key="show_clinical_email_btn"):
     st.info("""\
 Dear Dr. Martinez,
 

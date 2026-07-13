@@ -1,6 +1,6 @@
 # AIPassport: AI-Powered Educational Platform
 
-AIPassport is an interactive educational platform designed to teach the fundamentals of Artificial Intelligence, from basic concepts to complex clinical applications. The platform is built with **Streamlit** and integrates **Google Gemini** to provide real-time tutoring and interactive activities.
+AIPassport is an interactive clinical education platform designed to teach the fundamentals of Artificial Intelligence and their application to healthcare and biomedical research. The platform is built with **Streamlit** and integrates **Google Gemini** to provide real-time tutoring and interactive activities.
 
 ---
 
@@ -18,9 +18,9 @@ Instead of a complex external backend, the AI Guide is implemented as a **Direct
 - **Dynamic Context Sharing**: The guide is "content-aware." It automatically detects the current page from the navigation state and can "see" live activity results (like "Fact or Fiction" verdicts) passed through `st.session_state`.
 
 ### 3. Educational Content (Notebooks)
-- **`notebooks/clinical/`**: Specialized tracks for medical/clinical AI applications.
-- **`notebooks/basic/`**: Core AI/ML concepts for general learners.
-- Each notebook is a standalone Streamlit page that can also leverage the central AI configuration.
+- **`notebooks/clinical/`**: Lessons for medical and clinical AI applications.
+- The application exposes one page per module, with the module's available lessons selected from within that page.
+- Each lesson can leverage the central AI configuration.
 
 ### 4. Assets & LLM Resources
 - **`assets/llm/`**: Contains system instructions and JSON response schemas for structured AI activities.
