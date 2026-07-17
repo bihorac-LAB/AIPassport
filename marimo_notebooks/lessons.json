@@ -1,0 +1,2514 @@
+[
+  {
+    "id": "1.1",
+    "module": "1",
+    "module_name": "Fundamentals",
+    "title": "Demystifying Artificial Intelligence",
+    "objectives": [
+      "Understand AI as a human-built tool for solving specific problems.",
+      "Connect major AI milestones to the growth of modern biomedical and clinical AI.",
+      "Evaluate common AI claims as fact, fiction, misleading, or context-dependent."
+    ],
+    "sections": [
+      {
+        "title": "Overview",
+        "body": [
+          "Artificial intelligence can often seem mysterious, complex, or even magical—but at its core, AI is a \n            tool built by humans to solve specific problems. This assignment is designed to help \n            demystify AI by grounding it in history and critical thinking. \n\nFirst, you’ll explore an **Interactive AI Timeline** that highlights major milestones in the \ndevelopment of AI, providing a sense of how the field has evolved over time. \n\nNext, you will test your assumptions and beliefs about AI with **AI: Fact or Fiction?**, an \ninteractive activity that provides immediate feedback to separate myth from the reality\n\nTogether, these activities aim to build your foundational understanding and make AI feel a little \nless like science fiction and a little more like science.",
+          "**Artificial Intelligence (AI)** has evolved from a bold academic concept into a transformative\nforce reshaping science, medicine, industry, and everyday life. This interactive timeline \nexplores key milestones in the history of AI—from the theoretical groundwork laid by Alan Turing \nin the 1950s, to the explosive rise of generative models and multimodal agents in the 2020s.\n\nAs you scroll through the AI timeline, consider how each technological breakthrough not only \neflects the state of computing at the time but also contributes to a larger story of increasing \nintelligence, autonomy, and impact.",
+          "## gavel: AI: Fact or Fiction?",
+          "**Note:** The following activity uses generative AI to automatically provide feedback. Accuracy and appropriateness of responses is not guaranteed.",
+          "Artificial Intelligence can often feel like a mysterious black box—surrounded by hype, myths, and \nsometimes even fear. While some statements about AI reflect real technical capabilities and \nlimitations, others are based on outdated ideas or science fiction. As AI continues to grow more \npowerful and visible in our lives, it becomes increasingly important to distinguish fact from \nfiction.\n\nThis interactive tool invites you to put your assumptions to the test. Enter any statement you’ve \nheard or believed about AI—whether technical or philosophical—and our built-in AI assistant will \nhelp you evaluate whether it’s accurate, misleading, or just plain wrong.",
+          "AI feedback is unavailable because NAVIGATOR_TOOLKIT_API_KEY is not configured.",
+          "Click the tabs below for more information about your statement."
+        ],
+        "prompts": [
+          "Enter any statement about AI you'd like to evaluate."
+        ]
+      },
+      {
+        "title": "Interactive AI Timeline",
+        "body": [
+          "Give learners historical context for how AI capabilities developed over time.",
+          "Scroll through the timeline milestones. Ask learners to notice what changed between symbolic AI, expert systems, machine learning, deep learning, and generative AI."
+        ],
+        "prompts": []
+      },
+      {
+        "title": "AI: Fact or Fiction?",
+        "body": [
+          "Help learners test assumptions about AI using structured feedback.",
+          "Enter a statement about AI, then review the verdict, explanation, real-world biomedical examples, limitations, datasets, AI concepts, and research directions."
+        ],
+        "prompts": []
+      }
+    ],
+    "source": "notebooks/clinical/1.1_clinical.py"
+  },
+  {
+    "id": "1.2",
+    "module": "1",
+    "module_name": "Fundamentals",
+    "title": "Artificial Intelligence Lifecycle",
+    "objectives": [
+      "Explore how deployed AI model performance changes across data batches.",
+      "Connect data drift, validation checks, and retraining decisions.",
+      "Practice interpreting accuracy, ROC-AUC, confusion matrices, and predicted probability distributions."
+    ],
+    "sections": [
+      {
+        "title": "Heart Disease Risk Predictor and Model Monitoring",
+        "body": [
+          "**Dataset:** Simulated Heart Disease Prediction Data (entirely included here)  \n---\n\nThis notebook simulates a deployed AI model for heart disease risk prediction.  \nYou will:  \n- **Explore model performance across deployment versions**\n- **Simulate data drift**\n- **Practice data validation**\n- **Decide when to trigger model retraining**\n- **Reflect on good AI lifecycle management**\n---\n### 1. Dataset Overview\n\nThis scenario uses a **simulated EHR dataset** for heart disease risk, each \"version\" containing 100 patients and these features:\n\n- `age` (years)\n- `systolic_bp` (mmHg)\n- `cholesterol` (mg/dL)\n- `bmi`\n- `smoker` (1/0)\n- `outcome` (1=Heart disease event, 0=No event)",
+          "Sample of data (current batch):",
+          "---\n## 2. Choose a Model Version and Test on New Data",
+          "Distribution of predicted probabilities:",
+          "---\n## 3. Observe Model Drift and Decide When to Retrain",
+          "**Instructions:**  \n- Try different combinations above, e.g., test old (v1) model on recent (\"drifted\") batch, and compare vs. retrained models.\n- Watch for performance drop indicating “model drift”.\n\n**Q1: On which incoming batch does the performance of Model v1 FIRST significantly drop?**  \n**Q2: Does retraining recover performance?**  \nType your answers below.",
+          "---\n## 4. Data Validation Checks",
+          "**Practice data validation:**  \nArtificial Intelligence systems MUST check for data integrity before inference or retraining!\n\nBelow is a validator for 10 random patient records in the latest batch.  \nAdjust the validation thresholds to see impact.",
+          "**Q3: What problems could arise if these validation steps are skipped?**",
+          "---\n## 5. Lifecycle Management Scenario",
+          "**Imagine:**  \nYou are responsible for the deployed **Model v2**. Over the last 3 months, performance dropped _from ROC-AUC 0.83 to 0.71_ due to population changes.  \n- **How would you handle model versioning?**  \n- **How would you document and monitor, e.g., with MLflow or DVC?**  \n- **What communication/actions would you take before retraining and deployment?**",
+          "---\n**References:**  \n- [Jupyter notebook](https://jupyter.org/)  \n- [MLflow](https://mlflow.org/)  \n- [DVC](https://dvc.org/)  \n\n_This assignment simulates key components of AI clinical deployment, monitoring, and lifecycle practice!_"
+        ],
+        "prompts": [
+          "Notes on model drift observations:",
+          "Risks if no data validation:",
+          "Your short action plan for lifecycle management:"
+        ]
+      },
+      {
+        "title": "Dataset Overview",
+        "body": [
+          "Introduce a simulated EHR-style heart disease risk dataset.",
+          "Review the sample patient records and the outcome definition before changing model or batch selections."
+        ],
+        "prompts": []
+      },
+      {
+        "title": "Model Version and New Data",
+        "body": [
+          "Compare deployed model versions against incoming batches.",
+          "Change the model version and incoming batch. Watch how accuracy, ROC-AUC, the confusion matrix, and predicted probabilities change."
+        ],
+        "prompts": []
+      },
+      {
+        "title": "Model Drift",
+        "body": [
+          "Help learners decide when model monitoring should trigger retraining.",
+          "Try Model v1 on later batches, then compare against retrained versions. Use the notes box to record where performance changes."
+        ],
+        "prompts": []
+      },
+      {
+        "title": "Data Validation Checks",
+        "body": [
+          "Show why clinical AI systems need input validation before inference or retraining.",
+          "Adjust age, blood pressure, cholesterol, and BMI thresholds. Review which patient rows are flagged."
+        ],
+        "prompts": []
+      },
+      {
+        "title": "Lifecycle Management Scenario",
+        "body": [
+          "Prompt learners to plan monitoring, versioning, documentation, and communication.",
+          "Write a short action plan for model versioning, MLflow or DVC-style documentation, and stakeholder communication."
+        ],
+        "prompts": []
+      }
+    ],
+    "source": "notebooks/clinical/1.2_clinical.py"
+  },
+  {
+    "id": "1.3",
+    "module": "1",
+    "module_name": "Fundamentals",
+    "title": "Designing Biomedical Artificial Intelligence Experiments",
+    "objectives": [
+      "Identify knowledge gaps in clinical AI readmission prediction.",
+      "Turn clinical problems into SMART research questions.",
+      "Plan data selection, preprocessing, splitting, modeling, and evaluation.",
+      "Address concept drift, transparency, fairness, prospective readiness, ethics, and communication."
+    ],
+    "sections": [
+      {
+        "title": "Overview",
+        "body": [
+          "You are a clinical informatics researcher at a large academic medical center. Your hospital has higher-than-expected 30-day readmission rates for CHF patients.\n\n**Your Task:**  \nDesign an AI experiment to predict readmission risk and support enhanced discharge planning.  \nFollow each part, provide your responses using the inputs below. No programming required."
+        ],
+        "prompts": []
+      },
+      {
+        "title": "Resources: Datasets & Tools",
+        "body": [
+          "**Datasets:**  \n- [MIMIC-IV](https://physionet.org/content/mimiciv/2.2/)  \n- [UK Biobank Imaging Data](https://www.ukbiobank.ac.uk/enable-your-research/about-our-data/imaging-data)  \n\n**Tools:**  \n- [Google Colab](https://colab.research.google.com/)  \n- [TensorFlow](https://www.tensorflow.org/)"
+        ],
+        "prompts": []
+      },
+      {
+        "title": "1.1 Review the Current Literature",
+        "body": [
+          "Identify at least **three knowledge gaps or limitations** in current AI-based readmission prediction approaches for CHF patients."
+        ],
+        "prompts": [
+          "Knowledge Gap 1",
+          "Knowledge Gap 2",
+          "Knowledge Gap 3"
+        ]
+      },
+      {
+        "title": "1.2 Research Questions (SMART Criteria)",
+        "body": [],
+        "prompts": [
+          "Primary Research Question",
+          "Secondary Research Question 1",
+          "Secondary Research Question 2"
+        ]
+      },
+      {
+        "title": "1.3 Relevance and Impact",
+        "body": [],
+        "prompts": [
+          "How do your research questions address the identified gaps and improve patient care?"
+        ]
+      },
+      {
+        "title": "2.1 Data Selection Approach",
+        "body": [],
+        "prompts": [
+          "Specify other data elements:",
+          "Inclusion criteria",
+          "Exclusion criteria",
+          "How will you handle missing data?",
+          "How will you address potential biases in the data?"
+        ]
+      },
+      {
+        "title": "2.2 Data Preprocessing Pipeline",
+        "body": [],
+        "prompts": [
+          "Feature extraction from unstructured clinical notes",
+          "How will you normalize laboratory values?",
+          "Handling of temporal data (E.g., time series, hospital stays)",
+          "Creation of clinically relevant derived variables"
+        ]
+      },
+      {
+        "title": "2.3 Data Splitting Strategy",
+        "body": [
+          "How will you split your data to account for the considerations below?"
+        ],
+        "prompts": [
+          "Handling temporal shifts in clinical practice",
+          "Specify other approach to class imbalance:",
+          "How will you ensure patient demographic representation?",
+          "How will you evaluate generalizability across different hospital units?"
+        ]
+      },
+      {
+        "title": "3.1 Modelling Approach",
+        "body": [
+          "Briefly describe three candidate AI/ML algorithms for readmission prediction:"
+        ],
+        "prompts": [
+          "Algorithm 1",
+          "Algorithm 2",
+          "Algorithm 3",
+          "Which algorithm did you choose and why?",
+          "How does your approach address the limitations identified in Part 1?"
+        ]
+      },
+      {
+        "title": "3.2 Evaluation Framework",
+        "body": [],
+        "prompts": [
+          "Specify additional metrics:",
+          "Justify your choice of metrics",
+          "Describe your cross-validation strategy",
+          "How will you assess clinical relevance, not just statistical significance?"
+        ]
+      },
+      {
+        "title": "3.3 Addressing Challenges",
+        "body": [
+          "Prepare the model for clinical reality.",
+          "Explain how to handle concept drift, transparency, fairness across populations, and prospective evaluation readiness."
+        ],
+        "prompts": [
+          "How will you handle concept drift over time?",
+          "How will you ensure the model is transparent for clinical interpretation?",
+          "How will you assess fairness across patient populations?",
+          "How will you determine if the model is ready for prospective evaluation?"
+        ]
+      },
+      {
+        "title": "4.2 Handling Incidental Findings",
+        "body": [],
+        "prompts": [
+          "How would you handle and report incidental findings (e.g., unexpected medication associations)?"
+        ]
+      },
+      {
+        "title": "4.3 Limitations",
+        "body": [],
+        "prompts": [
+          "Acknowledge limitations of your approach and discuss how they may affect interpretation or application."
+        ]
+      },
+      {
+        "title": "5.1 Iterative Design",
+        "body": [],
+        "prompts": [
+          "How might results from your initial experiment inform future research directions?"
+        ]
+      },
+      {
+        "title": "5.2 Multidisciplinary Collaboration",
+        "body": [],
+        "prompts": [
+          "How does your design incorporate multidisciplinary perspectives? Where would clinical input be essential?"
+        ]
+      },
+      {
+        "title": "5.3 Communicating Your Design",
+        "body": [
+          "Describe your strategy for communicating your experiment to each audience:",
+          "You have completed all parts of the assignment! Please copy your responses to save or submit them as instructed by your course/instructor."
+        ],
+        "prompts": [
+          "AI/ML Technical Peers",
+          "Clinical Providers without AI expertise",
+          "Institutional Review Boards/Ethics Committees"
+        ]
+      },
+      {
+        "title": "Your Answers Summary",
+        "body": [
+          "**Part 1: Knowledge Gaps & Research Questions**",
+          "**Part 2: Data Management**",
+          "**Part 3: Experimental Design**",
+          "**Part 4: Ethics & Limitations**",
+          "**Part 5: Reflection**",
+          "Copy this output as your assignment review or for archiving."
+        ],
+        "prompts": []
+      },
+      {
+        "title": "Knowledge Gaps and Research Questions",
+        "body": [
+          "Frame a clinically meaningful AI experiment.",
+          "Write three gaps in current readmission prediction work, then define primary and secondary SMART research questions."
+        ],
+        "prompts": []
+      },
+      {
+        "title": "Data Management Strategy",
+        "body": [
+          "Plan clinical data elements, preprocessing, temporal handling, and split strategy.",
+          "Select MIMIC-IV data elements, specify inclusion and exclusion criteria, handle missing data, and plan bias mitigation."
+        ],
+        "prompts": []
+      },
+      {
+        "title": "Experimental Design",
+        "body": [
+          "Choose models and metrics beyond accuracy.",
+          "Describe candidate algorithms, pick a main model, justify metrics, and explain clinical relevance."
+        ],
+        "prompts": []
+      },
+      {
+        "title": "Ethics and Reflection",
+        "body": [
+          "Connect experiment design to responsible clinical use.",
+          "Address privacy, consent, security, fairness, clinical accountability, incidental findings, limitations, and communication."
+        ],
+        "prompts": []
+      }
+    ],
+    "source": "notebooks/clinical/1.3_clinical.py"
+  },
+  {
+    "id": "1.4",
+    "module": "1",
+    "module_name": "Fundamentals",
+    "title": "Training, Validation, and Generalizability",
+    "objectives": [
+      "Identify risks in simple random splitting for clinical imaging datasets.",
+      "Design clinically meaningful internal and external validation.",
+      "Plan calibration, robustness, subgroup fairness, and continuous monitoring.",
+      "Communicate performance and generalizability limits to clinical stakeholders."
+    ],
+    "sections": [
+      {
+        "title": "Overview",
+        "body": [
+          "**🗂 Datasets:**  \n- [MIMIC-CXR](https://physionet.org/content/mimic-cxr/2.0.0/)  \n- [NIH Chest X-ray Dataset](https://www.nih.gov/news-events/news-releases/nih-clinical-center-provides-one-largest-publicly-available-chest-x-ray-datasets-scientific-community)  \n\n**🛠 Tools:**  \n- [Keras (deep learning framework)](https://keras.io/)  \n- [ML-fairness-gym (fairness experiments)](https://github.com/google/ml-fairness-gym)",
+          "This assignment will guide you step-by-step through robust validation and fairness strategies for developing deep learning models to detect pneumonia from chest X-rays.",
+          "Click to expand each section, and interact with checkboxes, radios, and text boxes to develop your experimental design!",
+          "**Clinical Case:**\nYour institution collected **10,000 chest X-rays** from three hospitals over 3 years, using five X-ray machines, with a diverse, mostly urban patient population."
+        ],
+        "prompts": []
+      },
+      {
+        "title": "1.1 Issues with Simple Random Train-Test Split",
+        "body": [],
+        "prompts": [
+          "Elaborate on the issues you selected and describe at least three risks of a simple random split."
+        ]
+      },
+      {
+        "title": "1.2 Advanced Data Splitting Strategy",
+        "body": [
+          "Design a splitting strategy that addresses:",
+          "- Temporal factors\n- Equipment differences\n- Demographics\n- Prevalence variability"
+        ],
+        "prompts": [
+          "Describe your proposed data splitting strategy in detail:"
+        ]
+      },
+      {
+        "title": "1.3 Linking Split to Identified Issues",
+        "body": [
+          "**Goal:** Evaluate your model robustly using the splits you designed."
+        ],
+        "prompts": [
+          "Explain how your splitting strategy resolves the issues you chose in Task 1.1."
+        ]
+      },
+      {
+        "title": "2.1 Cross-Validation Framework",
+        "body": [],
+        "prompts": [
+          "How would you stratify? (e.g., by outcome label, hospital, demographic variables)"
+        ]
+      },
+      {
+        "title": "2.2 Additional Internal Validation",
+        "body": [],
+        "prompts": [
+          "Describe the additional approaches and their benefits."
+        ]
+      },
+      {
+        "title": "2.3 Calibration Approach",
+        "body": [
+          "How will you ensure your model's output probabilities are well-calibrated?",
+          "**Clinical Case:**\nYour model (trained internally) will be tested on the **NIH Chest X-ray dataset**."
+        ],
+        "prompts": [
+          "Describe your visualization(s) and how you will quantify calibration.",
+          "Describe your recalibration approach (if needed)."
+        ]
+      },
+      {
+        "title": "3.1 External Validation Framework",
+        "body": [],
+        "prompts": [
+          "How will you preprocess the external dataset to ensure compatibility?",
+          "How will you compare model performance between internal and external datasets?"
+        ]
+      },
+      {
+        "title": "3.2 Addressing Generalizability Gaps",
+        "body": [],
+        "prompts": [
+          "Your model underperforms on pediatric patients and portable machine X-rays. Propose a strategy to improve generalizability WITHOUT overfitting to this external dataset."
+        ]
+      },
+      {
+        "title": "3.3 Systematic Subgroup Evaluation",
+        "body": [
+          "How will you evaluate and address disparities?",
+          "**Goal:** Model should remain accurate despite benign image variation."
+        ],
+        "prompts": [
+          "Describe how you would (i) identify & quantify subgroup performance (demographics, clinical context), (ii) test for statistical significance, and (iii) address significant disparities detected."
+        ]
+      },
+      {
+        "title": "4.1 Robustness Experiments",
+        "body": [],
+        "prompts": [
+          "For each selected variation, how would you implement and evaluate robustness?"
+        ]
+      },
+      {
+        "title": "4.2 Improving Device Robustness",
+        "body": [],
+        "prompts": [
+          "Your model degrades with medical devices in images. Describe an approach to improve this (e.g., additional training, augmentations, post-processing, etc.)."
+        ]
+      },
+      {
+        "title": "4.3 Continuous Model Monitoring",
+        "body": [
+          "Develop a monitoring plan after deployment:",
+          "**Goal:** Ensure model equitability across populations."
+        ],
+        "prompts": [
+          "What continuous metrics will you track over time & how often will you evaluate robustness?",
+          "How will you update models in production WITHOUT disrupting clinical workflow?"
+        ]
+      },
+      {
+        "title": "5.1 Evaluating Across Groups",
+        "body": [],
+        "prompts": [
+          "Briefly describe your approach for evaluating performance in these subgroups."
+        ]
+      },
+      {
+        "title": "5.2 Common Pitfalls in Stratified Performance",
+        "body": [],
+        "prompts": [
+          "How does your approach avoid these pitfalls?"
+        ]
+      },
+      {
+        "title": "5.3 Addressing and Communicating Group Disparities",
+        "body": [],
+        "prompts": [
+          "Describe your approach for (i) identifying causes of disparities, (ii) mitigating without new bias, (iii) validating mitigation, and (iv) transparent communication."
+        ]
+      },
+      {
+        "title": "6.1 Performance-Generalizability Tradeoff",
+        "body": [],
+        "prompts": [
+          "How would you handle trade-offs between improving performance on one subgroup at the expense of another?"
+        ]
+      },
+      {
+        "title": "6.2 Informing Future Data Collection",
+        "body": [],
+        "prompts": [
+          "Based on your validation results, how would you guide future data collection? What would you prioritize?"
+        ]
+      },
+      {
+        "title": "6.3 Communication Strategy",
+        "body": [
+          "Assignment marked as complete! Review and save your responses as needed.",
+          "You can show/hide sections as needed. Use the checklists, radios, and text entry points to structure your thinking throughout the assignment."
+        ],
+        "prompts": [
+          "How would you communicate your model’s strengths and limitations to technical staff?",
+          "To clinical end users?",
+          "To hospital leadership?"
+        ]
+      },
+      {
+        "title": "Understanding Training and Validation Fundamentals",
+        "body": [
+          "Show why clinical imaging data needs careful splits.",
+          "Select risks of random splitting, then design a temporal, hospital-aware, equipment-aware, or hybrid split."
+        ],
+        "prompts": []
+      },
+      {
+        "title": "Internal Validation Techniques",
+        "body": [
+          "Build confidence before external testing.",
+          "Choose cross-validation type, folds, stratification, metrics, internal holdouts, and calibration methods."
+        ],
+        "prompts": []
+      },
+      {
+        "title": "External Validation and Generalizability",
+        "body": [
+          "Plan testing on the NIH Chest X-ray dataset.",
+          "Describe compatibility preprocessing, performance comparison, refinement thresholds, and subgroup gaps."
+        ],
+        "prompts": []
+      },
+      {
+        "title": "Model Robustness",
+        "body": [
+          "Evaluate model behavior under real-world image variation.",
+          "Select variations to test and write monitoring/update plans."
+        ],
+        "prompts": []
+      },
+      {
+        "title": "Demographic and Geographic Considerations",
+        "body": [
+          "Evaluate equitable performance across patient groups.",
+          "Choose groups, identify pitfalls, and describe mitigation plus communication."
+        ],
+        "prompts": []
+      },
+      {
+        "title": "Reflection",
+        "body": [
+          "Connect validation tradeoffs to deployment decisions.",
+          "Write how to balance subgroup performance, future data collection, and stakeholder communication."
+        ],
+        "prompts": []
+      }
+    ],
+    "source": "notebooks/clinical/1.4_clinical.py"
+  },
+  {
+    "id": "1.5",
+    "module": "1",
+    "module_name": "Fundamentals",
+    "title": "Leveraging Multidisciplinary Team Strengths",
+    "objectives": [
+      "Identify essential roles for a real-time stroke triage AI project.",
+      "Plan communication across clinical, technical, administrative, and patient-facing roles.",
+      "Practice shared decision-making when accuracy and explainability trade off.",
+      "Design training, collaboration tools, secure sharing, workflow integration, and ethics processes."
+    ],
+    "sections": [
+      {
+        "title": "Overview",
+        "body": [
+          "**Datasets**\n- [MIMIC-IV](https://physionet.org/content/mimiciv/2.2/): ICU/EHR data with patient encounters, ED visits, and outcomes.\n- [CheXpert](https://stanfordmlgroup.github.io/competitions/chexpert/): chest X-ray dataset with multi-label findings.\n\n**Collaboration tools**\n- [Microsoft Teams](https://www.microsoft.com/en-us/microsoft-teams/): chat, meetings, file sharing, channels.\n- [Trello](https://trello.com/): tasks, boards, assigned actions.",
+          "Demo datasets shown are for assignment context only. Use linked resources for full data."
+        ],
+        "prompts": []
+      },
+      {
+        "title": "Assignment Overview",
+        "body": [
+          "Welcome! In this assignment, you will explore strategies and best practices for **building, managing, and optimizing multidisciplinary teams** in clinical AI projects.\n\n**Clinical Focus:**\nYou are leading a project to develop an AI system that assists Emergency Department (ED) physicians in triaging suspected stroke patients.\n\n**You will:**  \n- Identify key team roles and responsibilities  \n- Develop team communication and problem-solving strategies  \n- Apply clinical and technical datasets (MIMIC-IV, CheXpert) as context for your planning  \n- Leverage modern collaboration tools  \n- Address workflow integration, training, and ethical challenges\n\n---  \n_Data previews for MIMIC-IV and CheXpert are available in the dataset expander above. Leverage these real-world datasets as you respond to planning and teamwork activities below._\n\n---"
+        ],
+        "prompts": []
+      },
+      {
+        "title": "Part 1: Understanding the Multidisciplinary Landscape",
+        "body": [
+          "Define clinical AI team roles.",
+          "List five roles, responsibilities, expertise, and project impact.",
+          "**Case:**  \nYou're leading an AI project to develop a real-time stroke triage tool in the ED. Your resources include funding, stakeholder attention, and a 6-month timeline."
+        ],
+        "prompts": []
+      },
+      {
+        "title": "Task 1.1: Essential Team Roles",
+        "body": [
+          "Identify at least **five essential roles** needed for this project. For each:\n* Key responsibilities\n* The expertise they bring\n* How their contribution will impact the project outcome"
+        ],
+        "prompts": []
+      },
+      {
+        "title": "Task 1.2: Competing Priorities",
+        "body": [],
+        "prompts": [
+          "Which roles might have competing priorities or different views on goals? Where might tension arise, and why?"
+        ]
+      },
+      {
+        "title": "Task 1.3: Organizational Structure",
+        "body": [],
+        "prompts": [
+          "Describe (or sketch) an organizational structure for your team, with rationale."
+        ]
+      },
+      {
+        "title": "Part 2: Communication Strategies",
+        "body": [
+          "Plan communication for mixed clinical and technical expertise.",
+          "Write a communication strategy, shared glossary, and patient/workflow focus plan.",
+          "**Team:**  \nEmergency physician, neurologist, data scientist, software engineer, nurse informaticist, hospital administrator, patient advocate.\n\n**Challenge:**  \nDiverse expertise, technical and clinical knowledge varies."
+        ],
+        "prompts": []
+      },
+      {
+        "title": "Task 2.1: Communication Strategy",
+        "body": [
+          "Plan for:",
+          "- Meeting frequency, format, objectives\n- Documentation methods/standards\n- Knowledge sharing (tech & clinical)\n- Progress reporting to stakeholders"
+        ],
+        "prompts": [
+          "Your Communication Strategy"
+        ]
+      },
+      {
+        "title": "Task 2.2: Shared Glossary",
+        "body": [
+          "**Term**",
+          "**Definition (for clinicians & technologists)**"
+        ],
+        "prompts": []
+      },
+      {
+        "title": "Task 2.3: Patient & Workflow Focus",
+        "body": [],
+        "prompts": [
+          "Three strategies to ensure patient needs and clinical workflow stay central, even during technical discussions:"
+        ]
+      },
+      {
+        "title": "Part 3: Team-Based Decision-Making",
+        "body": [
+          "Evaluate accuracy versus explainability tradeoffs.",
+          "Design a decision process, identify cognitive biases, and write a decision documentation template.",
+          "Your team faces a choice:\n\n**Approach A:** Deep learning; higher accuracy (92%) but low explainability.  \n**Approach B:** More explainable; lower accuracy (88%) but can give reasons.\n\nTeam is divided."
+        ],
+        "prompts": []
+      },
+      {
+        "title": "Task 3.1: Decision-Making Framework",
+        "body": [
+          "Design a process to fairly weigh both approaches, address all viewpoints, reach consensus, and document with rationale."
+        ],
+        "prompts": [
+          "Decision-making framework"
+        ]
+      },
+      {
+        "title": "Task 3.2: Cognitive Biases",
+        "body": [
+          "Identify three biases that might affect the process and propose mitigations."
+        ],
+        "prompts": []
+      },
+      {
+        "title": "Task 3.3: Decision Documentation Template",
+        "body": [
+          "Template should include all perspectives, rationale, decision, and contingencies."
+        ],
+        "prompts": [
+          "Decision documentation template"
+        ]
+      },
+      {
+        "title": "Part 4: Training Opportunities",
+        "body": [
+          "Close knowledge gaps between clinical and technical members.",
+          "Plan cross-training, shadowing, and external resources.",
+          "Progress check:  \n- Clinical team struggles with model validation  \n- Technical team unsure about stroke protocols  \n- Divergent expectations for 'success'"
+        ],
+        "prompts": []
+      },
+      {
+        "title": "Task 4.1: Cross-Training Plan",
+        "body": [
+          "- List specific topics for training\n- Who leads which part?\n- Format/duration\n- Effectiveness assessment"
+        ],
+        "prompts": [
+          "Cross-training plan"
+        ]
+      },
+      {
+        "title": "Task 4.2: Shadowing Schedule",
+        "body": [
+          "Design a 'Day in the Life' schedule. What should each group focus on during observation?"
+        ],
+        "prompts": [
+          "Shadowing schedule and focus points"
+        ]
+      },
+      {
+        "title": "Task 4.3: External Resources",
+        "body": [
+          "Identify three external resources (courses, workshops, key articles), and for each, what gap it will address."
+        ],
+        "prompts": []
+      },
+      {
+        "title": "Part 5: Collaboration Tools",
+        "body": [
+          "Choose tools and secure sharing protocols.",
+          "Pick tools, document their purpose and limitations, and define sharing protocols.",
+          "Team is cross-departmental, some remote, some onsite, confidentiality critical."
+        ],
+        "prompts": []
+      },
+      {
+        "title": "Task 5.1: Digital Tool Selection",
+        "body": [
+          "Pick three digital tools; for each, briefly justify:"
+        ],
+        "prompts": []
+      },
+      {
+        "title": "Task 5.2: Secure Sharing Protocol",
+        "body": [
+          "- Sharing/document control for: docs, clinical data, code/specs, meeting notes"
+        ],
+        "prompts": [
+          "Protocol for secure sharing"
+        ]
+      },
+      {
+        "title": "Task 5.3: Weekly Progress Dashboard",
+        "body": [
+          "Template should show milestones, challenges, deadlines, achievements"
+        ],
+        "prompts": [
+          "Weekly dashboard template/design"
+        ]
+      },
+      {
+        "title": "Task 6.1: Integrating AI into Clinical Workflows",
+        "body": [
+          "What challenges might you encounter, and how can a multidisciplinary team reduce resistance to change?"
+        ],
+        "prompts": [
+          "Integration reflection"
+        ]
+      },
+      {
+        "title": "Task 6.2: Team Effectiveness Metrics",
+        "body": [
+          "Suggest three ways to evaluate successful collaboration in your team."
+        ],
+        "prompts": []
+      },
+      {
+        "title": "Task 6.3: Addressing Ethics",
+        "body": [
+          "Describe a process to identify, discuss, and resolve ethical issues as a multidisciplinary team.",
+          "For more on the real-world data: [MIMIC-IV documentation](https://physionet.org/content/mimiciv/2.2/) | [CheXpert docs](https://stanfordmlgroup.github.io/competitions/chexpert/)."
+        ],
+        "prompts": [
+          "Ethical issue resolution process"
+        ]
+      },
+      {
+        "title": "Introduction",
+        "body": [
+          "Frame the clinical AI teamwork scenario.",
+          "Review the stroke triage case and optional sample data previews before choosing assignment sections."
+        ],
+        "prompts": []
+      },
+      {
+        "title": "Reflection",
+        "body": [
+          "Connect teamwork to clinical workflow, adoption, effectiveness, and ethics.",
+          "Reflect on integration challenges, success metrics, and ethical issue resolution."
+        ],
+        "prompts": []
+      }
+    ],
+    "source": "notebooks/clinical/1.5_clinical.py"
+  },
+  {
+    "id": "1.6",
+    "module": "1",
+    "module_name": "Fundamentals",
+    "title": "Basics of Scientific Rigor and Reproducibility",
+    "objectives": [
+      "Explore simulated hospital admission and outcome data for CHF readmission analysis.",
+      "Visualize and detect outliers in age, length of stay, BNP, and sodium.",
+      "Calculate 1.5x IQR thresholds and inspect flagged patient rows.",
+      "Compare summary statistics before and after outlier exclusion.",
+      "Evaluate remove, winsorize, and median-imputation strategies in clinical context."
+    ],
+    "sections": [
+      {
+        "title": "Overview",
+        "body": [
+          "Introduce simulated CHF-related hospital data.",
+          "Review each variable and remember that extreme clinical values may be valid, errors, or clinically important signals.",
+          "**Dataset:** Simulated Hospital Admission/Outcome Dataset (mimicking eICU/EHR data)  \n**Tool:** [Jupyter notebook](https://jupyter.org/) (and this Streamlit app)\n\n---\n\nThis notebook will guide you through:\n- Exploring clinical data, visualizing and detecting outliers\n- Calculating outlier thresholds (with 1.5x IQR)\n- Identifying and handling outliers via different strategies\n- Comparing summary statistics and discussing scientific rigor\n\n---"
+        ],
+        "prompts": []
+      },
+      {
+        "title": "1. Clinical Dataset Overview",
+        "body": [
+          "**Data context:**  \nA hospital wants to analyze characteristics and outcomes of patients with congestive heart failure (CHF) to investigate 30-day readmission.\n\n**Variables:**  \n- `age`: age of patient (years)  \n- `length_of_stay`: duration of hospitalization (days)  \n- `bnp`: admission B-type Natriuretic Peptide (BNP, pg/mL)  \n- `sodium`: admission Sodium (mmol/L)  \n- `readmit_30d`: 1=readmitted within 30 days, 0=no"
+        ],
+        "prompts": []
+      },
+      {
+        "title": "2. Visualize Outliers with Boxplots",
+        "body": [
+          "Spot extreme clinical values visually.",
+          "Select a variable, inspect the box plot, and note patient IDs and values that look unusual.",
+          "Explore variable distributions and visually spot possible outliers.\n\n**Choose a variable to plot:**",
+          "_What looks like a potential outlier in your chosen variable? Note their patient IDs and values below._"
+        ],
+        "prompts": [
+          "Notes on possible outliers:"
+        ]
+      },
+      {
+        "title": "3. Calculate Outlier Thresholds (IQR Method)",
+        "body": [
+          "Apply the 1.5x IQR rule to clinical variables.",
+          "Choose a variable and review Q1, Q3, IQR, bounds, and flagged patient rows.",
+          "The standard 1.5x IQR rule defines outliers as any value >Q3 + 1.5×IQR or <Q1 - 1.5×IQR.\n\n**Choose a variable to see its IQR thresholds and outliers:**",
+          "**Outlier Rows:**"
+        ],
+        "prompts": [
+          "Patient IDs and values flagged as outliers (IQR rule):"
+        ]
+      },
+      {
+        "title": "4. Effect of Outliers on Clinical Summary Statistics",
+        "body": [
+          "**All Data:**",
+          "**No Outliers:**"
+        ],
+        "prompts": [
+          "How did mean, std, or median change? Why is this important in clinical data analysis?"
+        ]
+      },
+      {
+        "title": "5. Outlier Handling Approaches",
+        "body": [
+          "Compare removal, winsorization, and imputation.",
+          "Choose a strategy and explain clinical risks if valid extreme values are mishandled.",
+          "Explore three common clinical data strategies:  \n- Remove outliers  \n- Winsorize (set outliers to threshold)  \n- Impute with median  \n\n**Try one and see the summary statistics change!**"
+        ],
+        "prompts": [
+          "Comment: Pros/cons of your chosen strategy, and specific clinical risks if outliers are mishandled:"
+        ]
+      },
+      {
+        "title": "6. Reflection: Scientific Rigor & Reproducibility in Clinical Settings",
+        "body": [
+          "Connect outlier handling to reproducible clinical research.",
+          "Write what should be reported in methods and how poor handling could affect clinical conclusions.",
+          "- Why is transparent description of outlier handling crucial in clinical research?  \n- What should always be reported in methods?\n- How could poor outlier handling impact clinical conclusions?",
+          "---\n**Links:**  \n- [Jupyter notebook](https://jupyter.org/)  \n- [eICU Collaborative Research Database](https://eicu-crd.mit.edu/)"
+        ],
+        "prompts": [
+          "Your reflection:"
+        ]
+      },
+      {
+        "title": "Effect on Clinical Summary Statistics",
+        "body": [
+          "Show how outliers influence clinical summaries.",
+          "Compare mean, standard deviation, and median with all values versus no outliers."
+        ],
+        "prompts": []
+      }
+    ],
+    "source": "notebooks/clinical/1.6_clinical.py"
+  },
+  {
+    "id": "1.7",
+    "module": "1",
+    "module_name": "Fundamentals",
+    "title": "Mentorship and Peer Review in Biomedical AI",
+    "objectives": [
+      "Identify communication, expectation, workload, and career-dynamic problems in clinical AI mentorship.",
+      "Draft a professional message that balances urgency, respect, and independence.",
+      "Reflect on mentorship challenges specific to clinical AI and clinical research teams."
+    ],
+    "sections": [
+      {
+        "title": "Overview",
+        "body": [
+          "**Objective:**  \nDevelop the skills to identify and effectively address challenges in mentoring relationships within clinical research/AI teams.\n\n---",
+          "**Clinical Case:**  \nDr. Jordan, an early-career clinician-researcher, is being mentored by Dr. Martinez, a senior attending physician and clinical AI leader.  \nInitially, their mentorship meetings were productive—Dr. Martinez provided guidance on integrating AI-driven risk prediction models into clinical workflows for heart failure patients.  \nHowever, recently, Dr. Martinez has frequently rescheduled or shortened their meetings. Dr. Jordan feels increasingly unsupported, especially with a deadline approaching for a multicenter study protocol and IRB submission.\n\nDr. Martinez perceives Dr. Jordan as becoming overly dependent, waiting for advice instead of proactively troubleshooting workflow and data obstacles. Frustrations are mounting on both sides.\n\n---",
+          "----"
+        ],
+        "prompts": []
+      },
+      {
+        "title": "1. Identify the Challenges",
+        "body": [
+          "Separate communication breakdown, expectation mismatch, workload conflict, and career-stage dynamics.",
+          "Write bullet points describing the clinical mentoring problems, then optionally compare with the example.",
+          "List the problems in this clinical mentoring relationship.  \nConsider issues like communication, expectations, workload, and career dynamics.",
+          "Example:\n\n- **Communication breakdown:** Dr. Martinez frequently reschedules/shortens meetings, but hasn't clearly communicated new availability or reasons, leaving Dr. Jordan uncertain.\n\n- **Expectation mismatch:** Dr. Jordan expects hands-on support for urgent tasks (protocol prep, IRB submission), while Dr. Martinez expects more independent troubleshooting with less direct oversight. These clashing assumptions fuel frustration.\n\n- **Workload management/conflict:** Both are busy clinicians/researchers; rescheduling meetings may signal overcommitment or competing priorities.\n\n- **Role/career imbalance:** Dr. Jordan may feel hesitant to push for help or clarity due to career stage; Dr. Martinez may underestimate the need for guidance at critical clinical research milestones.",
+          "----"
+        ],
+        "prompts": [
+          "Write your answer here (bullet points or text):"
+        ]
+      },
+      {
+        "title": "2. Draft a Professional Communication",
+        "body": [
+          "Practice respectful, concrete communication for busy clinical environments.",
+          "Draft a message that requests a meeting, acknowledges clinical workload, and proposes structured check-ins or agendas.",
+          "Imagine you are **Dr. Jordan**.  \nCompose a message requesting a meeting with Dr. Martinez to discuss and improve the situation:\n- Clearly and professionally explain the issues.\n- Show you recognize Dr. Martinez’s perspective.\n- Propose concrete, actionable changes to your working relationship, tailored for busy clinical environments.",
+          "Dear Dr. Martinez,\n\nI hope this message finds you well. I’d like to request a meeting to discuss our current working relationship and some challenges I’ve been experiencing. Your insights on integrating AI into our heart failure protocols have been extremely valuable, and I am grateful for your mentorship.\n\nRecently, I’ve noticed our meetings have become less frequent and are sometimes cut short. I completely appreciate your clinical and research obligations, especially as new projects arise. However, with the upcoming multicenter protocol deadline and IRB submission, I’ve felt unsure at times how to proceed when obstacles arise.\n\nI also realize I could be more proactive in troubleshooting workflow bottlenecks before seeking your direct guidance. Would we be able to set a recurring check-in (even biweekly) and perhaps agree on short agendas to maximize our time? I’d like to become more independent but still benefit from your targeted advice during critical moments.\n\nThank you for considering this. I am eager to find a balance that supports both your schedule and my professional growth.\n\nBest regards,  \nDr. Jordan",
+          "----"
+        ],
+        "prompts": [
+          "Write your email/message here:"
+        ]
+      },
+      {
+        "title": "3. Reflection (Clinical AI Teams)",
+        "body": [
+          "Apply the scenario to clinical AI teams.",
+          "Write what makes clinical AI mentorship hard and how these techniques could help in your own team.",
+          "- What aspects make mentorship relationships in clinical AI particularly challenging?\n- How can you apply techniques from this activity in your own clinical or research team experience?",
+          "Thank you! You have completed the clinical mentorship and peer review skills activity.",
+          "---\n**Key Takeaways for Clinical Teams:**\n- Busy clinical schedules demand clear, structured, and respectful communication.\n- Explicitly revisiting expectations helps prevent conflicts in high-stakes, time-pressured AI/clinical projects.\n- Proactive troubleshooting empowers mentees, while “just-in-time” mentoring can make limited mentor time more effective.\n\n**For further reading:**  \n- [Effective mentoring in clinical research](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4564451/)\n- [Nature - How to be a good mentee](https://www.nature.com/articles/d41586-020-02927-0)"
+        ],
+        "prompts": [
+          "Write your reflection here (optional):"
+        ]
+      },
+      {
+        "title": "Clinical Case",
+        "body": [
+          "Introduce a strained mentorship relationship around workflow integration, protocol deadlines, and IRB submission.",
+          "Read the case and notice both Dr. Jordan's support needs and Dr. Martinez's concern about independence."
+        ],
+        "prompts": []
+      }
+    ],
+    "source": "notebooks/clinical/1.7_clinical.py"
+  },
+  {
+    "id": "2.1",
+    "module": "2",
+    "module_name": "Alignment",
+    "title": "The Fundamental Principles of Bioethics",
+    "objectives": [
+      "Identify the four principles of bioethics in a clinical AI privacy case.",
+      "Explain conflicts between AI accuracy, patient privacy, harm prevention, and fairness.",
+      "Justify which principle should guide hospital policy when re-identification risk exists.",
+      "Reflect on rare groups, de-identification limits, and trust in clinical AI."
+    ],
+    "sections": [
+      {
+        "title": "Navigating AI and Bioethical Principles in Clinical Practice",
+        "body": [
+          "Map the case to autonomy, beneficence, non-maleficence, and justice.",
+          "Select all relevant principles, then optionally compare with the example.",
+          "**Objective:**  \nDevelop the skills to navigate ethical issues arising from the use of AI using the four principles of bioethics.",
+          "A hospital is piloting an AI system to predict disease risks and support early diagnosis, hoping to improve patient outcomes.  \nThe system uses vast amounts of **de-identified patient data**, such as demographics, clinical histories, and lifestyle information.  \nDe-identified data means no names or addresses, but the AI still analyzes broad health trends.\n\n**Ethical Dilemma:** For maximum accuracy, the AI benefits from detailed geographic and demographic information.  \nBut: such details can sometimes allow \"re-identification\"—figuring out who an individual is, especially in unique combinations or rare diseases.\n\nIf a patient’s health information were re-identified and accessed by third parties (employers, insurers, cybercriminals),  \nit could lead to discrimination, financial harm, and loss of privacy."
+        ],
+        "prompts": []
+      },
+      {
+        "title": "1. Which of the four principles of bioethics apply here?",
+        "body": [
+          "All four principles are relevant:\n- **Autonomy**: Patients expect control over their private information; re-identification risks violate their autonomy and privacy.\n- **Beneficence**: The AI could improve diagnosis and outcomes (population benefit).\n- **Non-maleficence**: Re-identification could cause real harm (discrimination, financial harm).\n- **Justice**: If certain groups are more at risk for re-identification (rare conditions, small communities), or are excluded for privacy, this raises fairness concerns."
+        ],
+        "prompts": []
+      },
+      {
+        "title": "2. Which principles are in conflict? Why?",
+        "body": [
+          "- **Beneficence** (improving care via better AI) vs. **Autonomy**/**Non-maleficence** (protecting privacy, preventing harm):\n• The more detailed the data, the more AI helps patients—BUT the higher the risk of re-identification and harm.\n- **Justice** can also conflict if privacy risks are unequally distributed, or if some populations are excluded to protect privacy."
+        ],
+        "prompts": [
+          "Explain which principles may come into conflict and describe how:"
+        ]
+      },
+      {
+        "title": "3. On your view, which principle should take precedence? Why?",
+        "body": [
+          "Practice defending an ethical clinical policy position.",
+          "Choose which principle should guide clinicians and hospital policy, then justify the tradeoff.",
+          "Example: While beneficence is important, **non-maleficence** (do no harm) and **autonomy** (patient privacy) should take precedence—especially where privacy breaches can cause irreversible harm. The hospital must put safeguards in place so that no patient can be re-identified, even if it reduces AI accuracy somewhat; otherwise, trust is lost and harm may result."
+        ],
+        "prompts": [
+          "Defend your view: which principle should guide clinicians and hospital policy here, and why?"
+        ]
+      },
+      {
+        "title": "Reflection",
+        "body": [
+          "Connect bioethics to patient trust and vulnerable groups.",
+          "Reflect on rare demographic groups, privacy safeguards, and questions raised by AI data use.",
+          "- What new questions do you have about the use of AI and patient data in healthcare?\n- How might your thinking change if you were a member of a rare demographic group?",
+          "Thank you for your thoughtful engagement with AI and bioethics in clinical care.",
+          "---\n**Key Concepts:**  \n- Autonomy = respecting patients’ wishes and privacy  \n- Beneficence = doing good for the patient/population  \n- Non-maleficence = avoiding harm  \n- Justice = fairness in distribution of risks and benefits\n\n**Further reading:** [Principlism in Clinical Ethics (Stanford)](https://plato.stanford.edu/entries/principle-bioethics/)"
+        ],
+        "prompts": [
+          "Optional: Add your reflections here"
+        ]
+      },
+      {
+        "title": "Clinical Case",
+        "body": [
+          "Introduce a hospital AI system using de-identified data with re-identification risk.",
+          "Read the case and notice the tension between detailed data for accuracy and privacy risks."
+        ],
+        "prompts": []
+      },
+      {
+        "title": "Principle Conflicts",
+        "body": [
+          "Explain ethical tensions around detailed clinical data use.",
+          "Describe how improving care can conflict with privacy, harm prevention, and fairness."
+        ],
+        "prompts": []
+      }
+    ],
+    "source": "notebooks/clinical/2.1_clinical.py"
+  },
+  {
+    "id": "2.3",
+    "module": "2",
+    "module_name": "Alignment",
+    "title": "Bias, Fairness, and Societal Impact of Biomedical AI",
+    "objectives": [
+      "Imagine a useful clinical AI system and identify fairness safeguards.",
+      "Analyze possible bias vectors in an emergency-room triage algorithm.",
+      "Explain risks from regional mismatch, demographic features, subjective inputs, and overreliance.",
+      "Reflect on post-deployment fairness monitoring in clinical settings."
+    ],
+    "sections": [
+      {
+        "title": "Assignment 1: Imagine Your Ideal Clinical AI System",
+        "body": [
+          "Prompt learners to design a clinical AI tool with fairness safeguards.",
+          "Describe what the system would do, why it is clinically useful, what data it would use, and how bias would be mitigated.",
+          "> **Prompt:**  \n> Imagine that you could create any AI system to assist you with your clinical practice.  \n> - What would you design the system to do and why?  \n> - How might you safeguard against bias and unfairness?",
+          "**Example:**\n\nI would create a system that cycles through patient data to predict which diseases are on the rise seasonally. This would allow hospitals to prepare for an influx of sickness and for clinicians to be on the lookout for specific symptoms. It would have to take in data from surrounding hospitals and clinics to be more accurate, as some hospitals serve certain demographics and without other data, we won’t have a very generalizable picture of what’s happening in the city or surrounding areas.\n\n**Guidance:**  \n- Describe a useful, necessary AI system for your clinical setting.  \n- Identify the types of data you would use and why.  \n- Explicitly consider risks of bias and unfairness, and how you would attempt to mitigate or monitor them."
+        ],
+        "prompts": [
+          "Write your answer here (please address usefulness, necessity, and fairness/bias):"
+        ]
+      },
+      {
+        "title": "Assignment 2: Case Study on Algorithmic Triage in the ER",
+        "body": [
+          "A large hospital is the only level one trauma center in a 100-mile radius of a small city in the Southern United States.  \nBecause of this, the hospital receives an abundance of patients with traumatic injuries including vehicle crashes, shootings, catastrophic injuries, along with other injuries into its Emergency Room.  \nHospital staff and administration want to find a way to best determine which patients should receive the most immediate care.  \nTo do this, the hospital wants to decide whether to employ an algorithm that ranks patients by the acuity of their illness as calculated using the symptoms and demographic data input by hospital staff.\n\n> **Questions:**  \n> - What are the possible vectors of bias that might impact patient care?  \n> - What should the hospital consider before employing the algorithmic tool?  \n> - What are the possible negative outcomes?  \n> Explain your answer.",
+          "**Example:**\n\nThe vectors of bias for the algorithm include the data and the people who will interpret the guidance from the algorithm. As the only trauma center in a 100-mile radius, the hospital will receive all kinds of terrible injuries that other hospitals may not receive, therefore, if the data that was used to train the algorithm is not similar, the resulting guidance will be off-base. Further, although the algorithms will only be used to offer guidance, some clinicians will think that the algorithm cannot be wrong, and they won’t critically consider the results.\n\n**Guidance:**  \n- Consider how the unique patient population (regional, demographic, trauma-specific) may or may not be reflected in the data used to train the model.  \n- Consider the risk that social, demographic, or subjective data could introduce or amplify bias.  \n- Reflect on the consequences (e.g., inequities in care, overreliance on algorithms, errors propagating)."
+        ],
+        "prompts": [
+          "Write your answer here (please address data, bias, and practical implications):"
+        ]
+      },
+      {
+        "title": "Reflection and Takeaways",
+        "body": [
+          "Connect clinical AI fairness to monitoring and safe deployment.",
+          "Write why societal impact matters and how fairness would be monitored after deployment.",
+          "- Why is it important to account for societal impact and bias when designing clinical AI?\n- How would you monitor or check for fairness *after* deploying such a system?",
+          "Thank you! Your careful thought on bias, fairness, and impact is essential for safe and effective clinical AI.",
+          "---\n**Key Points:**  \n- Always consider how your data and clinical realities shape model fairness and effectiveness.\n- No algorithm is objective or immune to bias.\n- Both technical design and human interpretation can perpetuate or reduce inequity.\n\n*For further learning, see: [AAMC Artificial Intelligence in Medicine Case Studies](https://www.aamc.org/contact/ai-case-studies)*"
+        ],
+        "prompts": [
+          "Write your reflections here (optional):"
+        ]
+      },
+      {
+        "title": "Algorithmic Triage Case Study",
+        "body": [
+          "Analyze fairness risks in a trauma-center triage algorithm.",
+          "Read the case and write possible bias vectors, deployment considerations, and negative patient-care outcomes."
+        ],
+        "prompts": []
+      }
+    ],
+    "source": "notebooks/clinical/2.3_clinical.py"
+  },
+  {
+    "id": "2.5",
+    "module": "2",
+    "module_name": "Alignment",
+    "title": "Biomedical AI Quality and Safety Simulator",
+    "objectives": [
+      "Recognize covariate shift in a simulated sepsis prediction model.",
+      "Compare doing nothing versus retraining under clinical distribution shift.",
+      "Evaluate vendor model discrimination and calibration on a mismatched local population.",
+      "Build a model card documenting intended clinical use, limitations, metrics, and ethical considerations."
+    ],
+    "sections": [
+      {
+        "title": "Overview",
+        "body": [
+          "**Interactive Simulator:**\n* **Activity 1 (Drift):** Visualize **Covariate Shift** in a Sepsis model and practice **Retraining**.\n* **Activity 2 (Evaluation):** Compare **Calibration vs. Discrimination** in a vendor model.\n* **Activity 3 (Transparency):** Build a **Model Card** to document limits and intended use."
+        ],
+        "prompts": []
+      },
+      {
+        "title": "Activity 1: Recognizing Data Drift",
+        "body": [
+          "Simulate how model performance degrades over time due to covariate shift, and test if retraining fixes the issue."
+        ],
+        "prompts": []
+      },
+      {
+        "title": "Simulation Controls",
+        "body": [
+          "Model has 'learned the new normal' (Retrained).",
+          "A high False Positive rate leads to 'Alert Fatigue' and unnecessary antibiotics."
+        ],
+        "prompts": []
+      },
+      {
+        "title": "Visualizing Covariate Shift",
+        "body": [
+          "This graph demonstrates **Covariate Shift**: The input data (Lactate) has changed distribution, confusing the original model."
+        ],
+        "prompts": []
+      },
+      {
+        "title": "Activity 2: Calibration vs. Discrimination",
+        "body": [
+          "Analyze a vendor model's performance on a local population by comparing Discrimination (ranking) and Calibration (reliability)."
+        ],
+        "prompts": []
+      },
+      {
+        "title": "Vendor Model Check",
+        "body": [
+          "High Discrimination (Good at ranking patients).",
+          "Low Discrimination."
+        ],
+        "prompts": []
+      },
+      {
+        "title": "Calibration Curve (Reliability Diagram)",
+        "body": [
+          "**How to read this:**\n* **On the Diagonal:** Perfect Calibration.\n* **Below Diagonal:** The model **Overestimates** risk (Predicted 80%, Actual 40%).\n* **Above Diagonal:** The model **Underestimates** risk."
+        ],
+        "prompts": []
+      },
+      {
+        "title": "Activity 3: Model Card Builder",
+        "body": [
+          "Practice clinical model documentation before deployment.",
+          "Fill in intended users, caveats, and ethical considerations, then review the generated model card.",
+          "Create a transparency document to communicate the model's intended use and limitations."
+        ],
+        "prompts": []
+      },
+      {
+        "title": "Enter Model Details",
+        "body": [],
+        "prompts": [
+          "Model Name",
+          "Developer",
+          "Intended Users",
+          "Caveats / Limitations",
+          "Ethical Considerations"
+        ]
+      },
+      {
+        "title": "Sepsis Drift",
+        "body": [
+          "Show how changing patient populations or lab distributions can affect alerts.",
+          "Move the months slider, compare lactate distributions, choose a mitigation strategy, and watch false positive rate."
+        ],
+        "prompts": []
+      },
+      {
+        "title": "Vendor Calibration",
+        "body": [
+          "Evaluate whether a vendor model is reliable on the local population.",
+          "Adjust population mismatch, review AUC, and inspect calibration to see whether predicted risks match actual risks."
+        ],
+        "prompts": []
+      }
+    ],
+    "source": "notebooks/clinical/2.5_clinical.py"
+  },
+  {
+    "id": "2.6",
+    "module": "2",
+    "module_name": "Alignment",
+    "title": "Human-AI Collaboration in Biomedicine",
+    "objectives": [
+      "Identify human-AI collaboration tools currently used in clinical practice.",
+      "Evaluate benefits, drawbacks, governance, and data-management practices for those tools.",
+      "Analyze possible hospital responses to AI transcription errors in patient-care settings.",
+      "Practice balancing documentation efficiency against patient safety, fairness, trust, and privacy risks."
+    ],
+    "sections": [
+      {
+        "title": "Overview",
+        "body": [
+          "### Question 1",
+          "Identify and list all the human-AI collaboration tools currently at use in your clinical \npractice. How do you or your colleagues use these tools. What are their benefits and drawbacks? \nExplain how you manage these systems, and the data created from them.",
+          "### Question 2",
+          "Consider the following case:\n\nA large hospital has implemented the use of an AI transcription system for hospital staff to use \nin care settings. The idea is that the AI tool will allow more accurate notes to be input into \npatient records. After testing the tool in various care settings for about a month, hospital \nstaff began reviewing the transcripts and notes from the tool. To their dismay, they found that \nalthough the tool transcribed patient interviews, it also:\n- Made up segments of conversations that did not happen.\n- Made certain patients appear to be being aggressive with staff, when this behavior was not present; and \n- Was not as accurate in conversations with patients with accents, from the around the US or otherwise.\n\n**What are the possible routes the hospital could take after reviewing the transcription data? \nWhat should the hospital do?  Explain your answer.**"
+        ],
+        "prompts": [
+          "Your response to Question 1",
+          "Your response to Question 2"
+        ]
+      },
+      {
+        "title": "Question 1",
+        "body": [
+          "Inventory current human-AI collaboration tools in clinical work.",
+          "List tools used in clinical practice, explain how they are used, note benefits and drawbacks, and describe how outputs/data are managed."
+        ],
+        "prompts": []
+      },
+      {
+        "title": "Question 2",
+        "body": [
+          "Analyze a flawed AI transcription system in hospital care.",
+          "Consider hallucinated content, inaccurate tone, accent-related errors, documentation risk, patient safety, and what the hospital should do next."
+        ],
+        "prompts": []
+      }
+    ],
+    "source": "notebooks/clinical/2.6_clinical.py"
+  },
+  {
+    "id": "2.7",
+    "module": "2",
+    "module_name": "Alignment",
+    "title": "Sex-Specific Modeling",
+    "objectives": [
+      "Prepare an eICU-style clinical dataset for sex-specific model analysis.",
+      "Compare clinical variable patterns by sex and mortality status.",
+      "Calculate univariate odds ratios for female, male, and full-cohort groups.",
+      "Train multivariate models and compare AUROC across sex-specific cohorts."
+    ],
+    "sections": [
+      {
+        "title": "Overview",
+        "body": [
+          "Clean the raw dataset, remove identifiers, and handle missing values.",
+          "Visualize patient demographics and answer key conceptual questions.",
+          "Calculate odds ratios for individual variables to see sex-specific risk factors.",
+          "Train and evaluate models. Compare AUROC performance between sexes."
+        ],
+        "prompts": []
+      },
+      {
+        "title": "Data Processing",
+        "body": [
+          "Clean identifiers, encode categories, impute missing values, and create a model-ready clinical dataset.",
+          "### Removing Irrelevant Columns\nOne of the first logical steps is to remove the columns that contain no informational value. Some columns are unique random numeric identifiers (e.g., patient_id) with no discernible meaning. \n\nWe'll also remove weight_discharge and discharge_location because they will not be used as inputs.\n\n### Fast Preprocessing\nWe will save time with a heavy-handed approach:\n1. One-hot encode all categorical variables.\n2. Impute missing values in each numerical column with the mean."
+        ],
+        "prompts": []
+      },
+      {
+        "title": "Raw Data Preview",
+        "body": [
+          "Preprocessing Complete!"
+        ],
+        "prompts": []
+      },
+      {
+        "title": "Processed Data Preview",
+        "body": [
+          "First 10 rows after dropping identifiers, one-hot encoding categorical fields, and imputing missing numeric values."
+        ],
+        "prompts": []
+      },
+      {
+        "title": "Brief Exploratory Analysis",
+        "body": [
+          "Filter patient data and inspect how selected clinical variables differ by sex and mortality status.",
+          "Now, please take a moment to check the Data Explorer. Notice that, this isn’t about deep analysis, just getting a feel for the data at a glance. Keep it simple, you’re just getting familiar with the variable before modeling."
+        ],
+        "prompts": []
+      },
+      {
+        "title": "Visualize the sex-specific patterns",
+        "body": [
+          "Before jumping into modeling, it is important to ask: \"Do males and females behave differently in this data?\" In many clinical datasets, combining all patients into a single analysis can blur important differences. Let’s split the lens and take a closer look."
+        ],
+        "prompts": []
+      },
+      {
+        "title": "Question 1",
+        "body": [
+          "Why is it important to analyze clinical data separately for males and females before modeling?",
+          "Correct! Clinical data often contains meaningful differences between males and females. When we analyze the entire dataset as a single group, these differences can get averaged out or hidden.",
+          "Try again."
+        ],
+        "prompts": []
+      },
+      {
+        "title": "Sex-specific Association Models",
+        "body": [
+          "We will now perform a univariate analysis using odds ratios separately for females and males. \n\nBy calculating odds ratios within each sex, we can uncover whether a variable (like elevated lactate) has differential predictive power for mortality in women versus men."
+        ],
+        "prompts": []
+      },
+      {
+        "title": "Performance Evaluation by Sex",
+        "body": [
+          "Now we will evaluate how well our models perform not just overall, but within each sex. \nWe use the AUROC (Area Under the Receiver Operating Characteristic Curve) to measure discriminative ability.",
+          "#### 1. Population Filter (Optional)",
+          "#### 2. Model Features",
+          "Select at least one predictor."
+        ],
+        "prompts": []
+      },
+      {
+        "title": "Question 2",
+        "body": [
+          "When comparing the outcomes of these sex-specific models, what are we most interested in identifying?",
+          "Correct! Our main goal is to see if the model performs differently across the two groups. Are predictions more accurate for one sex than the other? These performance differences can point to underlying biological, clinical, or systemic factors.",
+          "Try again."
+        ],
+        "prompts": []
+      },
+      {
+        "title": "Univariate Analysis",
+        "body": [
+          "Estimate one-variable odds ratios separately for female, male, and full-cohort data."
+        ],
+        "prompts": []
+      },
+      {
+        "title": "Multivariate Analysis",
+        "body": [
+          "Train logistic models and compare model discrimination using AUROC."
+        ],
+        "prompts": []
+      }
+    ],
+    "source": "notebooks/clinical/2.7_clinical.py"
+  },
+  {
+    "id": "3.2",
+    "module": "3",
+    "module_name": "Data",
+    "title": "Ethical Data Acquisition Audit",
+    "objectives": [
+      "Review autonomy, justice, privacy, and beneficence as clinical data acquisition pillars.",
+      "Revise consent language for clearer patient understanding.",
+      "Evaluate representation gaps and recruitment strategies.",
+      "Select privacy controls and return-of-value practices."
+    ],
+    "sections": [
+      {
+        "title": "Module MS2: Acquiring Ethically Sourced Biomedical Data",
+        "body": [
+          "**1. Autonomy**\n\nInformed Consent & Control",
+          "**2. Justice**\n\nEquitable Representation",
+          "**3. Privacy**\n\nData Security & Encryption",
+          "**4. Beneficence**\n\nReturning Value to Society"
+        ],
+        "prompts": []
+      },
+      {
+        "title": "Activity 1: The 'Fine Print' Audit (Autonomy)",
+        "body": [
+          "#### Current Protocol (Legal Standard)",
+          "**Audit Finding:** Low comprehension. Participants may feel alienated or coerced.",
+          "#### Revision Tool",
+          "Status: No changes made. (See warning on left)",
+          "Status: Improved, but still transactional.",
+          "**Audit Result:** Compliant. The participant is empowered to make an informed choice."
+        ],
+        "prompts": []
+      },
+      {
+        "title": "Activity 2: The 'Hidden Population' Audit (Justice)",
+        "body": [
+          "#### REP-EQUITY Toolkit Configuration",
+          "Step 1: Define Underserved Groups",
+          "Steps 3 & 4: Set Recruitment Goal",
+          "Step 5: Manage External Factors (Select Strategies)",
+          "Step 6: Evaluate Representation",
+          "**Audit Result:** FAIL. Additional strategies are needed to reach the target goal."
+        ],
+        "prompts": []
+      },
+      {
+        "title": "Security Protocol Checklist",
+        "body": [
+          "#### Simulation Results",
+          "Status: SECURE. Multi-layered protocols are active. Compliance verified.",
+          "Status: VULNERABLE. Some protections are in place, but gaps remain. High risk of breach.",
+          "Status: CRITICAL RISK. Data is effectively unprotected. Protocol rejected."
+        ],
+        "prompts": []
+      },
+      {
+        "title": "The Ethical Data Cycle",
+        "body": [
+          "Module MS2 | Course Materials | Based on the REP-EQUITY Toolkit and IC3 dataset"
+        ],
+        "prompts": []
+      },
+      {
+        "title": "Intro: The Four Pillars",
+        "body": [
+          "Frame the ethical audit target and learner role."
+        ],
+        "prompts": []
+      },
+      {
+        "title": "Autonomy: Consent Audit",
+        "body": [
+          "Compare legalistic consent language with patient-centered language."
+        ],
+        "prompts": []
+      },
+      {
+        "title": "Justice: Representation Audit",
+        "body": [
+          "Use recruitment strategies to close representation gaps."
+        ],
+        "prompts": []
+      },
+      {
+        "title": "Privacy: Security Audit",
+        "body": [
+          "Select layered security controls and inspect risk status."
+        ],
+        "prompts": []
+      },
+      {
+        "title": "Beneficence: Impact Audit",
+        "body": [
+          "Complete the ethical data cycle by returning value to patients and communities."
+        ],
+        "prompts": []
+      }
+    ],
+    "source": "notebooks/clinical/3.2_clinical.py"
+  },
+  {
+    "id": "3.3",
+    "module": "3",
+    "module_name": "Data",
+    "title": "Radiology AI Reliability",
+    "objectives": [
+      "Simulate or upload radiologist annotation data.",
+      "Measure inter-rater reliability with ICC.",
+      "Identify high-disagreement images for review.",
+      "Compare model accuracy as the number of radiologists changes."
+    ],
+    "sections": [
+      {
+        "title": "Overview",
+        "body": [
+          "**DATA PRIVACY NOTICE**: \nThis application is for demonstration and research simulation purposes only. \n**Do not upload** any Personally Identifiable Information (PII), Protected Health Information (PHI), or any confidential patient data. \nEnsure all datasets are fully anonymized before uploading.",
+          "### Case Study: Lung Cancer Detection\n**Context:** Radiologists label chest X-rays as either **Cancerous (1)** or **Benign (0)**. Inconsistencies among radiologists can confuse AI models.\n\n**Objectives:**\n1.  **Quantify Agreement:** Use ICC to measure how consistently radiologists rate the images.\n2.  **Identify Ambiguity:** Find specific X-rays with high disagreement for potential re-review.\n3.  **Optimize Annotators:** Determine how many radiologists are needed to train a reliable AI model."
+        ],
+        "prompts": []
+      },
+      {
+        "title": "Simulated Radiologist Diagnoses",
+        "body": [
+          "0 = Benign, 1 = Cancerous. Rows represent individual X-rays."
+        ],
+        "prompts": []
+      },
+      {
+        "title": "Review High-Disagreement Images",
+        "body": [
+          "Find cases with the most diagnostic variance.",
+          "The X-rays below have the highest variance in diagnosis (e.g., split decisions). These are candidates for expert re-review."
+        ],
+        "prompts": []
+      },
+      {
+        "title": "AI Model Performance vs. Number of Radiologists",
+        "body": [
+          "Show how consensus size affects model accuracy.",
+          "This curve shows how adding more radiologists to the consensus label improves the AI's ability to detect cancer.",
+          "scikit-learn is not installed. Please install it to run the model simulation.",
+          "**Interpretation:** * **Diminishing Returns:** Notice how the accuracy curve typically flattens out. The \"elbow\" of this curve suggests the optimal number of radiologists needed (cost-benefit).\n* **Noise Reduction:** More radiologists = stable consensus = better training data for the AI.",
+          "### References",
+          "* **Inter-rater Reliability:** \n* **Consensus Labeling:** Using majority vote or expert review to correct noisy labels."
+        ],
+        "prompts": []
+      },
+      {
+        "title": "Simulation Settings",
+        "body": [
+          "Configure sample count, raters, disagreement rate, or upload annotations."
+        ],
+        "prompts": []
+      },
+      {
+        "title": "Inter-Rater Reliability",
+        "body": [
+          "Use ICC to quantify diagnostic agreement."
+        ],
+        "prompts": []
+      }
+    ],
+    "source": "notebooks/clinical/3.3_clinical.py"
+  },
+  {
+    "id": "3.5",
+    "module": "3",
+    "module_name": "Data",
+    "title": "Cardiovascular Risk Data Preprocessing Lab",
+    "objectives": [
+      "Inspect noisy clinical feature data.",
+      "Apply winsorization to cap extreme measurements.",
+      "Choose an imputation method for missing values.",
+      "Scale clinical features and inspect distribution changes."
+    ],
+    "sections": [
+      {
+        "title": "Overview",
+        "body": [
+          "**The Case:** A hospital's AI model failed to predict a severe cardiac event because it was fed noisy data containing equipment errors (outliers) and missing test results.\n\n**Your Task:** Use the controls below to clean the dataset.\n1.  **Outliers:** extreme values in Blood Pressure or Cholesterol skew the mean. Use **Winsorization** to cap them.\n2.  **Missing Data:** Some patient records have gaps. Choose an **Imputation** method to fill them.\n3.  **Scaling:** Algorithms struggle when variables have different units (e.g., Age vs. Glucose). Apply **Scaling** to normalize them."
+        ],
+        "prompts": []
+      },
+      {
+        "title": "Feature Distributions",
+        "body": [
+          "Use boxplots to inspect remaining skew and outliers.",
+          "> **Observation:** > * Without **Winsorization**, notice how the box plots are \"squashed\" by the extreme outliers at the top.\n> * Without **Scaling**, notice how `Cholesterol` (large numbers) dominates the scale compared to `BMI`."
+        ],
+        "prompts": []
+      },
+      {
+        "title": "Case Study and Instructions",
+        "body": [
+          "Frame the clinical data-quality problem."
+        ],
+        "prompts": []
+      },
+      {
+        "title": "Preprocessing Controls",
+        "body": [
+          "Control winsorization, imputation, and scaling."
+        ],
+        "prompts": []
+      },
+      {
+        "title": "Dataset Preview",
+        "body": [
+          "Inspect cleaned rows after preprocessing."
+        ],
+        "prompts": []
+      }
+    ],
+    "source": "notebooks/clinical/3.5_clinical.py"
+  },
+  {
+    "id": "3.6",
+    "module": "3",
+    "module_name": "Data",
+    "title": "Multi-Institutional Data Sharing Simulation",
+    "objectives": [
+      "Generate simulated hospital datasets.",
+      "Detect and remove outliers before collaboration.",
+      "Impute and scale local clinical data consistently.",
+      "Run a federated-learning-style round without sharing patient records."
+    ],
+    "sections": [
+      {
+        "title": "Overview",
+        "body": [
+          "### Interactive Federated Learning Simulation",
+          "INSTRUCTIONS: This simulation guides you through the process of preparing a local dataset and collaborating with another institution without sharing raw data. Follow the numbered steps below, adjusting parameters in the sidebar and main area to observe changes.",
+          "**Current Scenario:** Harmonizing patient data from multiple hospitals (City General vs. Mountain View) to predict COVID-19 severity.\n**Challenge:** Outliers (measurement errors) and Missing Data (O2 Saturation) must be handled locally before the model can be shared."
+        ],
+        "prompts": []
+      },
+      {
+        "title": "Step 1: Local Data Inspection",
+        "body": [
+          "Inspect the raw local dataset.",
+          "Before collaboration, inspect your local data for issues.",
+          "Note: 'Feature_Target' contains the critical values for the model, and 'Feature_Secondary' contains missing values (NaN)."
+        ],
+        "prompts": []
+      },
+      {
+        "title": "Step 2: Outlier Detection",
+        "body": [
+          "Use a z-score threshold to identify values for removal.",
+          "Outliers can severely skew Federated Learning models. Use the Z-Score method to identify and remove data points that are statistically improbable."
+        ],
+        "prompts": []
+      },
+      {
+        "title": "Configuration",
+        "body": [
+          "Please check 'Apply Filter and Proceed' to move to the next step."
+        ],
+        "prompts": []
+      },
+      {
+        "title": "Step 3: Standardization & Imputation",
+        "body": [
+          "Federated Learning requires all institutions to preprocess data identically so the model weights are compatible."
+        ],
+        "prompts": []
+      },
+      {
+        "title": "Step 4: Federated Learning Simulation",
+        "body": [
+          "Aggregate model weights instead of sharing raw patient data.",
+          "In this step, we simulate the **NVIDIA FLARE** workflow.\nInstead of sending this cleaned data to a central server, we will:\n1. Train a local model (calculate weights) on Institution A.\n2. Train a local model on Institution B.\n3. Send ONLY the weights to the aggregator.",
+          "#### Institution Node A",
+          "Local Weights (Private)",
+          "#### Institution Node B",
+          "Local Weights (Private)",
+          "#### Global Server",
+          "Aggregated Global Model",
+          "Federated Round Complete. Global model updated without data leakage."
+        ],
+        "prompts": []
+      },
+      {
+        "title": "Simulation Settings",
+        "body": [
+          "Choose scenario, sample size, and outlier contamination."
+        ],
+        "prompts": []
+      },
+      {
+        "title": "Standardization and Imputation",
+        "body": [
+          "Prepare compatible clinical data locally."
+        ],
+        "prompts": []
+      }
+    ],
+    "source": "notebooks/clinical/3.6_clinical.py"
+  },
+  {
+    "id": "4.1",
+    "module": "4",
+    "module_name": "Machine Learning",
+    "title": "Shared Biomedical AI Vocabulary",
+    "objectives": [],
+    "sections": [
+      {
+        "title": "Overview",
+        "body": [
+          "### Navigation",
+          "Error: Could not find bundled diabetes dataset at assets/datasets/csv/diabetes.csv."
+        ],
+        "prompts": []
+      },
+      {
+        "title": "Activity 1: Exploring Data Types",
+        "body": [
+          "### Instructions",
+          "Before training a model, data scientists must inspect the raw data to understand feature distributions and identify correlations with the outcome variable. Use the controls below to preview the dataset and inspect the data types."
+        ],
+        "prompts": []
+      },
+      {
+        "title": "Data Preview",
+        "body": [
+          "These are the variable types the computer recognizes for each column:"
+        ],
+        "prompts": []
+      },
+      {
+        "title": "Feature Distributions",
+        "body": [
+          "By inspecting the dataset, you should notice there are 8 input features (predictors) containing numerical data (integers and floats), and 1 binary outcome variable containing integers (0 or 1)."
+        ],
+        "prompts": []
+      },
+      {
+        "title": "Activity 2: Data Preprocessing and Splitting",
+        "body": [
+          "### Instructions",
+          "Before a model can learn, the data must be partitioned into a Training Set and a Testing Set. Use the slider below to adjust the ratio of this split and observe how the data is divided.",
+          "When following the notebook's default setting of 0.2, you should expect 80% of the patient records to be used for training the model, and 20% to be held back for testing.",
+          "This separation is critical. If we evaluated the model on the exact same data it was trained on, it would likely memorize the answers (overfitting), resulting in falsely high performance metrics that would fail in real-world scenarios."
+        ],
+        "prompts": []
+      },
+      {
+        "title": "Activity 3: Model Training and Interactive Prediction",
+        "body": [
+          "### Instructions",
+          "With the data prepared, we can train the Decision Tree Classifier. Adjust the 'Max Depth' parameter to control how complex the model's rules can become. Then, explore the Decision Tree Visualization to trace the mathematical logic the model uses to make a prediction. Finally, test the model yourself using the live simulator."
+        ],
+        "prompts": []
+      },
+      {
+        "title": "Decision Tree Visualization",
+        "body": [
+          "This graphic maps out the exact mathematical thresholds the algorithm uses to sort data and make decisions."
+        ],
+        "prompts": []
+      },
+      {
+        "title": "Live Interactive Simulator",
+        "body": [
+          "Adjust the metrics below. The Decision Tree will process the inputs through the visual rules above and output a live prediction.",
+          "Model Prediction: Outcome Detected (Class 1)",
+          "Model Prediction: Outcome Not Detected (Class 0)",
+          "Using the notebook's default Max Depth of 4, you should observe an accuracy of approximately 0.6948.",
+          "Looking at the Decision Tree Visualization, you should expect to see the model heavily prioritizing features like Glucose and BMI near the top of the tree. These primary splits indicate the strongest predictors of the outcome variable within this dataset."
+        ],
+        "prompts": []
+      },
+      {
+        "title": "Activity 4: Cross-Validation",
+        "body": [
+          "### Instructions",
+          "A single Train/Test split can be sensitive to exactly how the data was randomly divided. Cross-validation provides a more robust evaluation by dividing the dataset into multiple 'folds'. The model is trained and tested on every fold. Adjust the number of folds below to see how the average metrics stabilize.",
+          "Using the default 5 folds, you should expect the Average Accuracy to rise slightly to approximately 0.7305 compared to the single Train/Test split.",
+          "You should also expect to see a higher Specificity (~0.7540) than Sensitivity (~0.6871). This reveals an important insight about the model: it is currently slightly better at correctly identifying stable patients (True Negatives) than it is at catching patients who experience failure/mortality (True Positives)."
+        ],
+        "prompts": []
+      }
+    ],
+    "source": "notebooks/clinical/4.1_clinical.py"
+  },
+  {
+    "id": "4.2",
+    "module": "4",
+    "module_name": "Machine Learning",
+    "title": "Applied Fundamentals of ML and DL",
+    "objectives": [],
+    "sections": [
+      {
+        "title": "Overview",
+        "body": [
+          "### Navigation"
+        ],
+        "prompts": []
+      },
+      {
+        "title": "Activity 1: Exploring Data Types",
+        "body": [
+          "### Instructions",
+          "Complete each activity in order and record your responses to the module activities exclusively in your Canvas submission area.",
+          "Before training a model, researchers must inspect the raw data to understand feature distributions and identify class imbalances."
+        ],
+        "prompts": []
+      },
+      {
+        "title": "Data Preview",
+        "body": [
+          "Variable types recognized for each column:"
+        ],
+        "prompts": []
+      },
+      {
+        "title": "Feature Distributions",
+        "body": [
+          "**Outcome Distribution**",
+          "**The Job Task:** The objective is to predict in-hospital mortality using demographic and lab data to support ICU triage.\n**The Algorithmic Advantage:** A Deep Neural Network evaluates the non-linear interactions between variables. A specific blood pressure value may be safe for one patient but critical for another when combined with specific BMI and Glucose levels.\n**Understanding the Data Format:** Features are standardized so that large numerical values do not dominate the model's weight updates, ensuring all clinical metrics are treated proportionally."
+        ],
+        "prompts": []
+      },
+      {
+        "title": "Activity 2: Model Optimization",
+        "body": [
+          "### Instructions",
+          "Configure the optimization parameters to dictate how the network updates its internal weights. Execute the training pipeline and evaluate the resulting learning curve."
+        ],
+        "prompts": []
+      },
+      {
+        "title": "Deep Neural Network Architecture",
+        "body": [
+          "Training Complete"
+        ],
+        "prompts": []
+      },
+      {
+        "title": "Model Learning Curve",
+        "body": [
+          "**Comparison to MS1:** The DNN can reach higher accuracy than the Decision Tree by finding hidden layers of risk, but global accuracy alone is deceptive.\n**Metric Suitability:** In mortality prediction, accuracy is an insufficient metric. Because most patients survive, the model could guess 'Survival' for everyone and still appear accurate while failing to detect at-risk patients."
+        ],
+        "prompts": []
+      },
+      {
+        "title": "Activity 3: Cross-Validation and Trade-Offs",
+        "body": [
+          "### Instructions",
+          "Execute the 5-fold cross-validation analysis. Adjust the classification threshold to observe the statistical trade-offs between Sensitivity and Specificity.",
+          "Evaluation Metrics Generated",
+          "**Performance Evaluation:** Lowering the threshold improves Sensitivity (catching more deaths) but reduces Specificity (more false alarms). This adjustment is the interactive equivalent of moving along an ROC curve to find the optimal clinical balance."
+        ],
+        "prompts": []
+      },
+      {
+        "title": "Activity 4: Strategic Evaluation",
+        "body": [
+          "### Instructions",
+          "Determine the optimal algorithmic approach based on organizational requirements for interpretability versus performance."
+        ],
+        "prompts": []
+      },
+      {
+        "title": "Architectural Comparison",
+        "body": [
+          "**Decision Tree (MS1)**",
+          "- Logic: Interpretable 'If-Then' splits.",
+          "- Transparency: High (White Box).",
+          "**Deep Neural Network (Current)**",
+          "- Logic: Complex non-linear combinations across hidden layers.",
+          "- Transparency: Low (Black Box).",
+          "Strategy: Use the Decision Tree. Clinician trust often relies on being able to follow the model's logic step-by-step.",
+          "Strategy: Use the DNN. Raw predictive power is prioritized to maximize patient safety and triage accuracy.",
+          "Strategy: A balanced approach may require hybrid models or post-hoc explainability tools.",
+          "**Model Selection:** The DNN trades human readability for mathematical capacity. It is chosen for its superior ability to map complex features, but the Decision Tree remains the standard if structural transparency is the priority."
+        ],
+        "prompts": []
+      }
+    ],
+    "source": "notebooks/clinical/4.2_clinical.py"
+  },
+  {
+    "id": "4.3",
+    "module": "4",
+    "module_name": "Machine Learning",
+    "title": "Applied Fundamentals of ML and DL",
+    "objectives": [],
+    "sections": [
+      {
+        "title": "Overview",
+        "body": [
+          "### Navigation"
+        ],
+        "prompts": []
+      },
+      {
+        "title": "Activity 1: Exploring Data Types",
+        "body": [
+          "### Instructions",
+          "Complete each activity in order and record your responses to the module activities exclusively in your Canvas submission area.",
+          "Before training a model, researchers must inspect the raw data to understand feature distributions and identify class imbalances."
+        ],
+        "prompts": []
+      },
+      {
+        "title": "Data Preview",
+        "body": [
+          "Variable types recognized for each column:"
+        ],
+        "prompts": []
+      },
+      {
+        "title": "Feature Distributions",
+        "body": [
+          "**Outcome Distribution**",
+          "**The Job Task:** The objective is to predict in-hospital mortality using demographic and lab data to support ICU triage.\n**The Algorithmic Advantage:** A Deep Neural Network evaluates the non-linear interactions between variables. A specific blood pressure value may be safe for one patient but critical for another when combined with specific BMI and Glucose levels.\n**Understanding the Data Format:** Features are standardized so that large numerical values do not dominate the model's weight updates, ensuring all clinical metrics are treated proportionally."
+        ],
+        "prompts": []
+      },
+      {
+        "title": "Activity 2: Model Optimization",
+        "body": [
+          "### Instructions",
+          "Configure the optimization parameters to dictate how the network updates its internal weights. Execute the training pipeline and evaluate the resulting learning curve."
+        ],
+        "prompts": []
+      },
+      {
+        "title": "Deep Neural Network Architecture",
+        "body": [
+          "Training Complete"
+        ],
+        "prompts": []
+      },
+      {
+        "title": "Model Learning Curve",
+        "body": [
+          "**Comparison to MS1:** The DNN can reach higher accuracy than the Decision Tree by finding hidden layers of risk, but global accuracy alone is deceptive.\n**Metric Suitability:** In mortality prediction, accuracy is an insufficient metric. Because most patients survive, the model could guess 'Survival' for everyone and still appear accurate while failing to detect at-risk patients."
+        ],
+        "prompts": []
+      },
+      {
+        "title": "Activity 3: Cross-Validation and Trade-Offs",
+        "body": [
+          "### Instructions",
+          "Execute the 5-fold cross-validation analysis. Adjust the classification threshold to observe the statistical trade-offs between Sensitivity and Specificity.",
+          "Evaluation Metrics Generated",
+          "**Performance Evaluation:** Lowering the threshold improves Sensitivity (catching more deaths) but reduces Specificity (more false alarms). This adjustment is the interactive equivalent of moving along an ROC curve to find the optimal clinical balance."
+        ],
+        "prompts": []
+      },
+      {
+        "title": "Activity 4: Strategic Evaluation",
+        "body": [
+          "### Instructions",
+          "Determine the optimal algorithmic approach based on organizational requirements for interpretability versus performance."
+        ],
+        "prompts": []
+      },
+      {
+        "title": "Architectural Comparison",
+        "body": [
+          "**Decision Tree (MS1)**",
+          "- Logic: Interpretable 'If-Then' splits.",
+          "- Transparency: High (White Box).",
+          "**Deep Neural Network (Current)**",
+          "- Logic: Complex non-linear combinations across hidden layers.",
+          "- Transparency: Low (Black Box).",
+          "Strategy: Use the Decision Tree. Clinician trust often relies on being able to follow the model's logic step-by-step.",
+          "Strategy: Use the DNN. Raw predictive power is prioritized to maximize patient safety and triage accuracy.",
+          "Strategy: A balanced approach may require hybrid models or post-hoc explainability tools.",
+          "**Model Selection:** The DNN trades human readability for mathematical capacity. It is chosen for its superior ability to map complex features, but the Decision Tree remains the standard if structural transparency is the priority."
+        ],
+        "prompts": []
+      }
+    ],
+    "source": "notebooks/clinical/4.3_clinical.py"
+  },
+  {
+    "id": "4.4",
+    "module": "4",
+    "module_name": "Machine Learning",
+    "title": "Choosing the Right Biomedical Deep Learning Model",
+    "objectives": [],
+    "sections": [
+      {
+        "title": "Overview",
+        "body": [
+          "Instructions: Please use this sidebar menu below to navigate through the different phases of Activity 4. Complete each section in order before answering the final question in your Canvas submission area."
+        ],
+        "prompts": []
+      },
+      {
+        "title": "Phase 1: Data Preprocessing",
+        "body": [
+          "**Notebook Directives:**\n* Complete each activity in order. Record your responses only in your Canvas submission area.\n* Open the sidebar to select the next phase in the activity.\n* **Clinical Scenario:** You are part of a hospital's clinical analytics team using a CNN model to predict in-hospital mortality.\n* **Task:** Preprocess the data before running the model."
+        ],
+        "prompts": []
+      },
+      {
+        "title": "StandardScaler Transformation",
+        "body": [
+          "In the notebook, the data is passed through `StandardScaler()` to center the mean at 0 and scale the standard deviation to 1. Toggle the scaler below to see why this is a necessary preprocessing step.",
+          "Data Normalized: Notice how the massive numerical difference between 'Glucose' and 'DiabetesPedigreeFunction' has been eliminated. This prevents large numbers from artificially dominating the neural network's weights.",
+          "Raw Data: Feeding this directly into a CNN causes the model to over-value 'Glucose' simply because the raw integer is larger than the others."
+        ],
+        "prompts": []
+      },
+      {
+        "title": "The 1D Sliding Kernel",
+        "body": [
+          "After preprocessing and reshaping the input to a 1D vector, the Conv1D layer slides a kernel (size=3) across the features.",
+          "Text Description: The dark blue boxes represent the 3 adjacent features currently being multiplied by the kernel's weights to extract a latent pattern. The light gray boxes are currently inactive.",
+          "Dataset not found. Please ensure that 'diabetes.csv' is uploaded to a folder named 'data' inside your repository."
+        ],
+        "prompts": []
+      },
+      {
+        "title": "Phase 2: Model Training Structure",
+        "body": [
+          "**Notebook Directives:**\n* Complete each activity in order. Record your responses only in your Canvas submission area.\n* Open the sidebar to select the next phase in the activity.\n* **Notebook Interpretation:**\n  * There are 7 layers (1 input layer, 5 hidden layers, and 1 output layer) in the CNN model.\n  * The first and second hidden layers learn the latent factors from the data using 32 and 64 nodes.\n  * The Dropout layer randomly drops 30 percent of neurons during training, preventing overfitting."
+        ],
+        "prompts": []
+      },
+      {
+        "title": "Interactive Mechanics: The Dropout Regularizer",
+        "body": [
+          "In the Dense layer, the notebook applies `Dropout(0.3)`. This randomly turns off 30 percent of the neurons during training so the model does not become overly reliant on any single feature pathway."
+        ],
+        "prompts": []
+      },
+      {
+        "title": "Phase 3: Cross-Validation & Results",
+        "body": [
+          "**Notebook Directives:**\n* Complete each activity in order. Record your responses only in your Canvas submission area.\n* Open the sidebar to select the next phase in the activity.\n* **5-fold cross validation:** Split the data into 5 unoverlapped datasets. Instead of training on one dataset once, train and test the model five times, each time using a different part of the data as the test set.\n* **Question:** How is the performance? Is it better than the DNN that we used in Notebook 2? Why? (Record your response in Canvas)."
+        ],
+        "prompts": []
+      },
+      {
+        "title": "Notebook Output Analysis",
+        "body": [
+          "These are the final averaged metrics across all 5 folds, exactly as printed at the end of Activity 4."
+        ],
+        "prompts": []
+      },
+      {
+        "title": "Interactive Diagnosis: Evaluating Performance",
+        "body": [
+          "To answer the final notebook question, notice that the **Average Sensitivity is 0.598**. This means the model is missing approximately 40 percent of the positive cases.",
+          "In the notebook, the prediction threshold is hardcoded to `0.5` (`y_pred_prob > 0.5`). Adjust the threshold slider below to simulate how performance shifts when prioritizing Sensitivity.",
+          "Text Description: A bar chart displaying the trade-off between Sensitivity and Specificity based on the selected probability threshold."
+        ],
+        "prompts": []
+      }
+    ],
+    "source": "notebooks/clinical/4.4_clinical.py"
+  },
+  {
+    "id": "4.5",
+    "module": "4",
+    "module_name": "Machine Learning",
+    "title": "Evaluating Machine Learning Models",
+    "objectives": [],
+    "sections": [
+      {
+        "title": "Clinical Data Processing",
+        "body": [
+          "### Preparing Electronic Health Records\nIn clinical environments, raw patient records often contain missing vitals and unique hospital identifiers that offer no predictive value.\n\n### Pipeline Operations\n1. **Remove Identifiers**: Exclude random numeric identifiers (e.g., patient IDs) to maintain privacy and prevent model bias.\n2. **Imputation**: Handle missing clinical lab results by imputing the cohort mean to preserve the patient record for analysis.",
+          "Preprocessing Complete"
+        ],
+        "prompts": []
+      },
+      {
+        "title": "Processed Data Preview",
+        "body": [
+          "A preview of the first 5 rows of the clean patient cohort."
+        ],
+        "prompts": []
+      },
+      {
+        "title": "Patient Demographics & Biomarkers",
+        "body": [
+          "Use this explorer to visualize clinical markers and demographic breakdowns across the hospital network."
+        ],
+        "prompts": []
+      },
+      {
+        "title": "Sex-Specific Clinical Patterns",
+        "body": [
+          "Do male and female patients exhibit different baseline physiological patterns? In clinical research, aggregating all patients can mask critical biological differences."
+        ],
+        "prompts": []
+      },
+      {
+        "title": "Sex-Specific Clinical Risk Factors",
+        "body": [
+          "We will perform univariate analyses using odds ratios. This helps uncover whether specific clinical labs hold differential predictive risk for mortality in women versus men."
+        ],
+        "prompts": []
+      },
+      {
+        "title": "Diagnostic Predictive Engine",
+        "body": [
+          "We will evaluate how well our multivariate models perform within each sex subgroup using the AUROC metric for diagnostic discrimination.",
+          "#### 1. Population Filter (Optional)",
+          "#### 2. Model Features",
+          "Select at least one predictor."
+        ],
+        "prompts": []
+      }
+    ],
+    "source": "notebooks/clinical/4.5_clinical.py"
+  },
+  {
+    "id": "4.6",
+    "module": "4",
+    "module_name": "Machine Learning",
+    "title": "Model Generalizability Sandbox",
+    "objectives": [],
+    "sections": [
+      {
+        "title": "Learning Activities",
+        "body": [
+          "Use the menu below to navigate between the three different activities in this module."
+        ],
+        "prompts": []
+      },
+      {
+        "title": "Activity 1: Overfitting vs. Underfitting",
+        "body": [
+          "1. Compare a 'Complex' model (Low k) to a 'Simple' model (High k) using the inputs below.\n2. Observe how the complex model attempts to draw boundaries around every single outlier, while the simple model draws a generalized regional boundary.\n3. Use the sidebar on the left to navigate to Activity 2 when you are ready."
+        ],
+        "prompts": []
+      },
+      {
+        "title": "Visualizing Decision Boundaries (Top 2 Features)",
+        "body": [
+          "Colorblind-accessible contour plot displaying model decision boundaries. Yellow regions predict one class outcome, while dark blue regions predict the other. White-outlined dots represent individual patient or cell sample data points.",
+          "Models with low k values create highly jagged decision boundaries, essentially memorizing the training data (overfitting). Models with high k values create smooth, broad boundaries, which may miss critical patterns (underfitting)."
+        ],
+        "prompts": []
+      },
+      {
+        "title": "Activity 2: Hyperparameter Tuning",
+        "body": [
+          "1. Adjust the 'maximum k' slider to generate the Accuracy Curve.\n2. Observe where the Train and Test accuracy lines begin to separate. This divergence indicates the exact point where the model stops learning general rules and starts memorizing the training data.\n3. Use the sidebar on the left to navigate to Activity 3 when you are ready."
+        ],
+        "prompts": []
+      },
+      {
+        "title": "Accuracy Curve",
+        "body": [
+          "Line graph comparing model accuracy on training data versus testing data across different values of k. The dark blue line represents training accuracy, and the yellow line represents testing accuracy.",
+          "The optimal hyperparameter is found just before the training and testing curves diverge significantly. A large gap between high training accuracy and low testing accuracy is the mathematical signature of overfitting."
+        ],
+        "prompts": []
+      },
+      {
+        "title": "Activity 3: Cross-Validation Strategies",
+        "body": [
+          "1. Adjust the 'Number of Folds' slider to see how stable the model performance is.\n2. Observe the variance in the boxplot. A wide box indicates the model is highly sensitive to how the data is split.\n3. Compare the mean accuracies and standard deviations of K-Fold, Stratified K-Fold, and LOO-CV.",
+          "Boxplot displaying the spread of accuracy scores across multiple data folds. Wider boxes indicate greater instability in the model's performance."
+        ],
+        "prompts": []
+      },
+      {
+        "title": "Comparing Validation Strategies",
+        "body": [
+          "Bar chart comparing the mean accuracy of K-Fold, Stratified K-Fold, and Leave-One-Out cross-validation. Error bars represent the standard deviation of scores.",
+          "Stratified K-Fold is generally preferred for biomedical datasets as it ensures the ratio of positive to negative outcomes remains consistent across all test folds. LOO-CV provides an unbiased estimate but at a high computational cost and potentially high variance."
+        ],
+        "prompts": []
+      }
+    ],
+    "source": "notebooks/clinical/4.6_clinical.py"
+  },
+  {
+    "id": "4.7",
+    "module": "4",
+    "module_name": "Machine Learning",
+    "title": "Healthcare AI Fairness Sandbox",
+    "objectives": [],
+    "sections": [
+      {
+        "title": "Activity 1: Data Preview and Fairness Metrics",
+        "body": [
+          "1. Review the raw data and overall performance metrics.\n2. Use the slider to adjust age group bins and observe how demographic segmentation impacts model sensitivity."
+        ],
+        "prompts": []
+      },
+      {
+        "title": "Activity 2: Global Explainability with SHAP",
+        "body": [
+          "1. Adjust the feature count to see the most influential clinical factors.\n2. SHAP values indicate how much each feature pushes the model's prediction higher or lower."
+        ],
+        "prompts": []
+      },
+      {
+        "title": "Activity 3: Local Explainability with LIME",
+        "body": [
+          "1. Select a patient from the test set to analyze their specific prediction.\n2. Identify which clinical factors contributed most to that individual's classification."
+        ],
+        "prompts": []
+      },
+      {
+        "title": "Activity 4: The 'What-If' Simulation",
+        "body": [
+          "1. Manually adjust the clinical parameters below to create a synthetic patient profile.\n2. Observe the model's real-time prediction and confidence level."
+        ],
+        "prompts": []
+      }
+    ],
+    "source": "notebooks/clinical/4.7_clinical.py"
+  },
+  {
+    "id": "5.1",
+    "module": "5",
+    "module_name": "Images",
+    "title": "Clinical Imaging Assignment",
+    "objectives": [],
+    "sections": [
+      {
+        "title": "Overview",
+        "body": [
+          "PRIVACY NOTICE: Please do not upload any images containing Protected Health Information (PHI) or sensitive personal data."
+        ],
+        "prompts": []
+      },
+      {
+        "title": "Activity 1: Identifying Structures in X-Ray Imaging",
+        "body": [
+          "1. Observe the default image below or upload your own sample image.\n2. Adjust the **Low Threshold** and **High Threshold** sliders.\n3. Observe how the edge detection algorithm highlights different structures and noise within the image.\n4. Return to Canvas to answer the question: *Why might edge detection alone be insufficient for detecting fractures in an X-ray image?*",
+          "### Activity 1 Controls",
+          "Please upload an image to begin, or ensure the default image is placed in the correct directory."
+        ],
+        "prompts": []
+      },
+      {
+        "title": "Activity 2: Comparing CT and MRI for Brain Imaging",
+        "body": [
+          "1. Observe the side-by-side medical scans provided below.\n2. Use the **Contrast** and **Brightness** sliders to adjust the right-hand image.\n3. Notice how adjusting these settings impacts the visibility of dense structures versus soft tissues, simulating the visual difference between a CT scan and an MRI.\n4. Return to Canvas to list the key differences between the modalities and explain their preferred clinical scenarios.",
+          "### Activity 2 Controls",
+          "Please upload a scan to begin, or ensure the default image is in the correct directory.",
+          "Observation Tip for Canvas: Compare the baseline image on the left with your adjusted image on the right. High contrast highlights dense bone (typical of a CT), while adjusting brightness and contrast together can reveal variations in soft tissue layers (typical of an MRI)."
+        ],
+        "prompts": []
+      }
+    ],
+    "source": "notebooks/clinical/5.1_clinical.py"
+  },
+  {
+    "id": "5.2",
+    "module": "5",
+    "module_name": "Images",
+    "title": "Clinical Image Processing Suite",
+    "objectives": [],
+    "sections": [
+      {
+        "title": "Overview",
+        "body": [
+          "**Privacy Notice:**\n\nThis is an educational sandbox. Please **do not upload sensitive clinical data**, personally identifiable information (PII), or Protected Health Information (PHI)."
+        ],
+        "prompts": []
+      },
+      {
+        "title": "Global Image Selection",
+        "body": [
+          "Please select or upload an image to begin."
+        ],
+        "prompts": []
+      },
+      {
+        "title": "Image Processing & Augmentation",
+        "body": [
+          "**Instructions:** Adjust the sliders to scale pixel intensities (normalization) or apply spatial transformations (augmentation).",
+          "**Normalization:** Lowering the factor will uniformly darken the image. In real model training, standardizing all images to a [0, 1] range ensures stable neural network gradients.\n\n**Augmentation:** Flipping and rotating the image changes its orientation without altering the underlying cellular features. This forces machine learning models to learn the actual shape of the cells rather than memorizing their position on the slide."
+        ],
+        "prompts": []
+      },
+      {
+        "title": "Edge Detection with Filters",
+        "body": [
+          "**Instructions:** Apply spatial filters to extract structural features like cell walls.",
+          "**Directional Edges:** The horizontal filter will highlight the top and bottom boundaries of the cells, while the vertical filter will highlight the left and right boundaries.\n\n**Magnitude & Sobel:** These combine the horizontal and vertical gradients into a single image, creating a bright, continuous outline around the cellular structures. This is a critical first step for automated cell counting or segmentation algorithms."
+        ],
+        "prompts": []
+      },
+      {
+        "title": "Motion Blur Simulation",
+        "body": [
+          "**Instructions:** Use this tool to simulate imaging artifacts caused by camera shake or stage movement.",
+          "You should expect the image to look 'smeared'. Increasing the **Blur Length** makes the smear stretch further, simulating a faster or longer physical movement during image capture. Changing the **Blur Angle** will alter the exact trajectory (e.g., diagonal, horizontal, or vertical) of that smear."
+        ],
+        "prompts": []
+      },
+      {
+        "title": "Salt & Pepper Noise and Denoising",
+        "body": [
+          "**Instructions:** Introduce random sensor noise and attempt to clean it up using different filtering algorithms.",
+          "**The Noise:** You will see random pure black and pure white pixels scattered across the image, common in faulty imaging sensors.\n\n**The Fix:** You should expect the **Median filter** to clean this up beautifully, as it replaces the extreme noise pixels with the middle value of their neighbors, keeping the cell edges sharp. Conversely, the **Gaussian filter** will likely just blur the noise into the surrounding pixels, making the image look muddy. This demonstrates why Median filters are strictly preferred for this specific artifact."
+        ],
+        "prompts": []
+      }
+    ],
+    "source": "notebooks/clinical/5.2_clinical.py"
+  },
+  {
+    "id": "5.3",
+    "module": "5",
+    "module_name": "Images",
+    "title": "Biomedical Toolkit",
+    "objectives": [],
+    "sections": [
+      {
+        "title": "Overview",
+        "body": [
+          "⚠️ **Confidentiality:** Do not upload patient-identifiable images."
+        ],
+        "prompts": []
+      },
+      {
+        "title": "Morphology Settings",
+        "body": [
+          "Sample file not found. Generating synthetic phantom..."
+        ],
+        "prompts": []
+      },
+      {
+        "title": "Action Map (What changed?)",
+        "body": [
+          "The bright areas indicate where the Closing operation filled in dark holes.",
+          "Please upload an ultrasound scan to begin."
+        ],
+        "prompts": []
+      }
+    ],
+    "source": "notebooks/clinical/5.3_clinical.py"
+  },
+  {
+    "id": "5.4",
+    "module": "5",
+    "module_name": "Images",
+    "title": "Clinical Computer Vision Applications",
+    "objectives": [],
+    "sections": [
+      {
+        "title": "Overview",
+        "body": [
+          "The original embedded HTML export is not present in this repository. This page now provides a stable in-app review activity instead of failing at runtime."
+        ],
+        "prompts": []
+      },
+      {
+        "title": "Clinical Computer Vision Application Review",
+        "body": [
+          "Use this page to reason about how a clinical computer vision workflow should be selected,\nvalidated, and monitored before use in care settings.",
+          "Good answers should mention image quality, subgroup performance, external validation, clinical workflow fit, and human review."
+        ],
+        "prompts": [
+          "What clinical feature should the model learn?",
+          "What patient-safety risk could appear if the model fails?",
+          "What validation evidence would be needed before deployment?"
+        ]
+      }
+    ],
+    "source": "notebooks/clinical/5.4_clinical.py"
+  },
+  {
+    "id": "5.5",
+    "module": "5",
+    "module_name": "Images",
+    "title": "Fusion Tools Integration",
+    "objectives": [],
+    "sections": [
+      {
+        "title": "Lesson workspace",
+        "body": [
+          "Use this workspace to record notes and reflect on the lesson."
+        ],
+        "prompts": []
+      }
+    ],
+    "source": "notebooks/clinical/5.5_clinical.py"
+  },
+  {
+    "id": "5.6",
+    "module": "5",
+    "module_name": "Images",
+    "title": "Consistency in Clinical Image Analysis",
+    "objectives": [],
+    "sections": [
+      {
+        "title": "Overview",
+        "body": [
+          "The original embedded HTML export is not present in this repository. This page now provides a stable in-app consistency checklist instead of failing at runtime."
+        ],
+        "prompts": []
+      },
+      {
+        "title": "Clinical Consistency Checklist",
+        "body": [
+          "Strong clinical workflows define acquisition protocol, preprocessing, annotation standards, site-level validation, quality control, and escalation paths for uncertain outputs."
+        ],
+        "prompts": [
+          "Which clinical workflow step could introduce inconsistency?",
+          "How would you standardize the workflow before deployment?"
+        ]
+      }
+    ],
+    "source": "notebooks/clinical/5.6_clinical.py"
+  },
+  {
+    "id": "7.1",
+    "module": "7",
+    "module_name": "Impact Project",
+    "title": "7.1 Designing Biomedical AI Experiments",
+    "objectives": [],
+    "sections": [
+      {
+        "title": "Overview",
+        "body": [
+          "Biomedical researchers are increasingly looking to incorporate artificial intelligence into their research programs.\nBut designing a strong AI-enabled experiment requires more than just selecting a model — it means establishing clear\nhypotheses, understanding data limitations, selecting appropriate AI techniques, and planning for baseline and\ncomparative evaluations.\n\nIn this activity, you'll receive personalized, automated feedback on your **experiment design ideas**. Whether you have\na specific project in mind or are brainstorming how to integrate AI into your existing work, this tool will help you\nrefine your thinking and increase the feasibility and clarity of your approach.",
+          "## psychology: Try it: Describe your Biomedical AI Experiment Idea",
+          "**Note:** The following activity uses a generative AI model to provide suggestions and feedback. This is an educational tool, not a peer review system."
+        ],
+        "prompts": [
+          "Describe your idea for a biomedical research experiment involving AI. **The more details, the better.**"
+        ]
+      }
+    ],
+    "source": "notebooks/clinical/7.1_clinical.py"
+  },
+  {
+    "id": "7.2",
+    "module": "7",
+    "module_name": "Impact Project",
+    "title": "7.2 Writing Successful Biomedical AI Proposals",
+    "objectives": [],
+    "sections": [
+      {
+        "title": "Overview",
+        "body": [
+          "In this activity, you will provide a short description of a hypothetical research topic that you are interested in, and will be presented with a corresponding NIH-style project summary.",
+          "## psychology: Try it: Generate an NIH-Style Project Summary",
+          "**Note:** The following activity uses a generative AI model to provide suggestions and feedback. This is an educational tool, not a peer review system."
+        ],
+        "prompts": [
+          "Describe your research idea. **The more details, the better.**"
+        ]
+      }
+    ],
+    "source": "notebooks/clinical/7.2_clinical.py"
+  },
+  {
+    "id": "7.3",
+    "module": "7",
+    "module_name": "Impact Project",
+    "title": "7.3 Effective Scientific Communication",
+    "objectives": [],
+    "sections": [
+      {
+        "title": "Overview",
+        "body": [
+          "In this activity, you will provide an abstract (or full text) from a research article, and will be presented with an elevator-pitch version designed for broad audiences.",
+          "## psychology: Try it: Generate an Elevator Pitch",
+          "**Note:** The following activity uses a generative AI model to provide suggestions and feedback. This is an educational tool, not a peer review system."
+        ],
+        "prompts": [
+          "Enter your research text (e.g., manuscript abstract, full article text, etc.)"
+        ]
+      }
+    ],
+    "source": "notebooks/clinical/7.3_clinical.py"
+  },
+  {
+    "id": "7.4",
+    "module": "7",
+    "module_name": "Impact Project",
+    "title": "7.4 Bridging Traditional Research with AI Innovation",
+    "objectives": [],
+    "sections": [
+      {
+        "title": "Overview",
+        "body": [
+          "In this activity, you will provide a specific challenge, limitation, or knowledge gap in your field, and will be presented with a hypothetical application of AI which could potentially help address it.",
+          "## psychology: Try it: AI Solutions for Biomedical Challenges",
+          "**Note:** The following activity uses a generative AI model to provide suggestions and feedback. This is an educational tool, not a peer review system."
+        ],
+        "prompts": [
+          "Enter a challenge, limitation, or gap in knowledge in your field."
+        ]
+      }
+    ],
+    "source": "notebooks/clinical/7.4_clinical.py"
+  },
+  {
+    "id": "7.5",
+    "module": "7",
+    "module_name": "Impact Project",
+    "title": "7.5 Peer Review and Feedback",
+    "objectives": [],
+    "sections": [
+      {
+        "title": "Overview",
+        "body": [
+          "In this activity, you will provide a description of a biomedical AI research idea, and will be presented with a critique which highlights potential limitations and provides suggestions for improvement.",
+          "## psychology: Try it: Critique Generator for Biomedical AI Research Ideas",
+          "**Note:** The following activity uses a generative AI model to provide suggestions and feedback. This is an educational tool, not a peer review system."
+        ],
+        "prompts": [
+          "Provide a biomedical AI research idea in as much detail as possible."
+        ]
+      }
+    ],
+    "source": "notebooks/clinical/7.5_clinical.py"
+  },
+  {
+    "id": "7.6",
+    "module": "7",
+    "module_name": "Impact Project",
+    "title": "7.6 Robust Biomedical AI Research Design",
+    "objectives": [],
+    "sections": [
+      {
+        "title": "Overview",
+        "body": [
+          "In this activity, you will provide a description of a biomedical dataset or AI model, and will be presented with a corresponding datasheet or model card.",
+          "## psychology: Try it: Datasheet and Model Card Generator",
+          "**Note:** The following activity uses a generative AI model to provide suggestions and feedback. This is an educational tool, not a peer review system."
+        ],
+        "prompts": [
+          "Provide the name and/or description of a public biomedical dataset and/or AI model."
+        ]
+      }
+    ],
+    "source": "notebooks/clinical/7.6_clinical.py"
+  },
+  {
+    "id": "7.7",
+    "module": "7",
+    "module_name": "Impact Project",
+    "title": "7.7 Responsible Biomedical AI Research",
+    "objectives": [],
+    "sections": [
+      {
+        "title": "Overview",
+        "body": [
+          "In this activity, you will explore a case of research misconduct, identify the ethical concerns it raises, and ways to navigate it.",
+          "## psychology: Try it: Navigating Research Misconduct",
+          "**Note:** The following activity uses a generative AI model to provide suggestions and feedback. This is an educational tool, not a peer review system."
+        ],
+        "prompts": [
+          "Provide your responses to Q1 and Q2:"
+        ]
+      }
+    ],
+    "source": "notebooks/clinical/7.7_clinical.py"
+  }
+]

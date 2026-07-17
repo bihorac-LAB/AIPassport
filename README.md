@@ -68,6 +68,12 @@ GEMINI_API_KEY = "your-actual-api-key-here"
 streamlit run aipassport_notebooks.py
 ```
 
+### marimo / browser-only version
+
+The `marimo` branch includes a reactive lesson browser and one standalone
+marimo app per consolidated lesson. See [docs/marimo.md](docs/marimo.md) for
+app-mode, editor, WASM export, and localhost commands.
+
 ---
 
 ## 🎨 Branding
