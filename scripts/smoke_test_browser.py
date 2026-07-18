@@ -114,6 +114,18 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("url")
     parser.add_argument("--expect", required=True)
+    parser.add_argument(
+        "--select",
+        action="append",
+        default=[],
+        help="Select an option whose visible label contains this text; may be repeated.",
+    )
+    parser.add_argument("--expect-after")
+    parser.add_argument(
+        "--expect-image",
+        action="store_true",
+        help="Require at least one fully loaded image, including inside shadow roots.",
+    )
     parser.add_argument("--screenshot")
     parser.add_argument("--timeout", type=float, default=60)
     args = parser.parse_args()
@@ -164,7 +176,140 @@ def main() -> None:
                     )
                 time.sleep(0.5)
 
+            for option_text in args.select:
+                selection_script = f"""
+                (() => {{
+                  const target = {json.dumps(option_text)};
+                  const deepSelects = [];
+                  const visit = root => {{
+                    deepSelects.push(...root.querySelectorAll("select"));
+                    for (const item of root.querySelectorAll("*")) {{
+                      if (item.shadowRoot) visit(item.shadowRoot);
+                    }}
+                  }};
+                  visit(document);
+                  for (const select of deepSelects) {{
+                    const option = [...select.options].find(
+                      item => item.textContent.includes(target)
+                    );
+                    if (option) {{
+                      select.value = option.value;
+                      select.dispatchEvent(new Event("change", {{bubbles: true}}));
+                      return true;
+                    }}
+                  }}
+                  return false;
+                }})()
+                """
+                selection = devtools.call(
+                    "Runtime.evaluate",
+                    {"expression": selection_script, "returnByValue": True},
+                )
+                selected = (
+                    selection.get("result", {})
+                    .get("result", {})
+                    .get("value", False)
+                )
+                if not selected:
+                    diagnostics = devtools.call(
+                        "Runtime.evaluate",
+                        {
+                            "expression": """JSON.stringify({
+                              selects: [...document.querySelectorAll("select")].map(
+                                item => [...item.options].map(option => option.textContent)
+                              ),
+                              comboboxes: [...document.querySelectorAll('[role="combobox"]')].map(
+                                item => item.textContent
+                              ),
+                              iframes: document.querySelectorAll("iframe").length,
+                              custom: [...new Set(
+                                [...document.querySelectorAll("*")]
+                                  .map(item => item.tagName.toLowerCase())
+                                  .filter(name => name.includes("-"))
+                              )].slice(0, 30)
+                            })""",
+                            "returnByValue": True,
+                        },
+                    )
+                    details = (
+                        diagnostics.get("result", {})
+                        .get("result", {})
+                        .get("value", "")
+                    )
+                    raise RuntimeError(
+                        f"Could not select option containing {option_text!r}: {details}"
+                    )
+                time.sleep(1)
+
+            if args.expect_after:
+                while True:
+                    result = devtools.call(
+                        "Runtime.evaluate",
+                        {"expression": "document.body.innerText", "returnByValue": True},
+                    )
+                    text = (
+                        result.get("result", {})
+                        .get("result", {})
+                        .get("value", "")
+                    )
+                    if args.expect_after in text:
+                        break
+                    if time.monotonic() >= deadline:
+                        raise TimeoutError(
+                            f"Did not find {args.expect_after!r} after interaction"
+                        )
+                    time.sleep(0.5)
+
+            if args.expect_image:
+                image_check = devtools.call(
+                    "Runtime.evaluate",
+                    {
+                        "expression": """
+                        (() => {
+                          const images = [];
+                          const visit = root => {
+                            images.push(...root.querySelectorAll("img"));
+                            for (const item of root.querySelectorAll("*")) {
+                              if (item.shadowRoot) visit(item.shadowRoot);
+                            }
+                          };
+                          visit(document);
+                          return images.some(image => image.complete && image.naturalWidth > 0);
+                        })()
+                        """,
+                        "returnByValue": True,
+                    },
+                )
+                loaded = (
+                    image_check.get("result", {})
+                    .get("result", {})
+                    .get("value", False)
+                )
+                if not loaded:
+                    raise RuntimeError("No fully loaded image found after interaction")
+
             if args.screenshot:
+                devtools.call(
+                    "Runtime.evaluate",
+                    {
+                        "expression": """
+                        (() => {
+                          const results = [];
+                          const visit = root => {
+                            results.push(...root.querySelectorAll(".lab-result"));
+                            for (const item of root.querySelectorAll("*")) {
+                              if (item.shadowRoot) visit(item.shadowRoot);
+                            }
+                          };
+                          visit(document);
+                          if (results.length) {
+                            results[results.length - 1].scrollIntoView({block: "start"});
+                          }
+                        })()
+                        """
+                    },
+                )
+                time.sleep(0.5)
                 result = devtools.call(
                     "Page.captureScreenshot",
                     {"format": "png", "captureBeyondViewport": False},
@@ -173,7 +318,8 @@ def main() -> None:
                 with open(args.screenshot, "wb") as output:
                     output.write(image)
 
-            print(f"PASS: found {args.expect!r} at {args.url}")
+            expectation = args.expect_after or args.expect
+            print(f"PASS: found {expectation!r} at {args.url}")
         finally:
             chrome.terminate()
             chrome.wait(timeout=10)

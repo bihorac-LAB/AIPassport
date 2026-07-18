@@ -94,6 +94,7 @@ def _(json):
       "prompts": []
     }
   ],
+  "media": [],
   "source": "notebooks/clinical/1.2_clinical.py"
 }""")
     return (lesson,)
@@ -170,6 +171,7 @@ def _(lesson, mo):
         gap=1,
     )
     return (section_picker,)
+
 
 
 @app.cell

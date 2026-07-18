@@ -39,6 +39,22 @@ Then open <http://localhost:8000>.
 The generated page runs Python in the browser through Pyodide. It does not
 require a Python notebook server after export.
 
+## Interactive learning labs
+
+Every available lesson in Modules 3–5 has a reactive activity:
+
+- **Module 3 — Data:** ethical acquisition audit, radiologist agreement,
+  preprocessing and outlier controls, and federated learning.
+- **Module 4 — Machine Learning:** decision trees, neural-network architecture,
+  model selection, confusion-matrix metrics, generalization, and subgroup
+  fairness.
+- **Module 5 — Images:** X-ray windowing, enhancement and blur, pathology
+  segmentation controls, computer-vision design, image fusion, and
+  reproducibility scoring.
+
+The clinical teaching images used by these activities are embedded into the
+generated notebooks as data URIs, so they also work in the static WASM export.
+
 ## Regenerate after changing the consolidated lessons
 
 ```bash
