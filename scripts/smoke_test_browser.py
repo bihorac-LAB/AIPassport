@@ -126,6 +126,13 @@ def main() -> None:
         action="store_true",
         help="Require at least one fully loaded image, including inside shadow roots.",
     )
+    parser.add_argument(
+        "--set-range",
+        action="append",
+        default=[],
+        metavar="INDEX=VALUE",
+        help="Set a zero-based range input inside shadow DOM and require the result to change.",
+    )
     parser.add_argument("--screenshot")
     parser.add_argument("--timeout", type=float, default=60)
     args = parser.parse_args()
@@ -287,6 +294,134 @@ def main() -> None:
                 )
                 if not loaded:
                     raise RuntimeError("No fully loaded image found after interaction")
+
+            for range_update in args.set_range:
+                index_text, value = range_update.split("=", maxsplit=1)
+                range_index = int(index_text)
+                fingerprint_script = """
+                (() => {
+                  const matches = [];
+                  const visit = root => {
+                    matches.push(...root.querySelectorAll(".lab-result"));
+                    for (const item of root.querySelectorAll("*")) {
+                      if (item.shadowRoot) visit(item.shadowRoot);
+                    }
+                  };
+                  visit(document);
+                  return matches.map(item => item.innerHTML).join("");
+                })()
+                """
+                before_result = devtools.call(
+                    "Runtime.evaluate",
+                    {"expression": fingerprint_script, "returnByValue": True},
+                )
+                before = (
+                    before_result.get("result", {})
+                    .get("result", {})
+                    .get("value", "")
+                )
+                range_script = f"""
+                (() => {{
+                  const ranges = [];
+                  const visit = root => {{
+                    ranges.push(
+                      ...root.querySelectorAll(
+                        'input[type="range"], [role="slider"]'
+                      )
+                    );
+                    for (const item of root.querySelectorAll("*")) {{
+                      if (item.shadowRoot) visit(item.shadowRoot);
+                    }}
+                  }};
+                  visit(document);
+                  const input = ranges[{range_index}];
+                  if (!input) return false;
+                  const requested = {json.dumps(value)};
+                  if (input.tagName === "INPUT") {{
+                    const setter = Object.getOwnPropertyDescriptor(
+                      HTMLInputElement.prototype, "value"
+                    ).set;
+                    setter.call(input, requested);
+                    input.dispatchEvent(new Event("input", {{bubbles: true, composed: true}}));
+                    input.dispatchEvent(new Event("change", {{bubbles: true, composed: true}}));
+                  }} else {{
+                    input.focus();
+                    const key = requested.toLowerCase() === "home" ? "Home" : "End";
+                    input.dispatchEvent(new KeyboardEvent("keydown", {{
+                      key, code: key, bubbles: true, composed: true
+                    }}));
+                    input.dispatchEvent(new KeyboardEvent("keyup", {{
+                      key, code: key, bubbles: true, composed: true
+                    }}));
+                  }}
+                  return true;
+                }})()
+                """
+                update = devtools.call(
+                    "Runtime.evaluate",
+                    {"expression": range_script, "returnByValue": True},
+                )
+                changed_input = (
+                    update.get("result", {})
+                    .get("result", {})
+                    .get("value", False)
+                )
+                if not changed_input:
+                    range_diagnostics = devtools.call(
+                        "Runtime.evaluate",
+                        {
+                            "expression": """
+                            (() => {
+                              const found = [];
+                              const visit = root => {
+                                for (const item of root.querySelectorAll("*")) {
+                                  if (
+                                    item.tagName.includes("-") ||
+                                    item.getAttribute("role") === "slider" ||
+                                    item.tagName === "INPUT"
+                                  ) {
+                                    found.push({
+                                      tag: item.tagName,
+                                      role: item.getAttribute("role"),
+                                      type: item.getAttribute("type"),
+                                      text: item.textContent.slice(0, 50)
+                                    });
+                                  }
+                                  if (item.shadowRoot) visit(item.shadowRoot);
+                                }
+                              };
+                              visit(document);
+                              return JSON.stringify(found.slice(-80));
+                            })()
+                            """,
+                            "returnByValue": True,
+                        },
+                    )
+                    details = (
+                        range_diagnostics.get("result", {})
+                        .get("result", {})
+                        .get("value", "")
+                    )
+                    raise RuntimeError(
+                        f"Range input {range_index} was not found: {details}"
+                    )
+                while True:
+                    current_result = devtools.call(
+                        "Runtime.evaluate",
+                        {"expression": fingerprint_script, "returnByValue": True},
+                    )
+                    current = (
+                        current_result.get("result", {})
+                        .get("result", {})
+                        .get("value", "")
+                    )
+                    if current and current != before:
+                        break
+                    if time.monotonic() >= deadline:
+                        raise TimeoutError(
+                            f"Range input {range_index} changed, but the lab result did not"
+                        )
+                    time.sleep(0.25)
 
             if args.screenshot:
                 devtools.call(

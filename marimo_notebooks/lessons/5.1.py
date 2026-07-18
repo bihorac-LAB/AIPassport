@@ -284,16 +284,21 @@ def _(lesson, mo):
     else:
         lab_controls = {}
 
+    lab_controls = (
+        mo.ui.dictionary(lab_controls, label="Interactive controls")
+        if lab_controls
+        else None
+    )
     lab_panel = (
         mo.vstack(
             [
                 mo.md("## 🧪 Interactive learning lab"),
                 mo.md("Change the controls and watch the evidence update immediately."),
-                mo.hstack(list(lab_controls.values()), widths="equal", wrap=True),
+                lab_controls.hstack(widths="equal", wrap=True),
             ],
             gap=1,
         )
-        if lab_controls
+        if lab_controls is not None
         else mo.md("")
     )
     lab_panel
@@ -302,7 +307,7 @@ def _(lesson, mo):
 
 @app.cell
 def _(lesson, lab_controls, lab_id, mo):
-    values = {name: control.value for name, control in lab_controls.items()}
+    values = lab_controls.value if lab_controls is not None else {}
 
     def meter(label, value, color="#0021a5"):
         bounded = max(0, min(100, value))
