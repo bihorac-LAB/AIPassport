@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>AI Passport — AIP Guide (embedded)</title>
+  <style>
+    :root { --gator-blue: #0021A5; --uf-orange: #FA4616; --ink: #1a1a1a; --muted: #667; }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      color: var(--ink);
+      background: #f4f6fb;
+    }
+    header {
+      display: flex; flex-wrap: wrap; align-items: center; gap: .75rem;
+      padding: .75rem 1.25rem;
+      background: #fff;
+      border-bottom: 3px solid var(--uf-orange);
+    }
+    header h1 { font-size: 1.05rem; margin: 0; color: var(--gator-blue); }
+    header .spacer { flex: 1 1 auto; }
+    .btn {
+      display: inline-flex; align-items: center; gap: .4rem;
+      font: inherit; font-weight: 600; font-size: .9rem;
+      padding: .45rem .8rem; border-radius: .5rem; cursor: pointer;
+      border: 1px solid var(--gator-blue); background: var(--gator-blue); color: #fff;
+      text-decoration: none;
+    }
+    .btn.secondary { background: #fff; color: var(--gator-blue); }
+    .btn:hover { opacity: .92; }
+    main { padding: 1.25rem; }
+    .frame-wrap {
+      position: relative;
+      max-width: 1100px; margin: 0 auto;
+      background: #fff; border-radius: .75rem; overflow: hidden;
+      box-shadow: 0 2px 14px rgba(0,0,0,.08);
+      border: 1px solid #e3e7ef;
+    }
+    iframe {
+      display: block; width: 100%; height: 78vh; min-height: 520px; border: 0;
+    }
+    footer {
+      max-width: 1100px; margin: 1rem auto 2rem; padding: 0 .25rem;
+      color: var(--muted); font-size: .85rem; line-height: 1.5;
+    }
+    footer code { background: #eef1f7; padding: .05rem .35rem; border-radius: .3rem; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>AI Passport &mdash; AIP Guide</h1>
+    <span class="spacer"></span>
+    <!-- Pop out into a full-size new tab. href is filled in from MARIMO_URL below. -->
+    <a id="popout" class="btn secondary" href="#" target="_blank" rel="noopener">
+      Open in new tab &#8599;
+    </a>
+    <!-- Make the iframe fill the whole screen in place (no new tab). -->
+    <button id="fullscreen" class="btn" type="button">Fullscreen</button>
+  </header>
+
+  <main>
+    <div class="frame-wrap">
+      <!--
+        sandbox = the permissions a host (e.g. Canvas) would impose. These tokens are
+        what the embedded marimo app needs:
+          allow-scripts + allow-same-origin      -> marimo can run at all
+          allow-popups + allow-popups-to-escape-sandbox -> the "Open full screen" link
+                                                     inside the app can open a new tab
+          allow-forms + allow-downloads          -> chat input + "Download responses"
+        If the host does NOT sandbox the frame, you can delete the sandbox attribute
+        entirely and everything still works.
+      -->
+      <iframe
+        id="guide"
+        title="AIP Guide"
+        src="about:blank"
+        allow="fullscreen; clipboard-write"
+        allowfullscreen
+        sandbox="allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox allow-forms allow-downloads">
+      </iframe>
+    </div>
+  </main>
+
+  <footer>
+    Embedded from <code id="url-label"></code>.
+    <strong>Open in new tab</strong> pops the app out full-size (a user click is required &mdash;
+    browsers block iframes from auto-escaping). <strong>Fullscreen</strong> expands the frame in
+    place via the Fullscreen API. To embed a different host, change <code>MARIMO_URL</code> in this file.
+  </footer>
+
+  <script>
+    // Single source of truth for where the marimo app is served.
+    const MARIMO_URL = "http://localhost:2718/";
+
+    document.getElementById("guide").src = MARIMO_URL;
+    document.getElementById("popout").href = MARIMO_URL;
+    document.getElementById("url-label").textContent = MARIMO_URL;
+
+    document.getElementById("fullscreen").addEventListener("click", () => {
+      const frame = document.getElementById("guide");
+      if (document.fullscreenElement) {
+        document.exitFullscreen();
+      } else {
+        frame.requestFullscreen();
+      }
+    });
+  </script>
+</body>
+</html>
