@@ -6,6 +6,7 @@ matplotlib
 seaborn
 scikit-learn
 scikit-image
+opencv-python
 statsmodels
 plotly
 altair

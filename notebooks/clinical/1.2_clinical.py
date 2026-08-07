@@ -2,239 +2,490 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 import plotly.express as px
-import plotly.graph_objects as go
 
+st.title("1.2 Designing a Study You Can Defend (Clinical Research)")
 
-def accuracy_score(y_true, y_pred):
-    return (np.array(y_true) == np.array(y_pred)).mean()
+st.markdown(
+    """
+You are a clinical informatics researcher at a large academic medical center. Your hospital has
+higher-than-expected **30-day readmission rates for congestive heart failure (CHF) patients**, and you have
+been asked to design an AI study to predict readmission risk and support discharge planning.
 
-def confusion_matrix(y_true, y_pred):
-    y_true = np.array(y_true)
-    y_pred = np.array(y_pred)
-    tn = np.sum((y_true==0)&(y_pred==0))
-    fp = np.sum((y_true==0)&(y_pred==1))
-    fn = np.sum((y_true==1)&(y_pred==0))
-    tp = np.sum((y_true==1)&(y_pred==1))
-    return np.array([[tn, fp],[fn,tp]])
+A design is only worth as much as the rigor behind it. This subsection moves in four steps:
 
-def roc_auc_score(y_true, y_prob):
-    y_true = np.array(y_true)
-    y_prob = np.array(y_prob)
-    if len(np.unique(y_true)) != 2:
-        return np.nan
+1. **Write the design brief** — the gap, the question, and the data plan.
+2. **Do the rigor work** — detect and handle outliers in a real table, and see what your choice does to the numbers.
+3. **Commit to a validation strategy** — splitting, cross-validation, external validation, subgroup performance.
+4. **Carry the decision to your team** — one professional message that a busy senior colleague will actually read.
 
-    pos = y_prob[y_true == 1]
-    neg = y_prob[y_true == 0]
-    return ((pos[:, None] > neg).mean() + 0.5 * (pos[:, None] == neg).mean())
-
-st.title("1.2 Artificial Intelligence Lifecycle (Clinical Research)")
-
-st.subheader("Clinical Track: Heart Disease Risk Predictor and Model Monitoring")
-
-st.markdown("""
-**Dataset:** Simulated Heart Disease Prediction Data (entirely included here)  
----
-
-This notebook simulates a deployed AI model for heart disease risk prediction.  
-You will:  
-- **Explore model performance across deployment versions**
-- **Simulate data drift**
-- **Practice data validation**
-- **Decide when to trigger model retraining**
-- **Reflect on good AI lifecycle management**
----
-### 1. Dataset Overview
-
-This scenario uses a **simulated EHR dataset** for heart disease risk, each "version" containing 100 patients and these features:
-
-- `age` (years)
-- `systolic_bp` (mmHg)
-- `cholesterol` (mg/dL)
-- `bmi`
-- `smoker` (1/0)
-- `outcome` (1=Heart disease event, 0=No event)
-""")
-
-np.random.seed(2024)
-
-
-def make_patients(n, drift=False):
-    age = np.random.randint(40, 82, n)
-    systolic_bp = np.random.normal(132, 17, n) + (8 if drift else 0)
-    cholesterol = np.random.normal(222, 52, n) + (15 if drift else 0)
-    bmi = np.random.normal(28, 7, n) + (2 if drift else 0)
-    smoker = np.random.binomial(1, 0.37 if drift else 0.32, n)
-
-    if drift:
-        coef = np.array([0.03, 0.04, 0.018, 0.04, 0.2])
-        intercept = -13.0
-    else:
-        coef = np.array([0.04, 0.025, 0.012, 0.08, 0.7])
-        intercept = -11.7
-
-    features = np.column_stack([age, systolic_bp, cholesterol, bmi, smoker])
-    risk = features @ coef + intercept
-    prob = 1/(1+np.exp(-risk))
-    outcome = np.random.binomial(1, prob)
-
-    return pd.DataFrame({
-        'age': age, 'systolic_bp': systolic_bp.round(),
-        'cholesterol': cholesterol.round(), 'bmi': bmi.round(1),
-        'smoker': smoker, 'outcome': outcome
-    })
-
-batches = [
-    make_patients(100, drift=False),   # Version 1 ("batch 1")
-    make_patients(100, drift=False),   # Version 2 (pre-drift)
-    make_patients(100, drift=True)     # Version 3 ("drifted data")
-]
-batch_names = ["Deployment v1 (Initial)", "Deployment v2 (Stable)", "Deployment v3 (Data Drift)"]
-
-def fake_model_predict(X, version=1):
-    base_coef = np.array([0.04, 0.025, 0.012, 0.08, 0.7])
-    base_intercept = -11.7
-
-    if version == 2:
-        coef = np.array([0.041, 0.026, 0.013, 0.076, 0.6])
-        intercept = -11.5
-    elif version == 3:
-        coef = np.array([0.03, 0.04, 0.018, 0.04, 0.2])
-        intercept = -13.0
-    else:
-        coef = base_coef
-        intercept = base_intercept
-    xb = (X[['age','systolic_bp','cholesterol','bmi','smoker']] @ coef) + intercept
-    prob = 1/(1+np.exp(-xb))
-    return prob
-
-st.markdown("Sample of data (current batch):")
-st.write(batches[0].head())
-
-st.markdown("---\n## 2. Choose a Model Version and Test on New Data")
-
-version = st.selectbox("Select Deployed Model Version:",
-    options=[
-        "Model v1 (trained on Deployment v1)",
-        "Model v2 (retrained on Deployment v2)",
-        "Model v3 (retrained on Deployment v3)"]
+**Resources:** [MIMIC-IV](https://physionet.org/content/mimiciv/2.2/) ·
+[eICU Collaborative Research Database](https://eicu-crd.mit.edu/) ·
+[Google Colab](https://colab.research.google.com/) · [scikit-learn](https://scikit-learn.org/stable/)
+"""
 )
-batch_idx = st.selectbox(
-    "Select NEW incoming data batch (for monitoring):",
-    options=[f"{i+1}: {name}" for i,name in enumerate(batch_names)]
+
+st.markdown("---")
+
+# ═══════════════════════════════════════════════════════════════════════════
+# Part 1 — The design brief
+# ═══════════════════════════════════════════════════════════════════════════
+st.header("1. The Design Brief")
+
+st.markdown(
+    """
+Six inputs. Keep each one short and specific — a brief that says exactly what you will do is more
+defensible than one that lists everything you *could* do.
+"""
 )
-model_ver = int(version[-2])
-batch_ver = int(batch_idx.split(":")[0]) - 1
-X_test = batches[batch_ver]
-y_test = X_test['outcome']
 
-y_prob = fake_model_predict(X_test, version=model_ver)
-y_pred = (y_prob >= 0.5).astype(int)
+st.subheader("1.1 The gap and the question")
+st.text_area(
+    "**Gap.** Name one concrete limitation of current AI-based CHF readmission prediction "
+    "(e.g., a population it was never validated on, a data type it ignores, a horizon it cannot see).",
+    key="m1_design_gap",
+)
+st.text_area(
+    "**Question.** State one primary research question that closes that gap, using SMART criteria "
+    "(specific, measurable, achievable, relevant, time-bound).",
+    key="m1_design_question",
+)
 
-st.write(f"Evaluating **{version}** on **{batch_names[batch_ver]}**:")
+st.subheader("1.2 The data plan")
+data_elements = st.multiselect(
+    "**Elements.** Which MIMIC-IV data elements will your model use?",
+    [
+        "Demographics",
+        "Diagnoses (ICD codes)",
+        "Procedures",
+        "Medications",
+        "Laboratory values",
+        "Clinical notes",
+        "Vitals",
+    ],
+    key="m1_design_elements",
+)
+st.text_area(
+    "**Cohort.** Give your inclusion and exclusion criteria in two or three lines.",
+    key="m1_design_cohort",
+)
+st.text_area(
+    "**Missingness and bias.** How will you handle missing values, and what bias in this data are you "
+    "most worried about carrying into the model?",
+    key="m1_design_missing",
+)
+st.text_area(
+    "**Preprocessing.** Name the transformations you will apply — lab-value normalization, temporal "
+    "aggregation over the stay, any clinically derived variables.",
+    key="m1_design_prepro",
+)
 
-acc = accuracy_score(y_test, y_pred)
-auc = roc_auc_score(y_test, y_prob)
-cm = confusion_matrix(y_test, y_pred)
-metric_cols = st.columns(2)
-metric_cols[0].metric("Accuracy", f"{acc:.2f}")
-metric_cols[1].metric("ROC-AUC", "N/A" if np.isnan(auc) else f"{auc:.2f}")
+if data_elements:
+    st.caption(f"Your model will see: {', '.join(data_elements)}.")
+    if "Clinical notes" in data_elements:
+        st.caption(
+            "Note: including clinical notes commits you to a text-feature pipeline — and to a "
+            "de-identification review before the data leaves the EHR."
+        )
 
-fig = go.Figure(
-    data=go.Heatmap(
-        z=cm,
-        x=["No event", "Event"],
-        y=["No event", "Event"],
-        colorscale="Blues",
-        showscale=False,
-        text=cm,
-        texttemplate="%{text}",
-        textfont={"size": 18},
-        hovertemplate="True: %{y}<br>Predicted: %{x}<br>Count: %{z}<extra></extra>",
+st.markdown("---")
+
+# ═══════════════════════════════════════════════════════════════════════════
+# Part 2 — The rigor lab (outliers)
+# ═══════════════════════════════════════════════════════════════════════════
+st.header("2. Rigor Lab: Outliers in Your Cohort")
+
+st.markdown(
+    """
+Your brief promised to handle missing and extreme values. This is where you actually do it.
+
+Below is a **simulated CHF admission table** — 40 patients, deliberately small enough to inspect by eye:
+
+- `age` — age of patient (years)
+- `length_of_stay` — duration of hospitalization (days)
+- `bnp` — admission B-type Natriuretic Peptide (pg/mL)
+- `sodium` — admission sodium (mmol/L)
+- `readmit_30d` — 1 = readmitted within 30 days, 0 = no
+"""
+)
+
+
+@st.cache_data
+def load_chf_cohort():
+    rng = np.random.default_rng(42)
+    n_patients = 40
+    df = pd.DataFrame(
+        {
+            "patient_id": np.arange(1, n_patients + 1),
+            "age": np.append(rng.normal(68, 11, n_patients - 1), [105]),                 # one high outlier
+            "length_of_stay": np.append(rng.exponential(4, n_patients - 2), [30, 0.2]),  # two outliers
+            "bnp": np.append(rng.normal(900, 500, n_patients - 1), [9000]),              # one extreme
+            "sodium": np.append(rng.normal(137, 5, n_patients - 1), [110]),              # one low
+            "readmit_30d": rng.binomial(1, 0.36, n_patients),
+        }
     )
-)
+    return df.sample(frac=1, random_state=42).reset_index(drop=True)
+
+
+df = load_chf_cohort()
+VARIABLES = ["age", "length_of_stay", "bnp", "sodium"]
+
+st.dataframe(df, use_container_width=True)
+
+
+def iqr_bounds(column):
+    q1 = df[column].quantile(0.25)
+    q3 = df[column].quantile(0.75)
+    iqr = q3 - q1
+    return q1 - 1.5 * iqr, q3 + 1.5 * iqr, q1, q3, iqr
+
+
+st.subheader("2.1 See them")
+st.markdown("A boxplot makes an extreme value obvious before any arithmetic does.")
+
+sel_plot = st.selectbox("Variable for boxplot:", VARIABLES, key="m1_rigor_plot_var")
+fig = px.box(df, x=sel_plot, points="all", hover_data=["patient_id"])
 fig.update_layout(
-    title="Confusion Matrix",
-    xaxis_title="Predicted",
-    yaxis_title="True label",
-    height=430,
-    margin=dict(l=40, r=20, t=55, b=45),
+    height=320,
+    xaxis_title=sel_plot,
+    yaxis_title="",
+    margin=dict(l=40, r=20, t=25, b=35),
 )
 st.plotly_chart(fig, use_container_width=True)
-
-st.write("Distribution of predicted probabilities:")
-prob_df = pd.DataFrame({"Predicted heart disease probability": y_prob})
-fig2 = px.histogram(
-    prob_df,
-    x="Predicted heart disease probability",
-    nbins=20,
-    range_x=[0, 1],
+st.text_area(
+    "Which points look like outliers, and which patient IDs are they?", key="m1_rigor_visual_notes"
 )
-fig2.update_layout(
-    yaxis_title="Patient count",
-    height=360,
-    margin=dict(l=40, r=20, t=25, b=45),
-    bargap=0.08,
+
+st.subheader("2.2 Measure them")
+st.markdown(
+    "The 1.5×IQR rule flags any value above Q3 + 1.5×IQR or below Q1 − 1.5×IQR. It is a convention, not "
+    "a law — but it is a convention you can write down in a methods section."
 )
-st.plotly_chart(fig2, use_container_width=True)
 
-st.markdown("---\n## 3. Observe Model Drift and Decide When to Retrain")
+sel_stat = st.selectbox("Variable for threshold calculation:", VARIABLES, key="m1_rigor_calc_var")
+lower, upper, q1, q3, iqr = iqr_bounds(sel_stat)
 
-st.markdown("""
-**Instructions:**  
-- Try different combinations above, e.g., test old (v1) model on recent ("drifted") batch, and compare vs. retrained models.
-- Watch for performance drop indicating “model drift”.
+bound_cols = st.columns(3)
+bound_cols[0].metric("IQR", f"{iqr:.1f}", help=f"Q1 = {q1:.1f}, Q3 = {q3:.1f}")
+bound_cols[1].metric("Lower bound", f"{lower:.1f}")
+bound_cols[2].metric("Upper bound", f"{upper:.1f}")
 
-**Q1: On which incoming batch does the performance of Model v1 FIRST significantly drop?**  
-**Q2: Does retraining recover performance?**  
-Type your answers below.
-""")
-st.text_area("Notes on model drift observations:", key="drift_notes")
+outlier_mask = (df[sel_stat] < lower) | (df[sel_stat] > upper)
+st.markdown("**Rows flagged by the IQR rule:**")
+st.dataframe(df[outlier_mask][["patient_id", sel_stat]], use_container_width=True)
+st.text_area(
+    "Do the flagged values look like data-entry errors, or like real patients who are genuinely unusual? "
+    "Your answer changes what you are allowed to do next.",
+    key="m1_rigor_flagged_notes",
+)
 
-st.markdown("---\n## 4. Data Validation Checks")
+st.subheader("2.3 See what they cost you")
+sel_compare = st.selectbox("Variable for comparison:", VARIABLES, key="m1_rigor_compare_var")
+lwr2, upr2, *_ = iqr_bounds(sel_compare)
+with_out = df[sel_compare]
+wout_out = df[~((df[sel_compare] < lwr2) | (df[sel_compare] > upr2))][sel_compare]
 
-st.markdown("""
-**Practice data validation:**  
-Artificial Intelligence systems MUST check for data integrity before inference or retraining!
+comp_cols = st.columns(2)
+with comp_cols[0]:
+    st.markdown("**All data**")
+    st.write(f"Mean: {with_out.mean():.2f}")
+    st.write(f"Std: {with_out.std():.2f}")
+    st.write(f"Median: {with_out.median():.2f}")
+with comp_cols[1]:
+    st.markdown("**Outliers excluded**")
+    st.write(f"Mean: {wout_out.mean():.2f}")
+    st.write(f"Std: {wout_out.std():.2f}")
+    st.write(f"Median: {wout_out.median():.2f}")
 
-Below is a validator for 10 random patient records in the latest batch.  
-Adjust the validation thresholds to see impact.
-""")
-row_samp = batches[batch_ver].sample(10, random_state=111)
-a_min, a_max = st.slider("Acceptable Age Range:", 40, 100, (45,85))
-bp_min, bp_max = st.slider("Systolic BP", 90, 220, (90,180))
-chol_min, chol_max = st.slider("Cholesterol", 100, 350, (120,340))
-bmi_min, bmi_max = st.slider("BMI", 10, 50, (15,45))
+st.text_area(
+    "Which statistic moved most — mean, standard deviation, or median? Why does that matter when the "
+    "number ends up in a paper?",
+    key="m1_rigor_effect_notes",
+)
 
-bad_age = ~row_samp['age'].between(a_min, a_max)
-bad_bp = ~row_samp['systolic_bp'].between(bp_min, bp_max)
-bad_chol = ~row_samp['cholesterol'].between(chol_min, chol_max)
-bad_bmi = ~row_samp['bmi'].between(bmi_min, bmi_max)
-row_samp['Validation Flag'] = np.where(bad_age|bad_bp|bad_chol|bad_bmi, '🚨 Problem', 'OK')
-st.dataframe(row_samp)
+st.subheader("2.4 Handle them")
+st.markdown(
+    """
+Three defensible strategies, each with a different cost:
 
-st.markdown("""
-**Q3: What problems could arise if these validation steps are skipped?**  
-""")
-st.text_area("Risks if no data validation:", key="validation_risks")
+- **Remove** — honest about uncertainty, but throws away real patients and shrinks your cohort.
+- **Winsorize** — keeps every row, at the price of a value that was never measured.
+- **Impute with median** — keeps the row and the sample size, and erases the signal that made it unusual.
+"""
+)
 
-st.markdown("---\n## 5. Lifecycle Management Scenario")
+sel_handle = st.selectbox("Variable for handling strategies:", VARIABLES, key="m1_rigor_handle_var")
+approach = st.radio(
+    "Strategy:",
+    ["Remove (exclude outlier rows)", "Winsorize (cap at threshold)", "Impute with median"],
+    key="m1_rigor_approach",
+)
+lwr, upr, *_ = iqr_bounds(sel_handle)
+series = df[sel_handle]
 
-st.markdown("""
-**Imagine:**  
-You are responsible for the deployed **Model v2**. Over the last 3 months, performance dropped _from ROC-AUC 0.83 to 0.71_ due to population changes.  
-- **How would you handle model versioning?**  
-- **How would you document and monitor, e.g., with MLflow or DVC?**  
-- **What communication/actions would you take before retraining and deployment?**
+if approach.startswith("Remove"):
+    handled = series[(series >= lwr) & (series <= upr)]
+elif approach.startswith("Winsor"):
+    handled = series.clip(lwr, upr)
+else:
+    median = series[(series >= lwr) & (series <= upr)].median()
+    handled = series.copy()
+    handled[(handled < lwr) | (handled > upr)] = median
 
-""")
-st.text_area("Your short action plan for lifecycle management:", key="lifecycle_plan")
+handle_cols = st.columns(3)
+handle_cols[0].metric("Mean", f"{handled.mean():.2f}", f"{handled.mean() - series.mean():+.2f}")
+handle_cols[1].metric("Std", f"{handled.std():.2f}", f"{handled.std() - series.std():+.2f}")
+handle_cols[2].metric("N", f"{handled.count()}", f"{handled.count() - series.count():+d}")
 
-st.markdown("""
+st.text_area(
+    "Pros and cons of the strategy you chose, and the specific clinical risk if this variable's outliers "
+    "are mishandled:",
+    key="m1_rigor_handle_notes",
+)
+
+st.subheader("2.5 Report them")
+st.markdown(
+    """
+Everything above is invisible to a reader unless you write it down. Transparent reporting is not a
+courtesy — it is what makes the result reproducible, and what lets a reviewer tell a cleaning decision
+from a result.
+"""
+)
+st.text_area(
+    "Write the outlier-handling sentence that would appear in your methods section. Name the rule, the "
+    "variables it was applied to, how many records it affected, and what you did with them.",
+    key="m1_rigor_reflection",
+)
+
+st.markdown("---")
+
+# ═══════════════════════════════════════════════════════════════════════════
+# Part 3 — Validation strategy
+# ═══════════════════════════════════════════════════════════════════════════
+st.header("3. A Validation Strategy You Can Defend")
+
+st.markdown(
+    """
+**The situation:** your institution has **10,000 CHF admissions from three hospitals over three years**,
+recorded on five different EHR configurations, in a diverse, mostly urban population. The model will later
+be tested at an outside health system.
+
+Four decisions. Each one is a claim you will have to defend.
+"""
+)
+
+st.subheader("Task 1 — Splitting")
+split_issues = st.multiselect(
+    "What makes a simple random split unsafe for *this* dataset? (choose all that apply)",
+    [
+        "Temporal leakage — future data ends up in the training set",
+        "The same patient appears in both train and test sets",
+        "Class imbalance differs across hospitals",
+        "Site and equipment batch effects are ignored",
+        "Demographic subgroups are unevenly represented across the split",
+        "Readmission prevalence changed over the three years",
+    ],
+    key="m1_valid_split_issues",
+)
+split_strategy = st.radio(
+    "Which splitting principle will you commit to?",
+    [
+        "Temporal split (train on the first two years, test on the last)",
+        "Hospital-wise split (hold out one hospital entirely)",
+        "Patient-level split stratified by outcome",
+        "Hybrid (temporal + hospital + demographic stratification)",
+    ],
+    key="m1_valid_split_strategy",
+)
+st.text_area(
+    "Which of the issues you selected does your chosen split actually solve — and which does it leave open?",
+    key="m1_valid_split_notes",
+)
+
+st.subheader("Task 2 — Internal validation")
+cv_cols = st.columns([2, 1])
+with cv_cols[0]:
+    cv_type = st.selectbox(
+        "Cross-validation design:",
+        [
+            "K-fold (random)",
+            "K-fold (hospital-stratified)",
+            "Leave-one-hospital-out",
+            "Time-series (rolling window)",
+            "Nested CV (tuning inside, evaluation outside)",
+        ],
+        key="m1_valid_cv_type",
+    )
+with cv_cols[1]:
+    n_folds = st.slider("Folds:", 3, 10, 5, key="m1_valid_folds")
+
+cv_metrics = st.multiselect(
+    "Which metrics will you report per fold? (accuracy alone is not enough on imbalanced outcomes)",
+    [
+        "AUROC",
+        "AUPRC",
+        "Sensitivity / recall",
+        "Specificity",
+        "Calibration (Brier score, reliability curve)",
+        "Subgroup disparities",
+    ],
+    key="m1_valid_metrics",
+)
+if cv_metrics and "Calibration (Brier score, reliability curve)" not in cv_metrics:
+    st.caption(
+        "Worth reconsidering: a discharge-planning tool acts on the *probability*, not the ranking. "
+        "Discrimination without calibration will not tell you whether 0.7 means 70%."
+    )
+
+st.subheader("Task 3 — External validation")
+st.text_area(
+    "Your model will be evaluated at an outside health system whose coding practices and case mix differ "
+    "from yours. What will you hold fixed, what will you allow to be re-fit, and what result would make "
+    "you say the model does *not* generalize?",
+    key="m1_valid_external",
+)
+
+st.subheader("Task 4 — Subgroup performance")
+subgroups = st.multiselect(
+    "Which subgroups will you report performance for, separately, before anyone deploys this?",
+    [
+        "Age bands",
+        "Sex",
+        "Race and ethnicity",
+        "Insurance status / payer",
+        "Primary language",
+        "Hospital site",
+        "Prior-admission count",
+    ],
+    key="m1_valid_subgroups",
+)
+st.text_area(
+    "Pick the subgroup you expect to perform worst and say why — mechanism, not guesswork. What would you "
+    "do if you were right?",
+    key="m1_valid_subgroup_notes",
+)
+
+if split_strategy and cv_type:
+    st.info(
+        f"**Your stated design:** {split_strategy.split(' (')[0]} · {cv_type} with {n_folds} folds · "
+        f"{len(cv_metrics)} reported metric(s) · {len(subgroups)} subgroup(s) audited."
+    )
+
+st.markdown("---")
+
+# ═══════════════════════════════════════════════════════════════════════════
+# Part 4 — Carrying it to the team
+# ═══════════════════════════════════════════════════════════════════════════
+st.header("4. Carrying the Decision to Your Team")
+
+st.markdown(
+    """
+A design nobody understands does not get built. This study needs an emergency physician, a cardiologist,
+a data scientist, a nurse informaticist, and someone who can speak for patients — and they do not share a
+vocabulary.
+"""
+)
+
+with st.expander("Terms this team will use differently without noticing", expanded=False):
+    st.markdown(
+        """
+    Before you write anything, check that these mean the same thing to everyone in the room:
+
+    | Term | Where the confusion comes from |
+    | --- | --- |
+    | *validation* | statistical out-of-sample testing vs. regulatory/clinical validation |
+    | *sensitivity* | true-positive rate vs. "how twitchy the alert is" |
+    | *significance* | p < 0.05 vs. "big enough to change what I do" |
+    | *model* | the fitted artefact vs. the whole deployed system |
+    | *bias* | statistical estimation bias vs. social/structural inequity |
+    | *label* | the recorded outcome vs. the clinical truth it stands in for |
+    | *drift* | covariate shift vs. "the ward changed its protocol" |
+    | *positive* | predicted positive vs. the patient actually being readmitted |
+    | *feature* | model input vs. product functionality |
+    | *accuracy* | the metric vs. "is it right" |
+    """
+    )
+
+st.text_area(
+    "**The team question.** Who do you need on this team, what will each of them catch that you would "
+    "miss, and how will you keep the clinical reasoning honest as the modelling work speeds up?",
+    key="m1_team_plan",
+)
+
+st.subheader("The communication artefact")
+
+with st.expander("The situation (click to expand)", expanded=True):
+    st.markdown(
+        """
+    **You are Dr. Jordan**, an early-career clinician-researcher. You are mentored by **Dr. Martinez**, a
+    senior attending and clinical AI lead.
+
+    Early mentorship meetings were productive — Dr. Martinez helped you integrate risk-prediction models
+    into heart-failure workflows. Lately, meetings have been rescheduled or cut short. You feel
+    unsupported, with a multicenter protocol deadline and IRB submission approaching.
+
+    Dr. Martinez, for their part, sees you as becoming dependent — waiting for advice rather than
+    troubleshooting data and workflow obstacles yourself. Frustration is building on both sides.
+    """
+    )
+
+st.markdown(
+    """
+Write the message that requests a meeting and actually improves the situation. It has to do three things
+at once: state the problem clearly, show you understand the other side, and propose a concrete change.
+This is the same skill as defending your design to an IRB or a sceptical department — the audience is
+busy and the ask has to be specific.
+"""
+)
+
+st.text_area(
+    "Your message to Dr. Martinez:",
+    height=220,
+    key="m1_comm_email",
+)
+
+if st.button("Compare with a worked example", key="m1_comm_example_btn"):
+    st.info(
+        """\
+Dear Dr. Martinez,
+
+I hope this message finds you well. I'd like to request a meeting to discuss our current working
+relationship and some challenges I've been experiencing. Your insights on integrating AI into our heart
+failure protocols have been extremely valuable, and I am grateful for your mentorship.
+
+Recently, I've noticed our meetings have become less frequent and are sometimes cut short. I completely
+appreciate your clinical and research obligations, especially as new projects arise. However, with the
+upcoming multicenter protocol deadline and IRB submission, I've felt unsure at times how to proceed when
+obstacles arise.
+
+I also realize I could be more proactive in troubleshooting workflow bottlenecks before seeking your
+direct guidance. Would we be able to set a recurring check-in (even biweekly) and perhaps agree on short
+agendas to maximize our time? I'd like to become more independent but still benefit from your targeted
+advice during critical moments.
+
+Thank you for considering this. I am eager to find a balance that supports both your schedule and my
+professional growth.
+
+Best regards,
+Dr. Jordan
+"""
+    )
+    st.caption(
+        "Notice what it does: names the specific change (frequency), credits the other side's constraints, "
+        "concedes its own contribution to the problem, and asks for one concrete, cheap thing."
+    )
+
+st.markdown(
+    """
 ---
-**References:**  
-- [Jupyter notebook](https://jupyter.org/)  
-- [MLflow](https://mlflow.org/)  
-- [DVC](https://dvc.org/)  
-  
-_This assignment simulates key components of AI clinical deployment, monitoring, and lifecycle practice!_
-""")
+**Key takeaways**
+
+- A defensible study states its gap, its question, and its data plan *before* the modelling starts.
+- Cleaning decisions are results. Report the rule, the count, and the consequence.
+- Splitting, cross-validation, external validation, and subgroup performance are four separate claims —
+  a strong answer to one does not cover the others.
+- High-stakes, time-pressured teams need explicit expectations more than they need extra meetings.
+
+**Further reading:** [Nature — How to be a good mentee](https://www.nature.com/articles/d41586-020-02927-0) ·
+[Effective mentoring in clinical research](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4564451/)
+"""
+)

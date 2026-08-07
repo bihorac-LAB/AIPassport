@@ -1,187 +1,488 @@
 import streamlit as st
+import pandas as pd
+import numpy as np
+import plotly.express as px
 
-st.title("1.2 Artificial Intelligence Lifecycle (Basic Science)")
-st.header("Basic Science Track: Molecular Classification Project")
+st.title("1.2 Designing a Study You Can Defend (Basic Science)")
 
-st.markdown("""
-Welcome to the **AI Project Lifecycle Simulation**!
+st.markdown(
+    """
+You are a computational biologist in a lab studying how cells respond to drug compounds. Your images
+capture subtle phenotypic changes that traditional scoring misses, and you want to use AI to **classify
+those phenotypes and surface novel responses**.
 
-In this basic science scenario, you will step through the lifecycle of an AI project to classify molecules (e.g., for predicting protein function or drug-likeness). At each phase, you'll make choices, reflect, and see typical LLM guidance.
+A design is only worth as much as the rigor behind it. This subsection moves in four steps:
 
-_There is no real molecular data required – this is a walkthrough!_
-""")
+1. **Write the design brief** — the gap, the question, and the data plan.
+2. **Do the rigor work** — detect and handle outliers in a real table, and see what your choice does to the numbers.
+3. **Commit to a validation strategy** — splitting, cross-validation, external validation, subgroup performance.
+4. **Carry the decision to your team** — one professional message that a busy senior colleague will actually read.
 
-st.markdown("----")
-
-#### 1. Data Collection Step ####
-st.header("Step 1: Collecting Molecular Data")
-st.markdown("""
-You're planning a molecular classification project.  
-You need to collect a dataset of molecules and their class labels (e.g., toxic vs non-toxic, drug-like vs non-drug-like).
-
-**What source will you use for this dataset?**  
-""")
-data_source = st.radio("Choose a data source below:",
-                       ["Public molecular database (e.g. ChEMBL, PubChem)",
-                        "In-house experimental dataset",
-                        "Simulated/Generated molecules",
-                        "I'm not sure / Other"])
-st.write(f"**You chose**: {data_source}")
-
-st.markdown("Why might this data source be appropriate, and what potential biases could it introduce?")
-source_just = st.text_area("Reflect here:", key="data_source_reflect")
-
-if st.button("LLM Guidance: Data Collection"):
-    if data_source == "Public molecular database (e.g. ChEMBL, PubChem)":
-        st.info("These offer large, diverse datasets, often with standardized structures and rich metadata. Beware of reporting/collection bias and label quality issues. Make sure your project goal matches the label definitions in these datasets.")
-    elif data_source == "In-house experimental dataset":
-        st.info("Such data is closer to your specific application, but could have smaller size, unstandardized formats, or local lab biases. Be transparent about experimental protocols and any missing data.")
-    elif data_source == "Simulated/Generated molecules":
-        st.info("Simulated datasets are helpful for data augmentation or novel compound exploration, but may not represent real-world chemistry. Validation using external sources is important.")
-    else:
-        st.info("Selecting the right molecular dataset is crucial; always document data provenance and consider possible biases that could affect downstream model generalizability.")
-
-st.markdown("----")
-
-#### 2. Preprocessing Step ####
-st.header("Step 2: Preprocessing and Feature Engineering")
-st.markdown("""
-You have a set of molecules, each as a SMILES string (a common text-based chemical representation).
-
-**What preprocessing steps will you take before modeling?**  
-(_select all you think are important_)""")
-prepro_steps = st.multiselect("Pick preprocessing steps:",
-    [
-        "Remove duplicate molecules",
-        "Standardize chemical representations",
-        "Calculate molecular descriptors/embeddings",
-        "Handle missing values",
-        "Scale/normalize numerical features",
-        "Assign class labels",
-        "None – ready to model"
-    ])
-st.write(f"**Your selected steps:** {', '.join(prepro_steps) if prepro_steps else 'None'}")
-
-st.markdown("Which of these do you feel LEAST confident about, and why?")
-step_reflect = st.text_area("Reflect here:", key="prepro_reflect")
-
-if st.button("LLM Guidance: Preprocessing"):
-    feedback = []
-    if "Remove duplicate molecules" in prepro_steps:
-        feedback.append("✔️ Removing duplicates avoids data leakage and overfitting.")
-    if "Standardize chemical representations" in prepro_steps:
-        feedback.append("✔️ Standardization ensures all molecules are consistently represented (e.g., tautomers, salts).")
-    if "Calculate molecular descriptors/embeddings" in prepro_steps:
-        feedback.append("✔️ Machine learning models can't use raw SMILES; you need to convert to descriptors or embeddings (e.g., molecular weight, fingerprints, graph embeddings).")
-    if "Handle missing values" in prepro_steps:
-        feedback.append("✔️ Missing data must be handled to prevent errors and bias.")
-    if "Scale/normalize numerical features" in prepro_steps:
-        feedback.append("✔️ Scaling helps if using models sensitive to feature scale (e.g., logistic regression).")
-    if "Assign class labels" in prepro_steps:
-        feedback.append("✔️ Labels are required for supervised learning.")
-    if not prepro_steps or "None – ready to model" in prepro_steps:
-        feedback.append("⚠️ Most raw molecular datasets need cleaning and descriptor calculation before modeling.")
-    st.info("\n".join(feedback))
-
-st.markdown("----")
-
-#### 3. Modeling Step ####
-st.header("Step 3: Model Selection")
-st.markdown("""
-Suppose your goal is to classify molecules as 'active' or 'inactive' against a protein.  
-You have typical molecular fingerprints (binary vectors) as features.
-""")
-model_choice = st.radio(
-    "Choose a modeling approach:",
-    [
-        "Logistic regression",
-        "Random forest",
-        "Neural network",
-        "Support vector machine",
-        "Other (add below)"
-    ]
+**Resources:** [Cell Painting Dataset](https://broad.io/CellPainting) ·
+[Allen Brain Atlas](https://portal.brain-map.org/) ·
+[PyTorch](https://pytorch.org/) · [scikit-learn](https://scikit-learn.org/stable/)
+"""
 )
-other_model = ""
-if model_choice == "Other (add below)":
-    other_model = st.text_input("Specify model:")
 
-st.markdown("Why did you pick this model?")
-model_reflect = st.text_area("Your reasoning:", key="modelwhy")
+st.markdown("---")
 
-if st.button("LLM Guidance: Model choice"):
-    if model_choice == "Logistic regression":
-        st.info("Logistic regression works well for linearly separable binary tasks, fast to train, and its results are interpretable. If you have high-dimensional binary descriptors, regularization is important.")
-    elif model_choice == "Random forest":
-        st.info("Random forests handle high-dimensional molecular fingerprints well, resist overfitting, and offer feature importance interpretation. Good baseline for many cheminformatics tasks.")
-    elif model_choice == "Neural network":
-        st.info("Neural networks can capture nonlinear features, especially if using graph-based or sequential models (e.g., graph neural networks). But they require larger datasets and careful hyperparameter selection.")
-    elif model_choice == "Support vector machine":
-        st.info("SVMs are strong with high-dimensional data and can model nonlinearity with kernels, but need tuning and may struggle with very large datasets.")
-    elif model_choice == "Other (add below)":
-        st.info(f"You chose: {other_model.strip() or '(unspecified)'} -- always explain how the inductive bias and requirements match your problem/data.")
+# ═══════════════════════════════════════════════════════════════════════════
+# Part 1 — The design brief
+# ═══════════════════════════════════════════════════════════════════════════
+st.header("1. The Design Brief")
 
-st.markdown("----")
+st.markdown(
+    """
+Six inputs. Keep each one short and specific — a brief that says exactly what you will do is more
+defensible than one that lists everything you *could* do.
+"""
+)
 
-#### 4. Validation ####
-st.header("Step 4: Model Validation")
-st.markdown("""
-You have trained your classifier.
+st.subheader("1.1 The gap and the question")
+st.text_area(
+    "**Gap.** Name one concrete limitation of current AI phenotype classification "
+    "(e.g., small labelled sets, batch effects, no interpretable link to a pathway, failure to transfer "
+    "across cell lines).",
+    key="m1_design_gap",
+)
+st.text_area(
+    "**Question.** State one primary research question that closes that gap, using SMART criteria "
+    "(specific, measurable, achievable, relevant, time-bound).",
+    key="m1_design_question",
+)
 
-**How will you validate performance?**  
-(_select all that apply_) 
-""")
-validation = st.multiselect(
-    "Pick your validation approach(es):",
+st.subheader("1.2 The data plan")
+channels = st.multiselect(
+    "**Elements.** Which staining channels or compartments will your model see?",
     [
-        "Simple train/test split",
-        "Cross-validation",
-        "External test set (different source)",
-        "Leave-cluster-out validation (e.g., by scaffold or class)",
-        "Other (add below)"
-    ])
-other_val = ""
-if "Other (add below)" in validation:
-    other_val = st.text_input("Describe other validation:")
+        "DNA",
+        "Mitochondria",
+        "Endoplasmic reticulum",
+        "Golgi",
+        "Cytoskeleton",
+        "RNA",
+    ],
+    key="m1_design_elements",
+)
+st.text_area(
+    "**Cohort.** Give your inclusion and exclusion criteria for images in two or three lines "
+    "(cell type, focus quality, treatment, plate position).",
+    key="m1_design_cohort",
+)
+st.text_area(
+    "**Missingness and bias.** How will you handle failed wells and missing channels, and which "
+    "acquisition bias — batch, plate edge, illumination, cell line — are you most worried about carrying "
+    "into the model?",
+    key="m1_design_missing",
+)
+st.text_area(
+    "**Preprocessing.** Name the transformations you will apply — illumination correction, intensity "
+    "normalization, feature extraction, and at least one biologically meaningful derived feature "
+    "(e.g., nuclear-to-cytoplasmic ratio).",
+    key="m1_design_prepro",
+)
 
-st.markdown("Which approach would best test generalizability?")
-gen_reflect = st.text_area("Your thoughts on generalizability:", key="valgeneral")
+if channels:
+    st.caption(f"Your model will see: {', '.join(channels)}.")
+    if len(channels) == 1:
+        st.caption(
+            "Note: a single channel makes interpretation easier but forecloses any phenotype defined by "
+            "the relationship *between* compartments."
+        )
 
-if st.button("LLM Guidance: Validation"):
-    lines = []
-    if "Cross-validation" in validation:
-        lines.append("✔️ Cross-validation (e.g., K-fold) is a robust internal check on generalization within your data.")
-    if "External test set (different source)" in validation:
-        lines.append("✔️ An external test set best measures generalizability to unseen chemical space/labs.")
-    if "Leave-cluster-out validation (e.g., by scaffold or class)" in validation:
-        lines.append("✔️ Scaffold-split validation is crucial to test how well the model extrapolates to novel molecule types, not just close analogs.")
-    if "Simple train/test split" in validation:
-        lines.append("⚠️ Single splits might not fully capture model stability, especially for clustered molecular data.")
-    if "Other (add below)" in validation:
-        lines.append(f"Other: {other_val.strip() or '(unspecified)'} -- justify your approach!")
-    if not lines:
-        lines.append("Validation is critical for trustworthy molecular ML. Use multiple strategies!")
-    st.info("\n".join(lines))
+st.markdown("---")
 
-st.markdown("----")
-st.header("Summary & Reflection")
+# ═══════════════════════════════════════════════════════════════════════════
+# Part 2 — The rigor lab (outliers)
+# ═══════════════════════════════════════════════════════════════════════════
+st.header("2. Rigor Lab: Outliers in a Measurement Table")
 
-st.markdown("""
-**Assignment Reflection:**  
-- What do you see as the most important/least obvious challenge in the molecular AI lifecycle?
-- What would you like to learn next?
-""")
+st.markdown(
+    """
+Your brief promised to handle failed wells and extreme values. This is where you actually do it.
 
-st.text_area("Freeform reflection:", key="final_reflect")
+The table below is a **simulated set of ICU vital signs** for 30 patients rather than a plate of images —
+deliberately, for two reasons: it is small enough to inspect by eye, and the outlier logic is identical
+whatever the measurement is. A saturated pixel intensity, a mis-segmented cell area, and a heart rate of 2
+are the same statistical problem and the same scientific decision.
 
-st.success("Thank you for completing the simulation! You have stepped through core lifecycle decisions for a molecular AI project. Remember: proper documentation and justification at each stage builds trust and rigor in your science.")
+- `heart_rate` — beats per minute
+- `map` — mean arterial pressure (mmHg)
+- `temperature` — °C
+"""
+)
 
-st.markdown("""
+
+@st.cache_data
+def load_vitals_sample():
+    rng = np.random.default_rng(42)
+    n = 30
+    return pd.DataFrame(
+        {
+            "patient_id": np.arange(1, n + 1),
+            "heart_rate": np.append(rng.normal(75, 10, n - 2), [150, 2]),  # two outliers
+            "map": np.append(rng.normal(85, 12, n - 1), [210]),            # one outlier
+            "temperature": np.append(rng.normal(37, 0.7, n - 1), [42]),    # one outlier
+        }
+    )
+
+
+df = load_vitals_sample()
+VARIABLES = ["heart_rate", "map", "temperature"]
+
+st.dataframe(df, use_container_width=True)
+
+
+def iqr_bounds(column):
+    q1 = df[column].quantile(0.25)
+    q3 = df[column].quantile(0.75)
+    iqr = q3 - q1
+    return q1 - 1.5 * iqr, q3 + 1.5 * iqr, q1, q3, iqr
+
+
+st.subheader("2.1 See them")
+st.markdown("A boxplot makes an extreme value obvious before any arithmetic does.")
+
+sel_plot = st.selectbox("Variable for boxplot:", VARIABLES, key="m1_rigor_plot_var")
+fig = px.box(df, x=sel_plot, points="all", hover_data=["patient_id"])
+fig.update_layout(
+    height=320,
+    xaxis_title=sel_plot,
+    yaxis_title="",
+    margin=dict(l=40, r=20, t=25, b=35),
+)
+st.plotly_chart(fig, use_container_width=True)
+st.text_area(
+    "Which points look like outliers, and which record IDs are they?", key="m1_rigor_visual_notes"
+)
+
+st.subheader("2.2 Measure them")
+st.markdown(
+    "The 1.5×IQR rule flags any value above Q3 + 1.5×IQR or below Q1 − 1.5×IQR. It is a convention, not "
+    "a law — but it is a convention you can write down in a methods section."
+)
+
+sel_stat = st.selectbox("Variable for threshold calculation:", VARIABLES, key="m1_rigor_calc_var")
+lower, upper, q1, q3, iqr = iqr_bounds(sel_stat)
+
+bound_cols = st.columns(3)
+bound_cols[0].metric("IQR", f"{iqr:.2f}", help=f"Q1 = {q1:.2f}, Q3 = {q3:.2f}")
+bound_cols[1].metric("Lower bound", f"{lower:.2f}")
+bound_cols[2].metric("Upper bound", f"{upper:.2f}")
+
+outlier_mask = (df[sel_stat] < lower) | (df[sel_stat] > upper)
+st.markdown("**Rows flagged by the IQR rule:**")
+st.dataframe(df[outlier_mask], use_container_width=True)
+st.text_area(
+    "Do the flagged values look like instrument or entry errors, or like genuinely unusual samples? "
+    "Your answer changes what you are allowed to do next.",
+    key="m1_rigor_flagged_notes",
+)
+
+st.subheader("2.3 See what they cost you")
+sel_compare = st.selectbox("Variable for comparison:", VARIABLES, key="m1_rigor_compare_var")
+lwr2, upr2, *_ = iqr_bounds(sel_compare)
+with_out = df[sel_compare]
+wout_out = df[~((df[sel_compare] < lwr2) | (df[sel_compare] > upr2))][sel_compare]
+
+comp_cols = st.columns(2)
+with comp_cols[0]:
+    st.markdown("**All data**")
+    st.write(f"Mean: {with_out.mean():.2f}")
+    st.write(f"Std: {with_out.std():.2f}")
+    st.write(f"Median: {with_out.median():.2f}")
+with comp_cols[1]:
+    st.markdown("**Outliers excluded**")
+    st.write(f"Mean: {wout_out.mean():.2f}")
+    st.write(f"Std: {wout_out.std():.2f}")
+    st.write(f"Median: {wout_out.median():.2f}")
+
+st.text_area(
+    "Which statistic moved most — mean, standard deviation, or median? Why does that matter when the "
+    "number ends up in a paper?",
+    key="m1_rigor_effect_notes",
+)
+
+st.subheader("2.4 Handle them")
+st.markdown(
+    """
+Three defensible strategies, each with a different cost:
+
+- **Remove** — honest about uncertainty, but throws away real samples and shrinks your dataset.
+- **Winsorize** — keeps every row, at the price of a value that was never measured.
+- **Impute with median** — keeps the row and the sample size, and erases the signal that made it unusual.
+"""
+)
+
+sel_handle = st.selectbox("Variable for handling strategies:", VARIABLES, key="m1_rigor_handle_var")
+approach = st.radio(
+    "Strategy:",
+    ["Remove (exclude outlier rows)", "Winsorize (cap at threshold)", "Impute with median"],
+    key="m1_rigor_approach",
+)
+lwr, upr, *_ = iqr_bounds(sel_handle)
+series = df[sel_handle]
+
+if approach.startswith("Remove"):
+    handled = series[(series >= lwr) & (series <= upr)]
+elif approach.startswith("Winsor"):
+    handled = series.clip(lwr, upr)
+else:
+    median = series[(series >= lwr) & (series <= upr)].median()
+    handled = series.copy()
+    handled[(handled < lwr) | (handled > upr)] = median
+
+handle_cols = st.columns(3)
+handle_cols[0].metric("Mean", f"{handled.mean():.2f}", f"{handled.mean() - series.mean():+.2f}")
+handle_cols[1].metric("Std", f"{handled.std():.2f}", f"{handled.std() - series.std():+.2f}")
+handle_cols[2].metric("N", f"{handled.count()}", f"{handled.count() - series.count():+d}")
+
+st.text_area(
+    "Pros and cons of the strategy you chose, and where it would be the wrong choice:",
+    key="m1_rigor_handle_notes",
+)
+
+st.subheader("2.5 Report them")
+st.markdown(
+    """
+Everything above is invisible to a reader unless you write it down. Transparent reporting is not a
+courtesy — it is what makes the result reproducible, and what lets a reviewer tell a cleaning decision
+from a result.
+"""
+)
+st.text_area(
+    "Write the outlier-handling sentence that would appear in your methods section. Name the rule, the "
+    "variables it was applied to, how many records it affected, and what you did with them.",
+    key="m1_rigor_reflection",
+)
+
+st.markdown("---")
+
+# ═══════════════════════════════════════════════════════════════════════════
+# Part 3 — Validation strategy
+# ═══════════════════════════════════════════════════════════════════════════
+st.header("3. A Validation Strategy You Can Defend")
+
+st.markdown(
+    """
+**The situation:** your dataset is **10,000 images acquired over three years**, across three plate batches,
+two microscopes, and four cell lines. The model will later be tested on images from a collaborating lab
+using a different imaging platform.
+
+Four decisions. Each one is a claim you will have to defend.
+"""
+)
+
+st.subheader("Task 1 — Splitting")
+split_issues = st.multiselect(
+    "What makes a simple random split unsafe for *this* dataset? (choose all that apply)",
+    [
+        "Temporal leakage — later acquisitions end up in the training set",
+        "Images of the same well or field appear in both train and test",
+        "Phenotype class balance differs across batches",
+        "Microscope and illumination batch effects are ignored",
+        "Some cell lines are represented on only one plate",
+        "Rare phenotypes may be absent from the test set entirely",
+    ],
+    key="m1_valid_split_issues",
+)
+split_strategy = st.radio(
+    "Which splitting principle will you commit to?",
+    [
+        "Temporal split (train on earlier batches, test on the latest)",
+        "Leave-one-batch-out (hold out an entire plate batch)",
+        "Well-level split stratified by phenotype",
+        "Hybrid (batch + cell line + phenotype stratification)",
+    ],
+    key="m1_valid_split_strategy",
+)
+st.text_area(
+    "Which of the issues you selected does your chosen split actually solve — and which does it leave open?",
+    key="m1_valid_split_notes",
+)
+
+st.subheader("Task 2 — Internal validation")
+cv_cols = st.columns([2, 1])
+with cv_cols[0]:
+    cv_type = st.selectbox(
+        "Cross-validation design:",
+        [
+            "K-fold (random)",
+            "K-fold (stratified by phenotype)",
+            "K-fold (grouped by cell line)",
+            "Leave-one-batch-out",
+            "Nested CV (tuning inside, evaluation outside)",
+        ],
+        key="m1_valid_cv_type",
+    )
+with cv_cols[1]:
+    n_folds = st.slider("Folds:", 3, 10, 5, key="m1_valid_folds")
+
+cv_metrics = st.multiselect(
+    "Which metrics will you report per fold? (accuracy alone is not enough when phenotypes are rare)",
+    [
+        "Accuracy",
+        "Macro F1",
+        "Precision / recall per class",
+        "AUROC",
+        "Confusion matrix",
+        "Biological enrichment (GO, pathways)",
+        "Cluster purity / silhouette",
+    ],
+    key="m1_valid_metrics",
+)
+if cv_metrics and "Accuracy" in cv_metrics and len(cv_metrics) == 1:
+    st.caption(
+        "Worth reconsidering: with a rare phenotype, a model that never predicts it can still be 97% "
+        "accurate. You need at least one per-class metric."
+    )
+
+st.subheader("Task 3 — External validation")
+st.text_area(
+    "Your model will be evaluated on images from a collaborating lab using a different microscope and "
+    "staining protocol. What will you hold fixed, what will you allow to be re-fit, and what result would "
+    "make you say the model does *not* generalize?",
+    key="m1_valid_external",
+)
+
+st.subheader("Task 4 — Subgroup performance")
+subgroups = st.multiselect(
+    "Which strata will you report performance for, separately, before claiming the model works?",
+    [
+        "Cell line",
+        "Plate batch",
+        "Microscope / imaging platform",
+        "Compound class",
+        "Dose level",
+        "Plate position (edge vs. interior wells)",
+        "Rare vs. common phenotypes",
+    ],
+    key="m1_valid_subgroups",
+)
+st.text_area(
+    "Pick the stratum you expect to perform worst and say why — mechanism, not guesswork. What would you "
+    "do if you were right?",
+    key="m1_valid_subgroup_notes",
+)
+
+if split_strategy and cv_type:
+    st.info(
+        f"**Your stated design:** {split_strategy.split(' (')[0]} · {cv_type} with {n_folds} folds · "
+        f"{len(cv_metrics)} reported metric(s) · {len(subgroups)} stratum/strata audited."
+    )
+
+st.markdown("---")
+
+# ═══════════════════════════════════════════════════════════════════════════
+# Part 4 — Carrying it to the team
+# ═══════════════════════════════════════════════════════════════════════════
+st.header("4. Carrying the Decision to Your Team")
+
+st.markdown(
+    """
+A design nobody understands does not get built. This study needs a cell biologist, a microscopist, a data
+scientist, a software engineer, and someone who knows the compound library — and they do not share a
+vocabulary.
+"""
+)
+
+with st.expander("Terms this team will use differently without noticing", expanded=False):
+    st.markdown(
+        """
+    Before you write anything, check that these mean the same thing to everyone in the room:
+
+    | Term | Where the confusion comes from |
+    | --- | --- |
+    | *validation* | statistical out-of-sample testing vs. wet-lab confirmation |
+    | *replicate* | technical replicate vs. biological replicate |
+    | *significance* | p < 0.05 vs. "big enough to be a real phenotype" |
+    | *model* | the fitted classifier vs. the model organism or system |
+    | *bias* | statistical estimation bias vs. batch/acquisition bias |
+    | *label* | the annotated class vs. the underlying biology it stands for |
+    | *feature* | model input vs. a visible cellular structure |
+    | *control* | negative control well vs. experimental control condition |
+    | *normalization* | per-image intensity scaling vs. per-plate statistical normalization |
+    | *accuracy* | the metric vs. "is it right" |
+    """
+    )
+
+st.text_area(
+    "**The team question.** Who do you need on this team, what will each of them catch that you would "
+    "miss, and how will you keep the biology honest as the modelling work speeds up?",
+    key="m1_team_plan",
+)
+
+st.subheader("The communication artefact")
+
+with st.expander("The situation (click to expand)", expanded=True):
+    st.markdown(
+        """
+    **You are Dr. Witmer**, an early-career research faculty member, mentored by **Dr. Antone**, a senior
+    faculty member.
+
+    Early meetings were productive, but over time Dr. Antone has become less available — often
+    rescheduling or cutting meetings short. You feel unsupported, particularly while preparing an upcoming
+    grant application.
+
+    Dr. Antone, in turn, sees you as overly reliant and not proactive in solving problems independently.
+    Tensions are rising and both of you are frustrated.
+    """
+    )
+
+st.markdown(
+    """
+Write the message that requests a meeting and actually improves the situation. It has to do three things
+at once: state the problem clearly, show you understand the other side, and propose a concrete change.
+This is the same skill as defending your design to a study section or a sceptical collaborator — the
+audience is busy and the ask has to be specific.
+"""
+)
+
+st.text_area(
+    "Your message to Dr. Antone:",
+    height=220,
+    key="m1_comm_email",
+)
+
+if st.button("Compare with a worked example", key="m1_comm_example_btn"):
+    st.info(
+        """\
+Dear Dr. Antone,
+
+I hope you're doing well. I'd like to request a meeting to discuss our working relationship and the
+challenges that I have been facing recently. I truly value your expertise, and I have learned a lot from
+you.
+
+Over the past few months, I've noticed that our meetings have been less frequent, with some rescheduled or
+cut short. I understand that you have many demands on your time, but I've felt unsupported, especially as
+I prepare for the upcoming grant application. However, I recognize that I may have been overly reliant on
+you, and I want to be more proactive in problem-solving going forward. Maybe we could schedule regular
+check-ins, with clear agendas to make the most of our time together. Mainly, I want to find a way to be
+more self-reliant while still benefiting from your mentorship.
+
+I look forward to hearing your thoughts on this.
+
+Best,
+Dr. Witmer
+"""
+    )
+    st.caption(
+        "Notice what it does: names the specific change (frequency), credits the other side's constraints, "
+        "concedes its own contribution to the problem, and asks for one concrete, cheap thing."
+    )
+
+st.markdown(
+    """
 ---
-References:
-- [ChEMBL](https://www.ebi.ac.uk/chembl/), [PubChem](https://pubchem.ncbi.nlm.nih.gov/)
-- [rdkit](https://www.rdkit.org/)
-- [DeepChem](https://deepchem.io/)
-- [OpenAI](https://platform.openai.com/docs/guides/chat)
+**Key takeaways**
 
-*(If you want to expand the notebook with real data or OpenAI API calls, let your instructor know!)*
-""")
+- A defensible study states its gap, its question, and its data plan *before* the modelling starts.
+- Cleaning decisions are results. Report the rule, the count, and the consequence.
+- Splitting, cross-validation, external validation, and subgroup performance are four separate claims —
+  a strong answer to one does not cover the others.
+- Open expectations prevent small misalignments from becoming ruptures.
+
+**Further reading:** [Nature — How to be a good mentee](https://www.nature.com/articles/d41586-020-02927-0) ·
+[Science — How to make the most of mentoring](https://www.science.org/content/article/how-make-most-mentoring)
+"""
+)
