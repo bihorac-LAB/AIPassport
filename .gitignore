@@ -1,2 +1,42 @@
+# ── Secrets: never commit ─────────────────────────────────────────────────────
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+legacy/.streamlit/secrets.toml
+
+# ── Python ───────────────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+.venv/
 venv/
-.streamlit/secrets.toml
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+
+# ── Node / frontend ──────────────────────────────────────────────────────────
+node_modules/
+dist/
+.vite/
+coverage/
+*.tsbuildinfo
+
+# ── Playwright ───────────────────────────────────────────────────────────────
+test-results/
+playwright-report/
+blob-report/
+.playwright/
+
+# ── Editors & OS ─────────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+
+# ── run.sh working directory ─────────────────────────────────────────────────
+.run/

@@ -1,0 +1,2289 @@
+{
+  "version": 1,
+  "generatedFrom": "frontend/src/content",
+  "activityGuidance": {
+    "concept-sorter": "Learner classifies real biomedical systems as rule-based AI, machine learning, or deep learning. Guide toward the origin of the rules, not the presence of data.",
+    "ai-timeline": "Learner explores 15 AI milestones from 1950 to 2025, filtered by era and paradigm. Emphasize that data and compute, not new theory, drove the deep learning era.",
+    "lifecycle-simulator": "Learner makes six sequential study-design decisions and receives consequences. The high-stakes decisions are the data split and the choice of outcome variable.",
+    "split-strategy": "Learner compares random, temporal, site-held-out, and grouped splits. The point is that a random split inflates the score because it shares setting between train and test.",
+    "outlier-lab": "Learner applies IQR or z-score detection then compares removal, winsorizing, and median imputation. The point is that statistical rules cannot separate errors from real extremes.",
+    "fairness-explorer": "Learner compares metrics across subgroups at varying thresholds. The point is that overall accuracy hides subgroup failure and sensitivity exposes it.",
+    "drift-simulator": "Learner advances deployment time to induce covariate shift and compares doing nothing against retraining. Emphasize diagnosing before intervening.",
+    "calibration-lab": "Learner increases population mismatch and sees AUC stay high while calibration degrades. The point is that ranking and probability are separate properties.",
+    "model-card-builder": "Learner authors a model card. Push for specific out-of-scope populations rather than generic caveats.",
+    "consent-rewriter": "Learner rewrites consent language across literacy levels. The point is that consent requires comprehension, not a signature.",
+    "representation-planner": "Learner sets a representation target and selects active recruitment strategies. The point is that passive recruitment reproduces existing access inequities.",
+    "security-audit": "Learner assembles layered data protections and sees which residual risks remain. Encourage proportionality to data sensitivity.",
+    "omop-mapper": "Learner maps source values to standard concept identifiers. The point is data minimization: keep only fields an analysis requires.",
+    "label-agreement": "Learner varies annotator count and compares percent agreement with Cohen's kappa. The point is that label quality caps achievable model performance.",
+    "preprocessing-pipeline": "Learner tunes outlier threshold, imputation, and scaling. Emphasize that mean imputation assumes missingness is unrelated to severity.",
+    "federated-round": "Learner runs local training and aggregation across two sites. The point is that federation solves data transfer, not data quality or representation.",
+    "decision-boundary": "Learner varies model complexity and compares boundary shape with train/test accuracy. The point is the gap, not either number.",
+    "complexity-curve": "Learner sweeps complexity to find where train and test accuracy diverge. That divergence point is where memorization begins.",
+    "cross-validation": "Learner compares single split, k-fold, stratified, and grouped validation. Emphasize fold-to-fold variance and patient-level grouping.",
+    "threshold-explorer": "Learner moves the decision threshold and watches the confusion matrix and every metric respond. The point is that threshold choice is a clinical decision.",
+    "explanation-lab": "Learner compares global feature importance with per-patient contributions. The point is that a model can be globally sensible and locally wrong.",
+    "what-if": "Learner builds a synthetic patient and watches predicted risk respond. Push toward asking whether the sensitivity is clinically plausible.",
+    "pixel-reveal": "Learner toggles between rendered pixels and their numeric values. The point is that an image is an array of intensities.",
+    "attenuation-phantom": "Learner sets tissue densities and watches the intensity histogram. The point is that overlapping distributions make findings hard for models and humans alike.",
+    "window-level": "Learner adjusts window centre and width. The point is that the same data under a different mapping is a different model input.",
+    "convolution-lab": "Learner applies kernels and steps through the per-position arithmetic. The point is that a CNN learns these nine numbers rather than being given them.",
+    "noise-denoise": "Learner compares mean and median filtering on impulse noise. The point is the same robustness property seen with clinical outliers.",
+    "histogram-equalization": "Learner compares global equalization with CLAHE. The point is that enhancement amplifies noise along with signal.",
+    "imaging-checklist": "Learner audits an imaging pipeline for reproducibility. Each unchecked item names a specific replication failure.",
+    "tokenizer": "Learner tokenizes biomedical text and sees rare terms fragment. The point is that fragmentation signals thin training evidence.",
+    "next-token": "Learner inspects next-token probabilities and manipulates temperature. The point is that plausibility, not truth, is being optimized.",
+    "embedding-space": "Learner explores semantic similarity between biomedical terms and finds misleading proximities.",
+    "hallucination-hunt": "Learner flags fabricated claims in fluent generated text. The point is that specific numbers and identifiers carry the most risk.",
+    "study-designer": "Learner specifies question, data, comparator, metric, validation, and risk for their own project. The comparator and baseline are the most commonly missing pieces."
+  },
+  "modules": [
+    {
+      "key": "module-1",
+      "position": 1,
+      "title": "Fundamentals",
+      "subtitle": "What AI is, and how an AI study is actually built",
+      "summary": "Replace the mystique around AI with a working mental model, then walk the path from a research question to a validated model.",
+      "accent": "blue",
+      "contentVersion": 1,
+      "pages": [
+        {
+          "key": "m1p1",
+          "moduleKey": "module-1",
+          "position": 1,
+          "slug": "demystifying-ai",
+          "title": "Demystifying AI",
+          "kicker": "Module 1 · Page 1",
+          "kind": "explore",
+          "objectives": [
+            "Distinguish artificial intelligence, machine learning, and deep learning by where the rules come from.",
+            "Place major AI milestones in historical context and explain why deep learning became dominant when it did.",
+            "Evaluate a claim about AI as fact, conditional, misleading, or not a claim at all."
+          ],
+          "requiredSections": [
+            "m1p1-nesting",
+            "m1p1-q1",
+            "m1p1-timeline",
+            "m1p1-q2",
+            "m1p1-fof"
+          ],
+          "estimatedMinutes": 18,
+          "contentVersion": 1,
+          "sections": [
+            {
+              "id": "m1p1-intro",
+              "kind": "prose",
+              "heading": "Three words people use interchangeably",
+              "summary": "Establishes the AI / ML / DL relationship before any technique is named."
+            },
+            {
+              "id": "m1p1-nesting",
+              "kind": "activity",
+              "heading": "Sort the systems",
+              "activity": "concept-sorter",
+              "summary": "Learner classifies real systems as rule-based AI, machine learning, or deep learning."
+            },
+            {
+              "id": "m1p1-q1",
+              "kind": "question",
+              "heading": "Check your model",
+              "questionKey": "m1p1.q1"
+            },
+            {
+              "id": "m1p1-history-intro",
+              "kind": "prose",
+              "heading": "Why the field keeps surprising people"
+            },
+            {
+              "id": "m1p1-timeline",
+              "kind": "activity",
+              "heading": "The AI timeline",
+              "activity": "ai-timeline",
+              "summary": "Learner explores major AI milestones and the paradigm shifts between symbolic AI, machine learning, deep learning, and generative AI."
+            },
+            {
+              "id": "m1p1-q2",
+              "kind": "question",
+              "questionKey": "m1p1.q2"
+            },
+            {
+              "id": "m1p1-fof-intro",
+              "kind": "prose",
+              "heading": "Test a claim of your own"
+            },
+            {
+              "id": "m1p1-fof",
+              "kind": "aiActivity",
+              "heading": "AI: Fact or Fiction?",
+              "promptKey": "fact_or_fiction"
+            },
+            {
+              "id": "m1p1-more",
+              "kind": "reveal",
+              "label": "Learn more: why \"the algorithm is biased\" is imprecise"
+            }
+          ],
+          "questions": [
+            {
+              "key": "m1p1.q1",
+              "moduleKey": "module-1",
+              "pageKey": "m1p1",
+              "position": 3,
+              "type": "single_choice",
+              "prompt": "A hospital installs a sepsis alert that fires when heart rate, temperature, and white cell count each cross fixed thresholds written by a clinical committee. Is this machine learning?",
+              "spec": {
+                "options": [
+                  {
+                    "value": "no_rules",
+                    "label": "No — the rules were written by people, not learned from data.",
+                    "feedback": "Correct. This is rule-based AI. It can be useful and it is auditable, but it did not learn anything, so it cannot discover a pattern the committee did not already know."
+                  },
+                  {
+                    "value": "yes_data",
+                    "label": "Yes — it uses patient data to make a prediction.",
+                    "feedback": "Using data at prediction time is not learning. The question is where the rules came from. Here a committee wrote them, so nothing was learned from examples."
+                  },
+                  {
+                    "value": "yes_ai",
+                    "label": "Yes — anything called AI is machine learning.",
+                    "feedback": "AI is the wider category. Rule-based expert systems were the dominant form of AI for decades and involve no learning at all."
+                  }
+                ],
+                "correct": "no_rules",
+                "explanation": "The dividing line is the origin of the rules. Hand-written rules → rule-based AI. Rules derived from labelled examples → machine learning."
+              },
+              "version": 1,
+              "isGraded": true
+            },
+            {
+              "key": "m1p1.q2",
+              "moduleKey": "module-1",
+              "pageKey": "m1p1",
+              "position": 6,
+              "type": "multi_choice",
+              "prompt": "Deep learning ideas existed in the 1980s but only became dominant around 2012. Which factors explain the gap? Select all that apply.",
+              "spec": {
+                "options": [
+                  {
+                    "value": "data",
+                    "label": "Large labelled datasets became available.",
+                    "feedback": "Yes — ImageNet-scale labelled data was the missing ingredient."
+                  },
+                  {
+                    "value": "compute",
+                    "label": "GPUs made training deep networks practical.",
+                    "feedback": "Yes — the same maths ran orders of magnitude faster on graphics hardware."
+                  },
+                  {
+                    "value": "brain",
+                    "label": "Scientists finally understood how the brain works.",
+                    "feedback": "No. Artificial neural networks are loosely brain-*inspired* but are not models of neuroscience, and no such breakthrough occurred."
+                  },
+                  {
+                    "value": "improvements",
+                    "label": "Practical training improvements (activation functions, regularization, initialization).",
+                    "feedback": "Yes — unglamorous engineering advances made deep networks trainable."
+                  }
+                ],
+                "correct": [
+                  "data",
+                  "compute",
+                  "improvements"
+                ],
+                "explanation": "Data, compute, and training tricks — not a new theory of intelligence. This is why \"the algorithm is better\" is rarely the whole story behind a performance jump."
+              },
+              "version": 1,
+              "isGraded": true
+            }
+          ]
+        },
+        {
+          "key": "m1p2",
+          "moduleKey": "module-1",
+          "position": 2,
+          "slug": "question-to-model",
+          "title": "From Question to Model",
+          "kicker": "Module 1 · Page 2",
+          "kind": "apply",
+          "objectives": [
+            "Sequence the six decisions that make up an AI study and identify where failures actually occur.",
+            "Recognize target leakage in a feature list.",
+            "Choose a data-splitting strategy that accounts for time, site, and repeated patients.",
+            "Justify an outlier-handling decision and describe it reproducibly."
+          ],
+          "requiredSections": [
+            "m1p2-lifecycle",
+            "m1p2-q1",
+            "m1p2-splitting",
+            "m1p2-outliers",
+            "m1p2-q2",
+            "m1p2-reflection"
+          ],
+          "estimatedMinutes": 25,
+          "contentVersion": 1,
+          "sections": [
+            {
+              "id": "m1p2-intro",
+              "kind": "prose",
+              "heading": "The six decisions"
+            },
+            {
+              "id": "m1p2-lifecycle",
+              "kind": "activity",
+              "heading": "Run a study end to end",
+              "activity": "lifecycle-simulator",
+              "summary": "Learner makes the six lifecycle decisions and receives targeted consequences for each choice."
+            },
+            {
+              "id": "m1p2-q1",
+              "kind": "question",
+              "heading": "The most expensive mistake",
+              "questionKey": "m1p2.q1"
+            },
+            {
+              "id": "m1p2-splitting",
+              "kind": "activity",
+              "heading": "Split the data four ways",
+              "activity": "split-strategy",
+              "summary": "Learner compares random, temporal, site-held-out, and grouped splits and sees the internal-versus-external performance gap each produces."
+            },
+            {
+              "id": "m1p2-split-note",
+              "kind": "callout",
+              "heading": "Why a random split flatters you"
+            },
+            {
+              "id": "m1p2-outlier-intro",
+              "kind": "prose",
+              "heading": "Then there is the boring part that decides everything"
+            },
+            {
+              "id": "m1p2-outliers",
+              "kind": "activity",
+              "heading": "Outlier handling lab",
+              "activity": "outlier-lab",
+              "summary": "Learner applies IQR or z-score detection, then compares removal, winsorizing, and median imputation on summary statistics."
+            },
+            {
+              "id": "m1p2-q2",
+              "kind": "question",
+              "questionKey": "m1p2.q2"
+            },
+            {
+              "id": "m1p2-reflection",
+              "kind": "question",
+              "heading": "Apply it to your own work",
+              "questionKey": "m1p2.q3"
+            },
+            {
+              "id": "m1p2-more",
+              "kind": "reveal",
+              "label": "Learn more: what to write in your methods section"
+            }
+          ],
+          "questions": [
+            {
+              "key": "m1p2.q1",
+              "moduleKey": "module-1",
+              "pageKey": "m1p2",
+              "position": 3,
+              "type": "single_choice",
+              "prompt": "A model predicting ICU mortality reaches AUC 0.94 in testing. One of its strongest features is \"number of lab tests ordered in the last 6 hours.\" What should worry you most?",
+              "spec": {
+                "options": [
+                  {
+                    "value": "leakage",
+                    "label": "The feature may encode the outcome: dying patients get tested more.",
+                    "feedback": "Correct — this is target leakage. The feature is a consequence of deterioration, not an independent predictor of it, so the model looks brilliant retrospectively and is useless prospectively."
+                  },
+                  {
+                    "value": "small",
+                    "label": "AUC 0.94 means the dataset is too small.",
+                    "feedback": "A high AUC is not itself evidence of a small dataset. The real problem here is what that particular feature represents."
+                  },
+                  {
+                    "value": "nothing",
+                    "label": "Nothing — AUC 0.94 is an excellent result.",
+                    "feedback": "A suspiciously good result deserves more scrutiny, not less. Ask what each strong feature actually measures and when it becomes available."
+                  },
+                  {
+                    "value": "interpretable",
+                    "label": "The model is not interpretable enough to trust.",
+                    "feedback": "Interpretability matters, but here the specific defect is identifiable without it: a feature that only exists because the outcome is already underway."
+                  }
+                ],
+                "correct": "leakage",
+                "explanation": "Ask of every feature: would this value be available, with this meaning, at the moment I need the prediction? If it only exists because the outcome is already happening, it is leakage."
+              },
+              "version": 1,
+              "isGraded": true
+            },
+            {
+              "key": "m1p2.q2",
+              "moduleKey": "module-1",
+              "pageKey": "m1p2",
+              "position": 8,
+              "type": "single_choice",
+              "prompt": "You remove all heart rates outside 1.5×IQR before modelling in-hospital mortality. What is the most likely consequence?",
+              "spec": {
+                "options": [
+                  {
+                    "value": "removes_signal",
+                    "label": "You remove some of the sickest patients, weakening the signal you care about.",
+                    "feedback": "Correct. Physiological extremes are often the strongest predictors of deterioration. A statistical outlier rule cannot tell a data-entry error from a crashing patient."
+                  },
+                  {
+                    "value": "improves",
+                    "label": "Model accuracy reliably improves because noise is gone.",
+                    "feedback": "Accuracy on your cleaned test set may rise, but it has risen partly because you deleted the hard cases. That is not a real improvement."
+                  },
+                  {
+                    "value": "nothing",
+                    "label": "Nothing much; outliers are rare by definition.",
+                    "feedback": "They are rare and disproportionately informative. In mortality prediction the tails carry most of the signal."
+                  }
+                ],
+                "correct": "removes_signal",
+                "explanation": "Prefer clinical plausibility ranges over purely statistical ones, handle implausible values as missing rather than deleting the patient, and report exactly what you did."
+              },
+              "version": 1,
+              "isGraded": true
+            },
+            {
+              "key": "m1p2.q3",
+              "moduleKey": "module-1",
+              "pageKey": "m1p2",
+              "position": 9,
+              "type": "free_text",
+              "prompt": "Think of a dataset you actually work with. Name one variable where an extreme value could be either an error or a real finding, and say how you would tell the difference.",
+              "spec": {
+                "minLength": 60,
+                "explanation": "The useful test is domain knowledge, not distribution: what value is physiologically possible, and what would have to be true for it to be real?"
+              },
+              "version": 1,
+              "isGraded": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "key": "module-2",
+      "position": 2,
+      "title": "Alignment",
+      "subtitle": "Ethics, fairness, and keeping a deployed model safe",
+      "summary": "Work through the ethical tensions a real biomedical AI project creates, then run the monitoring and transparency practices that keep a live model trustworthy.",
+      "accent": "teal",
+      "contentVersion": 1,
+      "pages": [
+        {
+          "key": "m2p1",
+          "moduleKey": "module-2",
+          "position": 1,
+          "slug": "principles-in-tension",
+          "title": "Principles in Tension",
+          "kicker": "Module 2 · Page 1",
+          "kind": "explore",
+          "objectives": [
+            "Name the four bioethics principles and identify which are in tension in a concrete AI case.",
+            "Explain why overall accuracy conceals subgroup failure, and which metrics expose it.",
+            "Decide when reliance on an AI tool is appropriate and what control makes it defensible."
+          ],
+          "requiredSections": [
+            "m2p1-q1",
+            "m2p1-q2",
+            "m2p1-fairness",
+            "m2p1-q3",
+            "m2p1-transcription"
+          ],
+          "estimatedMinutes": 22,
+          "contentVersion": 1,
+          "sections": [
+            {
+              "id": "m2p1-intro",
+              "kind": "prose",
+              "heading": "Four principles"
+            },
+            {
+              "id": "m2p1-case",
+              "kind": "callout",
+              "heading": "The case"
+            },
+            {
+              "id": "m2p1-q1",
+              "kind": "question",
+              "questionKey": "m2p1.q1"
+            },
+            {
+              "id": "m2p1-q2",
+              "kind": "question",
+              "heading": "Make the call",
+              "questionKey": "m2p1.q2"
+            },
+            {
+              "id": "m2p1-fairness-intro",
+              "kind": "prose",
+              "heading": "What a disparity actually looks like"
+            },
+            {
+              "id": "m2p1-fairness",
+              "kind": "activity",
+              "heading": "Subgroup performance explorer",
+              "activity": "fairness-explorer",
+              "summary": "Learner compares accuracy, sensitivity, specificity, and PPV across subgroups at varying thresholds and sees that overall accuracy conceals subgroup failure."
+            },
+            {
+              "id": "m2p1-q3",
+              "kind": "question",
+              "questionKey": "m2p1.q3"
+            },
+            {
+              "id": "m2p1-transcription-intro",
+              "kind": "prose",
+              "heading": "Appropriate reliance"
+            },
+            {
+              "id": "m2p1-transcription",
+              "kind": "question",
+              "questionKey": "m2p1.q4"
+            },
+            {
+              "id": "m2p1-more",
+              "kind": "reveal",
+              "label": "Learn more: fairness definitions that cannot all hold at once"
+            }
+          ],
+          "questions": [
+            {
+              "key": "m2p1.q1",
+              "moduleKey": "module-2",
+              "pageKey": "m2p1",
+              "position": 3,
+              "type": "multi_choice",
+              "prompt": "Which principles are in genuine tension in this case? Select all that apply.",
+              "spec": {
+                "options": [
+                  {
+                    "value": "beneficence",
+                    "label": "Beneficence — the model prevents disease for many patients now.",
+                    "feedback": "Yes. Withholding a working tool has a real cost that is easy to overlook."
+                  },
+                  {
+                    "value": "justice",
+                    "label": "Justice — the benefit and the error are unevenly distributed.",
+                    "feedback": "Yes. This is the crux: unequal performance means unequal benefit from the same tool."
+                  },
+                  {
+                    "value": "nonmaleficence",
+                    "label": "Non-maleficence — false positives cause real harm.",
+                    "feedback": "Yes. Unnecessary biopsies, surveillance, and insurance consequences are harms, not inconveniences."
+                  },
+                  {
+                    "value": "autonomy",
+                    "label": "Autonomy — patients cannot meaningfully consent to a risk score they were not told is less reliable for them.",
+                    "feedback": "Yes, and this is the one most often missed. Disclosure of differential performance is an autonomy question."
+                  }
+                ],
+                "correct": [
+                  "beneficence",
+                  "justice",
+                  "nonmaleficence",
+                  "autonomy"
+                ],
+                "explanation": "All four apply. Naming them individually is what turns \"this feels wrong\" into a decision you can defend and document."
+              },
+              "version": 1,
+              "isGraded": true
+            },
+            {
+              "key": "m2p1.q2",
+              "moduleKey": "module-2",
+              "pageKey": "m2p1",
+              "position": 4,
+              "type": "single_choice",
+              "prompt": "What should Dr. Lee do?",
+              "spec": {
+                "options": [
+                  {
+                    "value": "deploy_all",
+                    "label": "Deploy to everyone now; fix the disparity in the next version.",
+                    "feedback": "This maximizes immediate benefit and accepts a justice cost. It is defensible **only** with three things: disclosure of the differential performance to clinicians and patients, a stated timeline for remediation, and monitoring that would detect harm. Without those it is the disparity-entrenching option."
+                  },
+                  {
+                    "value": "deploy_restricted",
+                    "label": "Deploy only for the population where it is validated, and recruit for the rest.",
+                    "feedback": "The most common real-world answer, and it has a real cost people gloss over: it delivers benefit first to the already-better-served group. Defensible when paired with genuinely funded recruitment — not \"we intend to.\""
+                  },
+                  {
+                    "value": "delay",
+                    "label": "Delay entirely until performance is equitable.",
+                    "feedback": "Principled and expensive. Everyone forgoes benefit, including the under-served groups. Ask honestly: is the two-year cohort actually funded, or does \"delay\" mean \"never\"?"
+                  },
+                  {
+                    "value": "recalibrate",
+                    "label": "Deploy with group-specific recalibration and a higher alert threshold for the affected groups.",
+                    "feedback": "Technically the strongest option and the one most likely to be missed. Recalibration can reduce differential false-positive rates without new data collection. It raises its own question — is using race as a model input appropriate here? — which is exactly the discussion worth having."
+                  }
+                ],
+                "explanation": "Any of these can be right. What is never right is deploying without disclosure, monitoring, or a plan — because then nobody has made a decision at all."
+              },
+              "version": 1,
+              "isGraded": false
+            },
+            {
+              "key": "m2p1.q3",
+              "moduleKey": "module-2",
+              "pageKey": "m2p1",
+              "position": 7,
+              "type": "single_choice",
+              "prompt": "Your model has identical overall accuracy for two subgroups, but sensitivity is 0.82 in one and 0.61 in the other. What does that mean in practice?",
+              "spec": {
+                "options": [
+                  {
+                    "value": "missed_cases",
+                    "label": "The second group has substantially more missed cases — the model under-detects their disease.",
+                    "feedback": "Correct. Equal accuracy with unequal sensitivity usually means differing prevalence and a threshold that suits one group. The concrete harm is missed diagnoses."
+                  },
+                  {
+                    "value": "fine",
+                    "label": "Nothing important — accuracy is equal, so the model is fair.",
+                    "feedback": "Equal accuracy is one of the weakest fairness criteria. It is satisfiable by being right about the majority class in a low-prevalence group while missing most actual cases."
+                  },
+                  {
+                    "value": "more_data",
+                    "label": "It only means the second group has a smaller sample.",
+                    "feedback": "Sample size affects your *certainty* about the gap, not its existence. Check the confidence intervals, but do not use small n to dismiss it."
+                  }
+                ],
+                "correct": "missed_cases",
+                "explanation": "Always report sensitivity, specificity, and PPV per subgroup, with intervals. \"Overall accuracy\" is the metric most likely to let a disparity through."
+              },
+              "version": 1,
+              "isGraded": true
+            },
+            {
+              "key": "m2p1.q4",
+              "moduleKey": "module-2",
+              "pageKey": "m2p1",
+              "position": 9,
+              "type": "free_text",
+              "prompt": "Should the team use the tool? Name the specific failure that concerns you most and the control that would have to be in place before you would accept it.",
+              "spec": {
+                "minLength": 80,
+                "explanation": "A strong answer separates the four failures by severity. Fabrication and the tone misattribution are the serious ones: they corrupt the data and could defame a participant. Accent degradation is a systematic bias that skews which voices are represented. Metadata PHI is a compliance failure with a straightforward technical fix. \"Human verification against the audio\" is the control that makes fabrication survivable — and it removes most of the time saving, which is the honest trade-off."
+              },
+              "version": 1,
+              "isGraded": false
+            }
+          ]
+        },
+        {
+          "key": "m2p2",
+          "moduleKey": "module-2",
+          "position": 2,
+          "slug": "quality-and-safety",
+          "title": "Quality and Safety",
+          "kicker": "Module 2 · Page 2",
+          "kind": "apply",
+          "objectives": [
+            "Distinguish covariate shift from concept drift and describe how each is detected.",
+            "Separate discrimination from calibration and explain why a high AUC can still mislead a care pathway.",
+            "Write a model card that states intended use, out-of-scope use, and subgroup limitations."
+          ],
+          "requiredSections": [
+            "m2p2-drift",
+            "m2p2-q1",
+            "m2p2-calibration",
+            "m2p2-q2",
+            "m2p2-modelcard"
+          ],
+          "estimatedMinutes": 25,
+          "contentVersion": 1,
+          "sections": [
+            {
+              "id": "m2p2-intro",
+              "kind": "prose",
+              "heading": "Validation is a snapshot"
+            },
+            {
+              "id": "m2p2-drift",
+              "kind": "activity",
+              "heading": "Drift and retraining",
+              "activity": "drift-simulator",
+              "summary": "Learner advances deployment time to induce covariate shift, observes the false-positive rate climb, and compares doing nothing against retraining."
+            },
+            {
+              "id": "m2p2-q1",
+              "kind": "question",
+              "questionKey": "m2p2.q1"
+            },
+            {
+              "id": "m2p2-calibration-intro",
+              "kind": "prose",
+              "heading": "A model can rank perfectly and still lie about probability"
+            },
+            {
+              "id": "m2p2-calibration",
+              "kind": "activity",
+              "heading": "Calibration vs. discrimination",
+              "activity": "calibration-lab",
+              "summary": "Learner increases population mismatch and observes that AUC stays high while the reliability diagram bends away from the diagonal."
+            },
+            {
+              "id": "m2p2-q2",
+              "kind": "question",
+              "questionKey": "m2p2.q2"
+            },
+            {
+              "id": "m2p2-modelcard-intro",
+              "kind": "prose",
+              "heading": "Write down the limits"
+            },
+            {
+              "id": "m2p2-modelcard",
+              "kind": "activity",
+              "heading": "Build a model card",
+              "activity": "model-card-builder",
+              "summary": "Learner authors a model card covering intended use, out-of-scope use, training population, metrics, subgroup findings, and limitations."
+            },
+            {
+              "id": "m2p2-more",
+              "kind": "reveal",
+              "label": "Learn more: a minimum viable monitoring plan"
+            }
+          ],
+          "questions": [
+            {
+              "key": "m2p2.q1",
+              "moduleKey": "module-2",
+              "pageKey": "m2p2",
+              "position": 3,
+              "type": "single_choice",
+              "prompt": "Your sepsis alert's false-positive rate has doubled over six months. Nurses now dismiss most alerts. What is the first thing to check?",
+              "spec": {
+                "options": [
+                  {
+                    "value": "input_dist",
+                    "label": "Whether the input distributions have moved compared with the training data.",
+                    "feedback": "Correct, and it is the cheapest check available: it needs no outcome labels, so you can run it weekly. If lactate or WBC has shifted, you have found covariate shift."
+                  },
+                  {
+                    "value": "retrain",
+                    "label": "Retrain immediately on the last six months of data.",
+                    "feedback": "Retraining before diagnosing risks baking in the problem. If the shift came from a miscalibrated analyzer, you would be teaching the model that bad values are normal."
+                  },
+                  {
+                    "value": "threshold",
+                    "label": "Raise the alert threshold until the alert volume looks reasonable.",
+                    "feedback": "This suppresses the symptom and silently reduces sensitivity — you will miss real sepsis. It might be a justified stopgap, but only after you know what changed."
+                  },
+                  {
+                    "value": "training",
+                    "label": "Retrain the nursing staff on the importance of responding to alerts.",
+                    "feedback": "Alert fatigue is a rational response to a low-precision alert. The people are behaving correctly; the model is the problem."
+                  }
+                ],
+                "correct": "input_dist",
+                "explanation": "Diagnose before intervening. Distribution monitoring needs no labels and runs continuously, which is why it belongs in every deployment plan from day one."
+              },
+              "version": 1,
+              "isGraded": true
+            },
+            {
+              "key": "m2p2.q2",
+              "moduleKey": "module-2",
+              "pageKey": "m2p2",
+              "position": 6,
+              "type": "single_choice",
+              "prompt": "A vendor model has AUC 0.87 on your patients, but its reliability curve sits well below the diagonal. Your care pathway treats anyone above 40% predicted risk. What should you do?",
+              "spec": {
+                "options": [
+                  {
+                    "value": "recalibrate",
+                    "label": "Recalibrate on local data, then re-derive the threshold.",
+                    "feedback": "Correct. Below the diagonal means the model over-states risk, so a 40% cut point is capturing more people than intended. Recalibration (Platt scaling or isotonic regression) needs far less data than retraining and fixes exactly this."
+                  },
+                  {
+                    "value": "accept",
+                    "label": "Accept it — AUC 0.87 shows the model works.",
+                    "feedback": "AUC is threshold-free and tells you nothing about whether \"40%\" means 40%. Your pathway depends on the absolute number."
+                  },
+                  {
+                    "value": "retrain",
+                    "label": "Discard it and train your own model from scratch.",
+                    "feedback": "Possible, but you are throwing away good discrimination that you would have to rebuild. Recalibration preserves the ranking and fixes the probabilities."
+                  },
+                  {
+                    "value": "lower",
+                    "label": "Lower the threshold to 20% so more patients are captured.",
+                    "feedback": "Moving an uncalibrated threshold by intuition is guessing. Fix the probabilities first, then choose the threshold from the sensitivity you need."
+                  }
+                ],
+                "correct": "recalibrate",
+                "explanation": "Report both. Discrimination tells you whether the model ranks; calibration tells you whether its numbers mean what your protocol assumes."
+              },
+              "version": 1,
+              "isGraded": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "key": "module-3",
+      "position": 3,
+      "title": "Data",
+      "subtitle": "Sourcing it ethically, then making it usable",
+      "summary": "Audit a biomedical dataset against consent, representation, security, and benefit — then run the preparation decisions that determine what any model can learn.",
+      "accent": "violet",
+      "contentVersion": 1,
+      "pages": [
+        {
+          "key": "m3p1",
+          "moduleKey": "module-3",
+          "position": 1,
+          "slug": "sourcing-data",
+          "title": "Sourcing Data Responsibly",
+          "kicker": "Module 3 · Page 1",
+          "kind": "explore",
+          "objectives": [
+            "Explain why informed consent requires comprehension rather than a signature.",
+            "Identify how passive recruitment reproduces existing inequities, and which strategies change that.",
+            "Select data protections proportionate to the sensitivity of the data.",
+            "Describe what a common data model standardizes and why fields are dropped."
+          ],
+          "requiredSections": [
+            "m3p1-consent",
+            "m3p1-q1",
+            "m3p1-representation",
+            "m3p1-security",
+            "m3p1-omop",
+            "m3p1-q2"
+          ],
+          "estimatedMinutes": 22,
+          "contentVersion": 1,
+          "sections": [
+            {
+              "id": "m3p1-intro",
+              "kind": "prose",
+              "heading": "You are the compliance officer"
+            },
+            {
+              "id": "m3p1-consent",
+              "kind": "activity",
+              "heading": "Audit 1 · Consent as comprehension",
+              "activity": "consent-rewriter",
+              "summary": "Learner rewrites consent language across three literacy levels and sees the effect on comprehension and on what the participant can meaningfully agree to."
+            },
+            {
+              "id": "m3p1-q1",
+              "kind": "question",
+              "questionKey": "m3p1.q1"
+            },
+            {
+              "id": "m3p1-representation",
+              "kind": "activity",
+              "heading": "Audit 2 · Who is missing",
+              "activity": "representation-planner",
+              "summary": "Learner sets a representation target for an under-served group and selects active recruitment strategies, seeing which combinations close the gap."
+            },
+            {
+              "id": "m3p1-rep-note",
+              "kind": "callout",
+              "heading": "Passive recruitment reproduces existing access"
+            },
+            {
+              "id": "m3p1-security",
+              "kind": "activity",
+              "heading": "Audit 3 · Protecting the data",
+              "activity": "security-audit",
+              "summary": "Learner assembles a layered protection plan and sees which residual risks each layer does and does not address."
+            },
+            {
+              "id": "m3p1-omop-intro",
+              "kind": "prose",
+              "heading": "Audit 4 · Making it usable by anyone else"
+            },
+            {
+              "id": "m3p1-omop",
+              "kind": "activity",
+              "heading": "Standardize a patient record",
+              "activity": "omop-mapper",
+              "summary": "Learner maps source values to OMOP concept identifiers and observes which identifiers are dropped during standardization."
+            },
+            {
+              "id": "m3p1-q2",
+              "kind": "question",
+              "questionKey": "m3p1.q2"
+            },
+            {
+              "id": "m3p1-more",
+              "kind": "reveal",
+              "label": "Learn more: returning value to participants"
+            }
+          ],
+          "questions": [
+            {
+              "key": "m3p1.q1",
+              "moduleKey": "module-3",
+              "pageKey": "m3p1",
+              "position": 3,
+              "type": "single_choice",
+              "prompt": "A participant signed a consent form they did not understand. Legally the form is valid. Is the consent informed?",
+              "spec": {
+                "options": [
+                  {
+                    "value": "no",
+                    "label": "No — informed consent requires comprehension, not just a signature.",
+                    "feedback": "Correct. A signature documents consent; it does not create it. If the person cannot state what they agreed to, the ethical requirement is unmet even where the legal one is satisfied."
+                  },
+                  {
+                    "value": "yes",
+                    "label": "Yes — they had the opportunity to read it and ask questions.",
+                    "feedback": "Opportunity is not comprehension. Consent documents routinely test at graduate reading level while the median participant reads well below it; \"you could have asked\" shifts a researcher's duty onto the participant."
+                  },
+                  {
+                    "value": "depends",
+                    "label": "It depends on whether the study is high risk.",
+                    "feedback": "Risk level changes how much explanation is owed, not whether comprehension is required."
+                  }
+                ],
+                "correct": "no",
+                "explanation": "The practical test: ask the participant to say back, in their own words, what will happen to their data and how to withdraw. If they cannot, the form failed — and it is the form that needs fixing."
+              },
+              "version": 1,
+              "isGraded": true
+            },
+            {
+              "key": "m3p1.q2",
+              "moduleKey": "module-3",
+              "pageKey": "m3p1",
+              "position": 9,
+              "type": "single_choice",
+              "prompt": "During standardization, patient name and full address are dropped while year of birth is kept. Why keep year of birth?",
+              "spec": {
+                "options": [
+                  {
+                    "value": "age_needed",
+                    "label": "Age is clinically essential, and year alone is far less identifying than a full date.",
+                    "feedback": "Correct. This is data minimization in action: keep the analytic resolution you need and no more. Full date of birth plus ZIP plus sex is famously re-identifying; year of birth alone is much weaker."
+                  },
+                  {
+                    "value": "not_pii",
+                    "label": "Year of birth is not personally identifiable information.",
+                    "feedback": "It is a quasi-identifier — weak alone, potent in combination. It is kept because it is *necessary*, not because it is harmless."
+                  },
+                  {
+                    "value": "required",
+                    "label": "The common data model requires it.",
+                    "feedback": "The model has the field because researchers need age. The reasoning runs from the analytic need, not from the schema."
+                  }
+                ],
+                "correct": "age_needed",
+                "explanation": "Every retained field should survive one question: what analysis becomes impossible without it? Name and street address never survive it. Year of birth usually does."
+              },
+              "version": 1,
+              "isGraded": true
+            }
+          ]
+        },
+        {
+          "key": "m3p2",
+          "moduleKey": "module-3",
+          "position": 2,
+          "slug": "preparing-data",
+          "title": "Preparing Data for AI",
+          "kicker": "Module 3 · Page 2",
+          "kind": "apply",
+          "objectives": [
+            "Interpret percent agreement alongside Cohen's kappa and explain the low-prevalence paradox.",
+            "State the assumption behind mean imputation and when it fails in clinical data.",
+            "Explain what federated learning does and does not solve."
+          ],
+          "requiredSections": [
+            "m3p2-agreement",
+            "m3p2-q1",
+            "m3p2-pipeline",
+            "m3p2-q2",
+            "m3p2-federated",
+            "m3p2-q3"
+          ],
+          "estimatedMinutes": 25,
+          "contentVersion": 1,
+          "sections": [
+            {
+              "id": "m3p2-intro",
+              "kind": "prose",
+              "heading": "No model beats its labels"
+            },
+            {
+              "id": "m3p2-agreement",
+              "kind": "activity",
+              "heading": "Inter-rater agreement",
+              "activity": "label-agreement",
+              "summary": "Learner varies annotator count, inspects percent agreement versus Cohen's kappa, and reviews the specific cases where readers disagree."
+            },
+            {
+              "id": "m3p2-q1",
+              "kind": "question",
+              "questionKey": "m3p2.q1"
+            },
+            {
+              "id": "m3p2-pipeline-intro",
+              "kind": "prose",
+              "heading": "Then the preparation decisions"
+            },
+            {
+              "id": "m3p2-pipeline",
+              "kind": "activity",
+              "heading": "Preprocessing pipeline",
+              "activity": "preprocessing-pipeline",
+              "summary": "Learner tunes z-score threshold, imputation strategy, and scaling, seeing each step's effect on the distribution and on how many rows survive."
+            },
+            {
+              "id": "m3p2-q2",
+              "kind": "question",
+              "questionKey": "m3p2.q2"
+            },
+            {
+              "id": "m3p2-fed-intro",
+              "kind": "prose",
+              "heading": "Collaborating without moving the data"
+            },
+            {
+              "id": "m3p2-federated",
+              "kind": "activity",
+              "heading": "Run a federated round",
+              "activity": "federated-round",
+              "summary": "Learner runs local training and aggregation, seeing that no rows are shared and that site heterogeneity degrades the aggregated model."
+            },
+            {
+              "id": "m3p2-q3",
+              "kind": "question",
+              "questionKey": "m3p2.q3"
+            },
+            {
+              "id": "m3p2-more",
+              "kind": "reveal",
+              "label": "Learn more: the preprocessing record that makes a study reproducible"
+            }
+          ],
+          "questions": [
+            {
+              "key": "m3p2.q1",
+              "moduleKey": "module-3",
+              "pageKey": "m3p2",
+              "position": 3,
+              "type": "single_choice",
+              "prompt": "Two readers agree on 92% of cases, but Cohen's kappa is only 0.31. What is going on?",
+              "spec": {
+                "options": [
+                  {
+                    "value": "prevalence",
+                    "label": "The condition is rare, so most agreement is on the easy negatives and could happen by chance.",
+                    "feedback": "Correct. Kappa corrects for chance agreement. At 5% prevalence, two readers who both say \"normal\" almost always will hit ~90% agreement while agreeing on almost none of the positives."
+                  },
+                  {
+                    "value": "error",
+                    "label": "Kappa was calculated incorrectly.",
+                    "feedback": "This pattern — high raw agreement, low kappa — is the expected and well-documented behavior at low prevalence, not a computational error."
+                  },
+                  {
+                    "value": "good",
+                    "label": "Nothing; 92% agreement is good enough to proceed.",
+                    "feedback": "For a rare finding, 92% agreement can mean the readers agree on nearly nothing that matters. Kappa 0.31 is \"fair\" at best."
+                  }
+                ],
+                "correct": "prevalence",
+                "explanation": "Report both, plus agreement restricted to positive cases. For rare findings, the positive-case agreement is the number that tells you whether your labels support the study."
+              },
+              "version": 1,
+              "isGraded": true
+            },
+            {
+              "key": "m3p2.q2",
+              "moduleKey": "module-3",
+              "pageKey": "m3p2",
+              "position": 6,
+              "type": "single_choice",
+              "prompt": "Oxygen saturation is missing for 10% of patients. You fill those with the cohort mean. What have you assumed?",
+              "spec": {
+                "options": [
+                  {
+                    "value": "mcar",
+                    "label": "That the values are missing for reasons unrelated to how sick the patient is.",
+                    "feedback": "Correct — that is missing-completely-at-random, and it is usually false in clinical data. Sats often go unrecorded because the patient was stable and nobody bothered, which means the missing values are systematically *better* than average, not average."
+                  },
+                  {
+                    "value": "nothing",
+                    "label": "Nothing; mean imputation is a neutral default.",
+                    "feedback": "It is a strong assumption disguised as a default. It also shrinks variance and weakens any real association with the outcome."
+                  },
+                  {
+                    "value": "normal",
+                    "label": "That the variable is normally distributed.",
+                    "feedback": "Distribution shape affects whether the mean is a sensible center, but the load-bearing assumption is about *why* the data is missing."
+                  }
+                ],
+                "correct": "mcar",
+                "explanation": "Missingness is often informative. Two practical moves: add a \"was this measured\" indicator variable, and compare your result under mean imputation against multiple imputation or complete-case analysis."
+              },
+              "version": 1,
+              "isGraded": true
+            },
+            {
+              "key": "m3p2.q3",
+              "moduleKey": "module-3",
+              "pageKey": "m3p2",
+              "position": 9,
+              "type": "multi_choice",
+              "prompt": "Federated learning shares only model parameters. Which concerns does that leave unresolved? Select all that apply.",
+              "spec": {
+                "options": [
+                  {
+                    "value": "inversion",
+                    "label": "Parameters can leak information about individual training records.",
+                    "feedback": "Yes. Model-inversion and membership-inference attacks are demonstrated, which is why differential privacy is often layered on top."
+                  },
+                  {
+                    "value": "heterogeneity",
+                    "label": "Sites that preprocess differently produce incompatible parameters.",
+                    "feedback": "Yes, and this is the practical killer. Federated learning requires every site to agree on the pipeline *before* training — harmonization does not disappear, it moves earlier."
+                  },
+                  {
+                    "value": "bias",
+                    "label": "A group absent from every participating site stays absent from the model.",
+                    "feedback": "Yes. Federation broadens the sample; it does not fix a shared blind spot."
+                  },
+                  {
+                    "value": "accuracy",
+                    "label": "It always produces a less accurate model than pooling would.",
+                    "feedback": "Not always. With similar site distributions, federated averaging can approach pooled performance. With very different sites it degrades — which is what the simulation shows."
+                  }
+                ],
+                "correct": [
+                  "inversion",
+                  "heterogeneity",
+                  "bias"
+                ],
+                "explanation": "Federated learning solves data *transfer*, not data *quality*, *representation*, or *privacy in the absolute*. It is one control among several, not a substitute for governance."
+              },
+              "version": 1,
+              "isGraded": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "key": "module-4",
+      "position": 4,
+      "title": "Machine Learning",
+      "subtitle": "How models learn, and how to tell whether one is any good",
+      "summary": "Build an intuition for fitting, complexity, and validation, then evaluate and explain a model the way a reviewer or a clinician would.",
+      "accent": "amber",
+      "contentVersion": 1,
+      "pages": [
+        {
+          "key": "m4p1",
+          "moduleKey": "module-4",
+          "position": 1,
+          "slug": "how-models-learn",
+          "title": "How Models Learn",
+          "kicker": "Module 4 · Page 1",
+          "kind": "explore",
+          "objectives": [
+            "Distinguish overfitting from underfitting using the gap between training and test performance.",
+            "Identify the complexity at which a model stops generalizing.",
+            "Choose a validation strategy appropriate to repeated measures and class imbalance."
+          ],
+          "requiredSections": [
+            "m4p1-q1",
+            "m4p1-boundary",
+            "m4p1-q2",
+            "m4p1-curve",
+            "m4p1-cv",
+            "m4p1-q3"
+          ],
+          "estimatedMinutes": 24,
+          "contentVersion": 1,
+          "sections": [
+            {
+              "id": "m4p1-intro",
+              "kind": "prose",
+              "heading": "Features, labels, and the split"
+            },
+            {
+              "id": "m4p1-q1",
+              "kind": "question",
+              "heading": "Predict before you look",
+              "questionKey": "m4p1.q1"
+            },
+            {
+              "id": "m4p1-boundary",
+              "kind": "activity",
+              "heading": "Overfitting and underfitting",
+              "activity": "decision-boundary",
+              "summary": "Learner varies model complexity and compares decision-boundary shape against training and test accuracy."
+            },
+            {
+              "id": "m4p1-q2",
+              "kind": "question",
+              "questionKey": "m4p1.q2"
+            },
+            {
+              "id": "m4p1-curve",
+              "kind": "activity",
+              "heading": "Find the sweet spot",
+              "activity": "complexity-curve",
+              "summary": "Learner sweeps model complexity and identifies the divergence point between training and test accuracy."
+            },
+            {
+              "id": "m4p1-cv-intro",
+              "kind": "prose",
+              "heading": "One split is a coin flip"
+            },
+            {
+              "id": "m4p1-cv",
+              "kind": "activity",
+              "heading": "Compare validation strategies",
+              "activity": "cross-validation",
+              "summary": "Learner compares validation strategies and observes fold-to-fold variance and the effect of stratification and grouping."
+            },
+            {
+              "id": "m4p1-q3",
+              "kind": "question",
+              "questionKey": "m4p1.q3"
+            },
+            {
+              "id": "m4p1-more",
+              "kind": "reveal",
+              "label": "Learn more: choosing a model family"
+            }
+          ],
+          "questions": [
+            {
+              "key": "m4p1.q1",
+              "moduleKey": "module-4",
+              "pageKey": "m4p1",
+              "position": 2,
+              "type": "single_choice",
+              "prompt": "A k-nearest-neighbour classifier with k=1 labels each new point by its single closest neighbour. How will its accuracy on the training data compare with a model using k=25?",
+              "spec": {
+                "options": [
+                  {
+                    "value": "much_higher",
+                    "label": "Much higher — close to perfect.",
+                    "feedback": "Correct, and it means nothing. With k=1 each training point is its own nearest neighbour, so training accuracy is ~100% by construction. This is why training accuracy is never evidence."
+                  },
+                  {
+                    "value": "similar",
+                    "label": "About the same.",
+                    "feedback": "They differ sharply on training data. k=1 memorizes it; k=25 averages over a wide neighbourhood and will misclassify some training points."
+                  },
+                  {
+                    "value": "lower",
+                    "label": "Lower, because k=1 is too simple.",
+                    "feedback": "k=1 is the *most* complex setting, not the simplest — it can carve out a region around every single point. Larger k means a smoother, simpler boundary."
+                  }
+                ],
+                "correct": "much_higher",
+                "explanation": "High training accuracy with low test accuracy is the signature of overfitting. You are about to see the boundary that produces it."
+              },
+              "version": 1,
+              "isGraded": true
+            },
+            {
+              "key": "m4p1.q2",
+              "moduleKey": "module-4",
+              "pageKey": "m4p1",
+              "position": 4,
+              "type": "single_choice",
+              "prompt": "Your model scores 0.97 on training data and 0.71 on held-out data. What does that gap indicate?",
+              "spec": {
+                "options": [
+                  {
+                    "value": "overfit",
+                    "label": "Overfitting — the model learned patterns specific to the training sample.",
+                    "feedback": "Correct. The remedies are more data, a simpler model, regularization, or fewer features — and re-checking for leakage while you are there."
+                  },
+                  {
+                    "value": "underfit",
+                    "label": "Underfitting — the model is too simple.",
+                    "feedback": "Underfitting looks different: both scores are poor and close together. A large gap means the model captured too much, not too little."
+                  },
+                  {
+                    "value": "test_hard",
+                    "label": "The test set happens to be harder.",
+                    "feedback": "Possible with a small or unluckily-split test set — which is precisely why cross-validation exists. But a 26-point gap is far more likely to be overfitting."
+                  }
+                ],
+                "correct": "overfit",
+                "explanation": "Watch the gap, not either number alone. Then find the complexity where test performance peaks — which is what the next activity does."
+              },
+              "version": 1,
+              "isGraded": true
+            },
+            {
+              "key": "m4p1.q3",
+              "moduleKey": "module-4",
+              "pageKey": "m4p1",
+              "position": 8,
+              "type": "single_choice",
+              "prompt": "Your dataset has 200 admissions from 120 unique patients — some patients appear more than once. Which validation strategy is appropriate?",
+              "spec": {
+                "options": [
+                  {
+                    "value": "grouped",
+                    "label": "Grouped cross-validation, keeping all of a patient's admissions in the same fold.",
+                    "feedback": "Correct. Otherwise the model sees the same patient in training and testing and can recognize the individual rather than the condition. This is the most common silent leak in clinical ML."
+                  },
+                  {
+                    "value": "stratified",
+                    "label": "Stratified k-fold on the outcome.",
+                    "feedback": "Stratification balances outcome prevalence across folds, which is worth doing — but it does nothing about the same patient appearing on both sides. Use grouped *and* stratified where you can."
+                  },
+                  {
+                    "value": "random",
+                    "label": "Standard k-fold; with 200 rows the effect is negligible.",
+                    "feedback": "With 80 repeat admissions among 200 rows the effect is substantial, and it inflates performance in exactly the flattering direction."
+                  },
+                  {
+                    "value": "loo",
+                    "label": "Leave-one-out, since the dataset is small.",
+                    "feedback": "Leave-one-out uses the data efficiently but has the same patient-leakage problem, and its variance estimate is unreliable."
+                  }
+                ],
+                "correct": "grouped",
+                "explanation": "Ask what unit your conclusion is about. If it is patients, patients must not straddle the split — whatever the rows look like."
+              },
+              "version": 1,
+              "isGraded": true
+            }
+          ]
+        },
+        {
+          "key": "m4p2",
+          "moduleKey": "module-4",
+          "position": 2,
+          "slug": "evaluating-models",
+          "title": "Evaluating and Explaining",
+          "kicker": "Module 4 · Page 2",
+          "kind": "apply",
+          "objectives": [
+            "Explain why accuracy is inadequate for imbalanced clinical outcomes.",
+            "Predict how sensitivity, specificity, and PPV move as the decision threshold changes.",
+            "Explain why PPV depends on prevalence and what that means for deployment.",
+            "Distinguish global from local model explanation and use each appropriately."
+          ],
+          "requiredSections": [
+            "m4p2-q1",
+            "m4p2-threshold",
+            "m4p2-q2",
+            "m4p2-explain",
+            "m4p2-whatif",
+            "m4p2-q3"
+          ],
+          "estimatedMinutes": 26,
+          "contentVersion": 1,
+          "sections": [
+            {
+              "id": "m4p2-intro",
+              "kind": "prose",
+              "heading": "Why accuracy misleads"
+            },
+            {
+              "id": "m4p2-q1",
+              "kind": "question",
+              "heading": "Predict first",
+              "questionKey": "m4p2.q1"
+            },
+            {
+              "id": "m4p2-threshold",
+              "kind": "activity",
+              "heading": "Move the threshold",
+              "activity": "threshold-explorer",
+              "summary": "Learner varies the decision threshold and observes the coupled movement of the confusion matrix, sensitivity, specificity, PPV, F1, and the ROC operating point."
+            },
+            {
+              "id": "m4p2-q2",
+              "kind": "question",
+              "questionKey": "m4p2.q2"
+            },
+            {
+              "id": "m4p2-ppv-note",
+              "kind": "callout",
+              "heading": "Why this decides deployments"
+            },
+            {
+              "id": "m4p2-explain-intro",
+              "kind": "prose",
+              "heading": "Global and local explanation"
+            },
+            {
+              "id": "m4p2-explain",
+              "kind": "activity",
+              "heading": "Explain the model",
+              "activity": "explanation-lab",
+              "summary": "Learner compares global feature importance with per-patient contribution breakdowns from a transparent logistic model."
+            },
+            {
+              "id": "m4p2-whatif",
+              "kind": "activity",
+              "heading": "What-if simulator",
+              "activity": "what-if",
+              "summary": "Learner constructs a synthetic patient profile and observes the model's live risk prediction and confidence."
+            },
+            {
+              "id": "m4p2-q3",
+              "kind": "question",
+              "questionKey": "m4p2.q3"
+            },
+            {
+              "id": "m4p2-more",
+              "kind": "reveal",
+              "label": "Learn more: reading a ROC curve honestly"
+            }
+          ],
+          "questions": [
+            {
+              "key": "m4p2.q1",
+              "moduleKey": "module-4",
+              "pageKey": "m4p2",
+              "position": 2,
+              "type": "single_choice",
+              "prompt": "You lower the decision threshold from 0.5 to 0.3 so the model flags more patients. What happens?",
+              "spec": {
+                "options": [
+                  {
+                    "value": "sens_up_spec_down",
+                    "label": "Sensitivity rises, specificity falls.",
+                    "feedback": "Correct, and this trade is unavoidable — it is the same model, just a different cut point. The question is never \"which is better\" but \"which error costs more here\"."
+                  },
+                  {
+                    "value": "both_up",
+                    "label": "Both rise, because the model is more cautious.",
+                    "feedback": "Moving one threshold cannot improve both. To improve both you need a genuinely better model, not a different cut point."
+                  },
+                  {
+                    "value": "auc_up",
+                    "label": "AUC rises.",
+                    "feedback": "AUC is computed across all thresholds, so it does not change when you pick one. That is exactly why AUC alone cannot tell you how the model will behave in your clinic."
+                  }
+                ],
+                "correct": "sens_up_spec_down",
+                "explanation": "For a screening test that triggers a cheap confirmatory step, buy sensitivity. For one that triggers an invasive procedure, protect specificity."
+              },
+              "version": 1,
+              "isGraded": true
+            },
+            {
+              "key": "m4p2.q2",
+              "moduleKey": "module-4",
+              "pageKey": "m4p2",
+              "position": 4,
+              "type": "slider_estimate",
+              "prompt": "A test with 90% sensitivity and 90% specificity is applied where the condition affects 1% of patients. Of 100 patients who test positive, roughly how many actually have the condition?",
+              "spec": {
+                "correct": {
+                  "min": 4,
+                  "max": 14
+                },
+                "min": 0,
+                "max": 100,
+                "step": 1,
+                "unit": "%",
+                "explanation": "About 8%. Out of 10,000 patients, 100 have the condition and 90 are caught; 9,900 do not and 990 test positive anyway. So 90 true positives among 1,080 positives ≈ 8%. A \"90/90\" test is right about the diagnosis roughly one time in twelve at this prevalence — the single most consequential fact about screening, and the most counter-intuitive.",
+                "correctFeedback": "Close. The answer is ~8%, and most people guess 90%. False positives from the large healthy majority swamp the true positives.",
+                "incorrectFeedback": "The answer is ~8%. Work it through with 10,000 patients: 100 with the condition → 90 caught. 9,900 without → 990 false positives. 90 / (90 + 990) ≈ 8%."
+              },
+              "version": 1,
+              "isGraded": true
+            },
+            {
+              "key": "m4p2.q3",
+              "moduleKey": "module-4",
+              "pageKey": "m4p2",
+              "position": 9,
+              "type": "free_text",
+              "prompt": "You are presenting this model to clinicians who will use it. In three or four sentences, describe its performance and its limits in the way you would actually say it out loud.",
+              "spec": {
+                "minLength": 100,
+                "explanation": "A good version names the operating point (not just AUC), states PPV with the prevalence it assumes, names at least one population where the model is not validated, and says what the clinician should do when they disagree with it. If you said \"AUC 0.87\" and stopped, the audience learned nothing actionable."
+              },
+              "version": 1,
+              "isGraded": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "key": "module-5",
+      "position": 5,
+      "title": "Images",
+      "subtitle": "How a scan becomes numbers, and what happens to those numbers",
+      "summary": "Build the mental model that medical images are arrays of intensities, then run the transformations every imaging AI pipeline applies before a model ever sees a pixel.",
+      "accent": "rose",
+      "contentVersion": 1,
+      "pages": [
+        {
+          "key": "m5p1",
+          "moduleKey": "module-5",
+          "position": 1,
+          "slug": "images-as-data",
+          "title": "Images as Data",
+          "kicker": "Module 5 · Page 1",
+          "kind": "explore",
+          "objectives": [
+            "Describe a medical image as an array of intensity values.",
+            "Explain X-ray attenuation and read an intensity histogram.",
+            "Explain how window and level change a model's input without changing the data."
+          ],
+          "requiredSections": [
+            "m5p1-pixels",
+            "m5p1-q1",
+            "m5p1-attenuation",
+            "m5p1-q2",
+            "m5p1-window",
+            "m5p1-q3"
+          ],
+          "estimatedMinutes": 20,
+          "contentVersion": 1,
+          "sections": [
+            {
+              "id": "m5p1-intro",
+              "kind": "prose",
+              "heading": "There is no image in the computer"
+            },
+            {
+              "id": "m5p1-pixels",
+              "kind": "activity",
+              "heading": "See the numbers",
+              "activity": "pixel-reveal",
+              "summary": "Learner toggles between rendered pixels and their numeric values to internalize that an image is an array."
+            },
+            {
+              "id": "m5p1-q1",
+              "kind": "question",
+              "questionKey": "m5p1.q1"
+            },
+            {
+              "id": "m5p1-atten-intro",
+              "kind": "prose",
+              "heading": "Where the numbers come from"
+            },
+            {
+              "id": "m5p1-attenuation",
+              "kind": "activity",
+              "heading": "Build an X-ray",
+              "activity": "attenuation-phantom",
+              "summary": "Learner adjusts tissue densities in a simulated radiograph and sees the corresponding peaks move in the intensity histogram."
+            },
+            {
+              "id": "m5p1-q2",
+              "kind": "question",
+              "questionKey": "m5p1.q2"
+            },
+            {
+              "id": "m5p1-window-intro",
+              "kind": "prose",
+              "heading": "Windowing: the same data, a different view"
+            },
+            {
+              "id": "m5p1-window",
+              "kind": "activity",
+              "heading": "Window and level",
+              "activity": "window-level",
+              "summary": "Learner adjusts window centre and width and observes which structures become visible under each setting."
+            },
+            {
+              "id": "m5p1-q3",
+              "kind": "question",
+              "questionKey": "m5p1.q3"
+            },
+            {
+              "id": "m5p1-more",
+              "kind": "reveal",
+              "label": "Learn more: choosing a modality"
+            }
+          ],
+          "questions": [
+            {
+              "key": "m5p1.q1",
+              "moduleKey": "module-5",
+              "pageKey": "m5p1",
+              "position": 3,
+              "type": "single_choice",
+              "prompt": "How much data is a single 512×512 8-bit grayscale slice?",
+              "spec": {
+                "options": [
+                  {
+                    "value": "quarter_mb",
+                    "label": "About 262,000 values — roughly a quarter of a megabyte uncompressed.",
+                    "feedback": "Correct: 512 × 512 = 262,144 bytes at one byte per pixel. A 300-slice CT is therefore ~79 MB before compression, which is why imaging AI is an infrastructure problem as much as a modelling one."
+                  },
+                  {
+                    "value": "few_kb",
+                    "label": "A few kilobytes.",
+                    "feedback": "That would be about 3,000 pixels — a 55×55 image. Compressed formats can reach a few hundred KB, but the raw array is much larger."
+                  },
+                  {
+                    "value": "megabytes",
+                    "label": "Tens of megabytes.",
+                    "feedback": "That is the scale of a full CT *volume*, not one slice."
+                  }
+                ],
+                "correct": "quarter_mb",
+                "explanation": "Real CT is usually 12–16 bit, so multiply by two. This is why imaging models are trained on GPUs and why moving a study between institutions is non-trivial."
+              },
+              "version": 1,
+              "isGraded": true
+            },
+            {
+              "key": "m5p1.q2",
+              "moduleKey": "module-5",
+              "pageKey": "m5p1",
+              "position": 6,
+              "type": "single_choice",
+              "prompt": "You bring the soft-tissue density close to the bone density. What happens to the histogram, and why does it matter for AI?",
+              "spec": {
+                "options": [
+                  {
+                    "value": "merge",
+                    "label": "The two peaks merge, and a model can no longer separate the tissues by intensity alone.",
+                    "feedback": "Correct. Overlapping intensity distributions are exactly why low-contrast findings are hard for both radiologists and models, and why contrast enhancement exists as a preprocessing step."
+                  },
+                  {
+                    "value": "brighter",
+                    "label": "The image gets brighter overall but the peaks stay separate.",
+                    "feedback": "Overall brightness shifts, but the important change is the loss of *separation* between the two peaks."
+                  },
+                  {
+                    "value": "nothing",
+                    "label": "Nothing important — the model learns shape, not intensity.",
+                    "feedback": "Convolutional networks learn from local intensity *patterns*. If two tissues have the same intensity, there is no local pattern distinguishing them at the boundary."
+                  }
+                ],
+                "correct": "merge",
+                "explanation": "Separable intensity distributions are the substrate everything else is built on. When they overlap, you need contrast enhancement, a different modality, or a different feature."
+              },
+              "version": 1,
+              "isGraded": true
+            },
+            {
+              "key": "m5p1.q3",
+              "moduleKey": "module-5",
+              "pageKey": "m5p1",
+              "position": 9,
+              "type": "multi_choice",
+              "prompt": "A radiology AI trained at one hospital performs poorly at another. Which image-level differences could explain it? Select all that apply.",
+              "spec": {
+                "options": [
+                  {
+                    "value": "window",
+                    "label": "Different default window/level presets.",
+                    "feedback": "Yes — this alone can shift the input distribution beyond what the model saw."
+                  },
+                  {
+                    "value": "scanner",
+                    "label": "Different scanner manufacturers and reconstruction kernels.",
+                    "feedback": "Yes. Reconstruction kernels change texture and noise characteristics, which convolutional models are sensitive to."
+                  },
+                  {
+                    "value": "resolution",
+                    "label": "Different pixel spacing and slice thickness.",
+                    "feedback": "Yes. A lesion spanning 20 pixels at one site spans 12 at another, so learned size cues stop applying."
+                  },
+                  {
+                    "value": "labels",
+                    "label": "Different conventions for what counts as a positive finding.",
+                    "feedback": "Yes — and this is the one that gets missed because it is not visible in the image at all. It is a label-definition mismatch."
+                  }
+                ],
+                "correct": [
+                  "window",
+                  "scanner",
+                  "resolution",
+                  "labels"
+                ],
+                "explanation": "All four. This is why imaging AI needs external validation on genuinely different equipment, and why the paper must state acquisition parameters."
+              },
+              "version": 1,
+              "isGraded": true
+            }
+          ]
+        },
+        {
+          "key": "m5p2",
+          "moduleKey": "module-5",
+          "position": 2,
+          "slug": "enhancing-images",
+          "title": "Enhancing and Analyzing",
+          "kicker": "Module 5 · Page 2",
+          "kind": "apply",
+          "objectives": [
+            "Compute a convolution by hand and explain why an edge kernel sums to zero.",
+            "Match a denoising filter to the type of noise present.",
+            "Describe the cost of contrast enhancement as well as its benefit.",
+            "Audit an imaging pipeline for reproducibility."
+          ],
+          "requiredSections": [
+            "m5p2-kernel",
+            "m5p2-q1",
+            "m5p2-noise",
+            "m5p2-q2",
+            "m5p2-histogram",
+            "m5p2-checklist"
+          ],
+          "estimatedMinutes": 24,
+          "contentVersion": 1,
+          "sections": [
+            {
+              "id": "m5p2-intro",
+              "kind": "prose",
+              "heading": "One operation, everything else follows"
+            },
+            {
+              "id": "m5p2-kernel",
+              "kind": "activity",
+              "heading": "Convolution playground",
+              "activity": "convolution-lab",
+              "summary": "Learner applies identity, blur, sharpen, and edge-detection kernels and steps through the per-position arithmetic."
+            },
+            {
+              "id": "m5p2-q1",
+              "kind": "question",
+              "questionKey": "m5p2.q1"
+            },
+            {
+              "id": "m5p2-noise",
+              "kind": "activity",
+              "heading": "Noise and denoising",
+              "activity": "noise-denoise",
+              "summary": "Learner compares mean and median filtering on impulse noise and sees why the median preserves edges."
+            },
+            {
+              "id": "m5p2-q2",
+              "kind": "question",
+              "questionKey": "m5p2.q2"
+            },
+            {
+              "id": "m5p2-hist-intro",
+              "kind": "prose",
+              "heading": "Contrast enhancement, and its cost"
+            },
+            {
+              "id": "m5p2-histogram",
+              "kind": "activity",
+              "heading": "Equalization and CLAHE",
+              "activity": "histogram-equalization",
+              "summary": "Learner compares global histogram equalization with CLAHE and observes the amplification of noise alongside signal."
+            },
+            {
+              "id": "m5p2-checklist",
+              "kind": "activity",
+              "heading": "Reproducibility checklist",
+              "activity": "imaging-checklist",
+              "summary": "Learner audits an imaging pipeline against documentation, preprocessing, labelling, and validation practices and receives a scored result."
+            },
+            {
+              "id": "m5p2-more",
+              "kind": "reveal",
+              "label": "Learn more: what belongs in an imaging methods section"
+            }
+          ],
+          "questions": [
+            {
+              "key": "m5p2.q1",
+              "moduleKey": "module-5",
+              "pageKey": "m5p2",
+              "position": 3,
+              "type": "single_choice",
+              "prompt": "A vertical edge-detection kernel has negative values on its left column and positive values on its right. Why does it output near zero in a uniform region?",
+              "spec": {
+                "options": [
+                  {
+                    "value": "cancel",
+                    "label": "The positive and negative contributions cancel when the neighbourhood is uniform.",
+                    "feedback": "Correct. The kernel measures *difference*, not brightness. Uniform region → no difference → near-zero output. It only responds where intensity changes."
+                  },
+                  {
+                    "value": "small",
+                    "label": "Because the kernel values are small.",
+                    "feedback": "The magnitude of the values sets the response strength, not whether it is zero. The cancellation is what produces zero."
+                  },
+                  {
+                    "value": "normalized",
+                    "label": "Because the output is normalized to zero.",
+                    "feedback": "No normalization step is involved. The zero arises directly from the arithmetic."
+                  }
+                ],
+                "correct": "cancel",
+                "explanation": "Every edge detector works this way: sum to zero, so flat regions vanish and boundaries survive. This is the first thing a trained network learns in its earliest layer."
+              },
+              "version": 1,
+              "isGraded": true
+            },
+            {
+              "key": "m5p2.q2",
+              "moduleKey": "module-5",
+              "pageKey": "m5p2",
+              "position": 5,
+              "type": "single_choice",
+              "prompt": "Why does a median filter beat a mean filter on salt-and-pepper noise?",
+              "spec": {
+                "options": [
+                  {
+                    "value": "outlier",
+                    "label": "A single extreme value cannot move a median, but it does move a mean.",
+                    "feedback": "Correct — the same robustness property you saw with clinical outliers in Module 1. Salt-and-pepper noise is impulse noise: extreme, isolated values. The median discards them; the mean averages them in and smears them across the neighbourhood."
+                  },
+                  {
+                    "value": "faster",
+                    "label": "The median filter is faster.",
+                    "feedback": "It is actually slower — it sorts each neighbourhood. It wins on quality, not speed."
+                  },
+                  {
+                    "value": "larger",
+                    "label": "The median filter uses a larger window.",
+                    "feedback": "Both use the same window. The difference is the statistic computed inside it."
+                  }
+                ],
+                "correct": "outlier",
+                "explanation": "Match the filter to the noise. Median for impulse noise, Gaussian for additive sensor noise, and anisotropic or non-local methods when edge preservation is critical."
+              },
+              "version": 1,
+              "isGraded": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "key": "module-6",
+      "position": 6,
+      "title": "Generative AI",
+      "subtitle": "What language models actually do, and how to use them responsibly",
+      "summary": "Understand next-token prediction well enough to predict when a model will fail, then practise using one for biomedical work without creating a privacy or integrity problem.",
+      "accent": "green",
+      "contentVersion": 1,
+      "pages": [
+        {
+          "key": "m6p1",
+          "moduleKey": "module-6",
+          "position": 1,
+          "slug": "how-generative-models-work",
+          "title": "How Generative Models Work",
+          "kicker": "Module 6 · Page 1",
+          "kind": "explore",
+          "objectives": [
+            "Explain next-token prediction and why it produces hallucination structurally.",
+            "Relate tokenization to reliability on rare biomedical terms.",
+            "Choose a sampling temperature appropriate to the task.",
+            "Explain what an embedding is and how semantic similarity is computed."
+          ],
+          "requiredSections": [
+            "m6p1-tokens",
+            "m6p1-q1",
+            "m6p1-nexttoken",
+            "m6p1-q2",
+            "m6p1-embeddings",
+            "m6p1-q3"
+          ],
+          "estimatedMinutes": 22,
+          "contentVersion": 1,
+          "sections": [
+            {
+              "id": "m6p1-intro",
+              "kind": "prose",
+              "heading": "It does one thing"
+            },
+            {
+              "id": "m6p1-tokens",
+              "kind": "activity",
+              "heading": "Tokens, not words",
+              "activity": "tokenizer",
+              "summary": "Learner tokenizes text and discovers that rare biomedical terms fragment into many tokens while common words do not."
+            },
+            {
+              "id": "m6p1-q1",
+              "kind": "question",
+              "questionKey": "m6p1.q1"
+            },
+            {
+              "id": "m6p1-nexttoken",
+              "kind": "activity",
+              "heading": "Watch it predict",
+              "activity": "next-token",
+              "summary": "Learner inspects the next-token probability distribution and manipulates temperature to see the trade-off between reliability and variety."
+            },
+            {
+              "id": "m6p1-q2",
+              "kind": "question",
+              "questionKey": "m6p1.q2"
+            },
+            {
+              "id": "m6p1-embed-intro",
+              "kind": "prose",
+              "heading": "How meaning becomes arithmetic"
+            },
+            {
+              "id": "m6p1-embeddings",
+              "kind": "activity",
+              "heading": "Similarity in embedding space",
+              "activity": "embedding-space",
+              "summary": "Learner explores semantic similarity between biomedical terms and finds cases where proximity is misleading."
+            },
+            {
+              "id": "m6p1-q3",
+              "kind": "question",
+              "questionKey": "m6p1.q3"
+            },
+            {
+              "id": "m6p1-more",
+              "kind": "reveal",
+              "label": "Learn more: reducing hallucination"
+            }
+          ],
+          "questions": [
+            {
+              "key": "m6p1.q1",
+              "moduleKey": "module-6",
+              "pageKey": "m6p1",
+              "position": 3,
+              "type": "single_choice",
+              "prompt": "The word \"the\" is one token. \"Pembrolizumab\" splits into several. Why does that matter in practice?",
+              "spec": {
+                "options": [
+                  {
+                    "value": "rare",
+                    "label": "Rare terms are assembled from fragments, so the model has seen less evidence about them as units.",
+                    "feedback": "Correct. Tokenization reflects training frequency. Specialist vocabulary — drug names, gene symbols, rare diagnoses — fragments, and fragmented rare terms are exactly where models confuse similar-looking entities."
+                  },
+                  {
+                    "value": "length",
+                    "label": "Longer words always use more tokens.",
+                    "feedback": "Only loosely. \"Internationalization\" is long and common enough to tokenize efficiently; a short rare gene symbol may fragment badly. Frequency matters more than length."
+                  },
+                  {
+                    "value": "nothing",
+                    "label": "It only affects billing, not accuracy.",
+                    "feedback": "It affects cost too, but the accuracy implication is the important one: fragmentation is a signal that the model has thin evidence about that term."
+                  }
+                ],
+                "correct": "rare",
+                "explanation": "Practical consequence: be most sceptical of model output about rare entities — unusual drugs, gene variants, uncommon syndromes. That is where confident-sounding errors cluster."
+              },
+              "version": 1,
+              "isGraded": true
+            },
+            {
+              "key": "m6p1.q2",
+              "moduleKey": "module-6",
+              "pageKey": "m6p1",
+              "position": 5,
+              "type": "single_choice",
+              "prompt": "You are using a model to extract structured findings from clinical notes. What temperature setting is appropriate?",
+              "spec": {
+                "options": [
+                  {
+                    "value": "low",
+                    "label": "Near zero — you want the most probable output every time, and reproducibility.",
+                    "feedback": "Correct. Extraction has one right answer per note. Low temperature also makes runs reproducible, which you need to report a method at all."
+                  },
+                  {
+                    "value": "high",
+                    "label": "High — so the model considers more possibilities.",
+                    "feedback": "High temperature increases variety, which for extraction means inconsistency between runs on identical input. Save it for brainstorming."
+                  },
+                  {
+                    "value": "medium",
+                    "label": "Around 0.7, the usual default.",
+                    "feedback": "That default suits conversation. For a deterministic extraction task it introduces run-to-run variation you cannot justify in a methods section."
+                  }
+                ],
+                "correct": "low",
+                "explanation": "Match temperature to the task: near zero for extraction, classification, and anything you must reproduce; higher only when variety is the point."
+              },
+              "version": 1,
+              "isGraded": true
+            },
+            {
+              "key": "m6p1.q3",
+              "moduleKey": "module-6",
+              "pageKey": "m6p1",
+              "position": 8,
+              "type": "single_choice",
+              "prompt": "A model produces a fluent paragraph citing a study that does not exist. What is the best explanation?",
+              "spec": {
+                "options": [
+                  {
+                    "value": "plausible",
+                    "label": "It generated the most plausible continuation; a citation-shaped string is plausible whether or not the paper is real.",
+                    "feedback": "Correct, and this is the whole point. The model has no lookup table of papers to check against. It knows what citations *look like* — author-year-journal patterns — and produces one that fits. Fluency and factuality are separate properties."
+                  },
+                  {
+                    "value": "lying",
+                    "label": "The model is being deceptive.",
+                    "feedback": "Deception requires intent and a represented truth to conceal. Neither is present. Framing it morally obscures the real lesson, which is structural."
+                  },
+                  {
+                    "value": "bad_data",
+                    "label": "Its training data contained that fake citation.",
+                    "feedback": "Sometimes an error is memorized, but fabricated citations are usually assembled fresh from patterns — which is why the same prompt can invent a different fake paper each time."
+                  }
+                ],
+                "correct": "plausible",
+                "explanation": "The operational rule: any claim of fact from a generative model needs an independent source. Not because the model is untrustworthy in character, but because verification is not part of what it does."
+              },
+              "version": 1,
+              "isGraded": true
+            }
+          ]
+        },
+        {
+          "key": "m6p2",
+          "moduleKey": "module-6",
+          "position": 2,
+          "slug": "using-generative-ai",
+          "title": "Using Generative AI Responsibly",
+          "kicker": "Module 6 · Page 2",
+          "kind": "apply",
+          "objectives": [
+            "Apply a decision rule for whether text may be sent to a general-purpose model.",
+            "Write a prompt specific enough to produce a usable result.",
+            "Identify which claims in generated text require verification first.",
+            "State a personal policy for generative AI use in research."
+          ],
+          "requiredSections": [
+            "m6p2-q1",
+            "m6p2-promptlab",
+            "m6p2-hallucination",
+            "m6p2-q2",
+            "m6p2-scenario"
+          ],
+          "estimatedMinutes": 24,
+          "contentVersion": 1,
+          "sections": [
+            {
+              "id": "m6p2-intro",
+              "kind": "prose",
+              "heading": "A decision rule"
+            },
+            {
+              "id": "m6p2-q1",
+              "kind": "question",
+              "questionKey": "m6p2.q1"
+            },
+            {
+              "id": "m6p2-promptlab",
+              "kind": "aiActivity",
+              "heading": "Prompt workshop",
+              "promptKey": "prompt_craft"
+            },
+            {
+              "id": "m6p2-hallucination",
+              "kind": "activity",
+              "heading": "Hallucination hunt",
+              "activity": "hallucination-hunt",
+              "summary": "Learner identifies fabricated and distorted claims in fluent generated text and learns which claim types carry the most risk."
+            },
+            {
+              "id": "m6p2-q2",
+              "kind": "question",
+              "questionKey": "m6p2.q2"
+            },
+            {
+              "id": "m6p2-scenario",
+              "kind": "question",
+              "heading": "Write your own rule",
+              "questionKey": "m6p2.q3"
+            },
+            {
+              "id": "m6p2-more",
+              "kind": "reveal",
+              "label": "Learn more: disclosure in publication"
+            }
+          ],
+          "questions": [
+            {
+              "key": "m6p2.q1",
+              "moduleKey": "module-6",
+              "pageKey": "m6p2",
+              "position": 2,
+              "type": "multi_choice",
+              "prompt": "Which of these are acceptable uses of a public, general-purpose model in a clinical research setting? Select all that apply.",
+              "spec": {
+                "options": [
+                  {
+                    "value": "rewrite",
+                    "label": "Rewriting your own draft abstract to be clearer.",
+                    "feedback": "Yes. Your text, no patient data, and you verify the result."
+                  },
+                  {
+                    "value": "note",
+                    "label": "Summarizing a de-identified discharge summary to test an extraction idea.",
+                    "feedback": "Careful. \"De-identified\" is a technical claim requiring verification — free-text notes routinely retain identifying detail (rare diagnoses, dates, place names) even after names are stripped. Use approved infrastructure, or a genuinely synthetic note."
+                  },
+                  {
+                    "value": "explain",
+                    "label": "Asking it to explain what a propensity score is.",
+                    "feedback": "Yes, with the usual caveat: verify anything you will act on or cite. Explaining a standard concept is a well-supported use."
+                  },
+                  {
+                    "value": "refs",
+                    "label": "Asking it for five references supporting your hypothesis.",
+                    "feedback": "No. This is the highest-risk request you can make — the output is citation-shaped and unverified by construction. Use a real database, then read what you cite."
+                  },
+                  {
+                    "value": "code",
+                    "label": "Generating analysis code that you then review and test.",
+                    "feedback": "Yes, provided \"review and test\" actually happens. Generated code fails silently more often than loudly."
+                  }
+                ],
+                "correct": [
+                  "rewrite",
+                  "explain",
+                  "code"
+                ],
+                "explanation": "The pattern: your own content in, verified content out, no identifiable data, no unverifiable facts. The two rejected options fail on data governance and on fabrication risk respectively."
+              },
+              "version": 1,
+              "isGraded": true
+            },
+            {
+              "key": "m6p2.q2",
+              "moduleKey": "module-6",
+              "pageKey": "m6p2",
+              "position": 5,
+              "type": "single_choice",
+              "prompt": "Which type of claim in generated text deserves verification first?",
+              "spec": {
+                "options": [
+                  {
+                    "value": "specific",
+                    "label": "Specific numbers and identifiers — doses, percentages, DOIs, accession numbers.",
+                    "feedback": "Correct. Specificity reads as authority, which is exactly why an invented number is dangerous, and these are the fastest claims to check against a real source."
+                  },
+                  {
+                    "value": "general",
+                    "label": "General statements about how a method works.",
+                    "feedback": "Broad conceptual statements are usually well supported by training data and are lower risk. Not zero — but not first."
+                  },
+                  {
+                    "value": "opinion",
+                    "label": "Opinions and recommendations.",
+                    "feedback": "These need judgement rather than fact-checking. A fabricated dose can hurt someone; a debatable opinion is visible as an opinion."
+                  }
+                ],
+                "correct": "specific",
+                "explanation": "A useful habit: highlight every number and every identifier in generated text before you read the prose. Those are your verification list."
+              },
+              "version": 1,
+              "isGraded": true
+            },
+            {
+              "key": "m6p2.q3",
+              "moduleKey": "module-6",
+              "pageKey": "m6p2",
+              "position": 6,
+              "type": "free_text",
+              "prompt": "Write the generative-AI policy you would actually follow in your own work: one thing you will use it for, one thing you will never use it for, and the verification step you commit to.",
+              "spec": {
+                "minLength": 100,
+                "explanation": "The best versions are specific enough to be checkable. \"I will verify outputs\" is not a rule. \"I will look up every DOI in PubMed before it enters a manuscript, and I will never paste text from our EHR into a non-approved tool\" is."
+              },
+              "version": 1,
+              "isGraded": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "key": "module-7",
+      "position": 7,
+      "title": "Impact Project",
+      "subtitle": "Design a study, then communicate and defend it",
+      "summary": "Turn your own research interest into a specified AI study, then practise the three forms of communication it will face: a plain-language pitch, a funder-style summary, and peer review.",
+      "accent": "slate",
+      "contentVersion": 1,
+      "pages": [
+        {
+          "key": "m7p1",
+          "moduleKey": "module-7",
+          "position": 1,
+          "slug": "design-your-study",
+          "title": "Design Your Study",
+          "kicker": "Module 7 · Page 1",
+          "kind": "explore",
+          "objectives": [
+            "Specify a study in terms of question, data, comparator, metric, validation, and risk.",
+            "Identify a required baseline for an AI study.",
+            "Recognize which facts a datasheet or model card requires that you have not yet documented."
+          ],
+          "requiredSections": [
+            "m7p1-builder",
+            "m7p1-review",
+            "m7p1-opportunity",
+            "m7p1-datasheet"
+          ],
+          "estimatedMinutes": 30,
+          "contentVersion": 1,
+          "sections": [
+            {
+              "id": "m7p1-intro",
+              "kind": "prose",
+              "heading": "Six answers"
+            },
+            {
+              "id": "m7p1-builder",
+              "kind": "activity",
+              "heading": "Specify your study",
+              "activity": "study-designer",
+              "summary": "Learner specifies question, data, comparator, metric, validation plan, and primary risk for their own project."
+            },
+            {
+              "id": "m7p1-review-intro",
+              "kind": "prose",
+              "heading": "Get it reviewed"
+            },
+            {
+              "id": "m7p1-review",
+              "kind": "aiActivity",
+              "heading": "AI design review",
+              "promptKey": "design_review"
+            },
+            {
+              "id": "m7p1-opportunity",
+              "kind": "aiActivity",
+              "heading": "Where could AI help?",
+              "promptKey": "ai_opportunity"
+            },
+            {
+              "id": "m7p1-datasheet",
+              "kind": "aiActivity",
+              "heading": "Datasheet / model card generator",
+              "promptKey": "datasheet"
+            },
+            {
+              "id": "m7p1-more",
+              "kind": "reveal",
+              "label": "Learn more: the baseline you must include"
+            }
+          ],
+          "questions": []
+        },
+        {
+          "key": "m7p2",
+          "moduleKey": "module-7",
+          "position": 2,
+          "slug": "communicate-and-review",
+          "title": "Communicate and Review",
+          "kicker": "Module 7 · Page 2",
+          "kind": "apply",
+          "objectives": [
+            "Specify a study in terms of question, data, comparator, metric, validation, and risk.",
+            "Identify a required baseline for an AI study.",
+            "Recognize which facts a datasheet or model card requires that you have not yet documented."
+          ],
+          "requiredSections": [
+            "m7p2-pitch",
+            "m7p2-proposal",
+            "m7p2-critique",
+            "m7p2-misconduct",
+            "m7p2-q1"
+          ],
+          "estimatedMinutes": 30,
+          "contentVersion": 1,
+          "sections": [
+            {
+              "id": "m7p2-intro",
+              "kind": "prose",
+              "heading": "Three audiences"
+            },
+            {
+              "id": "m7p2-pitch",
+              "kind": "aiActivity",
+              "heading": "The plain-language version",
+              "promptKey": "pitch"
+            },
+            {
+              "id": "m7p2-proposal",
+              "kind": "aiActivity",
+              "heading": "The funder version",
+              "promptKey": "proposal"
+            },
+            {
+              "id": "m7p2-critique",
+              "kind": "aiActivity",
+              "heading": "The reviewer version",
+              "promptKey": "review_critique"
+            },
+            {
+              "id": "m7p2-integrity-intro",
+              "kind": "callout",
+              "heading": "A research integrity case"
+            },
+            {
+              "id": "m7p2-misconduct",
+              "kind": "aiActivity",
+              "heading": "Analyze the case",
+              "promptKey": "misconduct"
+            },
+            {
+              "id": "m7p2-q1",
+              "kind": "question",
+              "heading": "The one you will actually face",
+              "questionKey": "m7p2.q1"
+            },
+            {
+              "id": "m7p2-more",
+              "kind": "reveal",
+              "label": "Learn more: reporting standards worth knowing"
+            }
+          ],
+          "questions": [
+            {
+              "key": "m7p2.q1",
+              "moduleKey": "module-7",
+              "pageKey": "m7p2",
+              "position": 7,
+              "type": "single_choice",
+              "prompt": "Your analysis is nearly finished. A secondary outcome is significant; the pre-registered primary outcome is not. What do you do?",
+              "spec": {
+                "options": [
+                  {
+                    "value": "report_both",
+                    "label": "Report the primary outcome as the primary result, and the secondary as exploratory.",
+                    "feedback": "Correct. This is the only honest option, and it is publishable. A well-powered null result on a pre-registered primary outcome is a real contribution; the secondary finding is a hypothesis for the next study."
+                  },
+                  {
+                    "value": "switch",
+                    "label": "Lead with the secondary outcome, since that is where the signal is.",
+                    "feedback": "This is outcome switching — one of the failures in the case above. It inflates the false-positive rate and it is detectable by anyone who reads your registration."
+                  },
+                  {
+                    "value": "both_equal",
+                    "label": "Present both as co-primary outcomes.",
+                    "feedback": "Retrospectively promoting an outcome to co-primary is outcome switching with extra steps, and it does not correct for the multiple comparisons involved."
+                  },
+                  {
+                    "value": "more_data",
+                    "label": "Collect more data until the primary outcome reaches significance.",
+                    "feedback": "That is optional stopping, and it drives the true false-positive rate far above 5%. If you extend a study, the extension needs to be pre-specified."
+                  }
+                ],
+                "correct": "report_both",
+                "explanation": "Pre-registration exists precisely to make this decision in advance, when it is easy. The pressure you feel here is the pressure it was designed to remove."
+              },
+              "version": 1,
+              "isGraded": true
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

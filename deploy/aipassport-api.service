@@ -1,0 +1,75 @@
+# systemd unit for the AIPassport API.
+#
+#   sudo cp deploy/aipassport-api.service /etc/systemd/system/
+#   sudo systemctl daemon-reload
+#   sudo systemctl enable --now aipassport-api
+#
+# Uvicorn binds to 127.0.0.1 only. Public HTTPS is terminated by the reverse proxy; the application
+# port is never exposed in the security group.
+
+[Unit]
+Description=AIPassport API (FastAPI/Uvicorn)
+Documentation=https://github.com/bihorac-LAB/AIPassport
+After=network-online.target postgresql.service
+Wants=network-online.target
+Requires=postgresql.service
+
+[Service]
+Type=exec
+User=aipassport
+Group=aipassport
+WorkingDirectory=/opt/aipassport/backend
+
+# Secrets live in a root-owned file readable only by the service user:
+#   sudo install -d -m 0750 -o root -g aipassport /etc/aipassport
+#   sudo install -m 0640 -o root -g aipassport backend/.env.example /etc/aipassport/api.env
+EnvironmentFile=/etc/aipassport/api.env
+Environment=PYTHONUNBUFFERED=1
+Environment=PYTHONDONTWRITEBYTECODE=1
+
+ExecStartPre=/opt/aipassport/backend/.venv/bin/alembic upgrade head
+ExecStart=/opt/aipassport/backend/.venv/bin/uvicorn app.main:app \
+    --host 127.0.0.1 \
+    --port 8000 \
+    --workers 2 \
+    --proxy-headers \
+    --forwarded-allow-ips=127.0.0.1 \
+    --timeout-keep-alive 20 \
+    --no-access-log
+
+ExecReload=/bin/kill -HUP $MAINPID
+Restart=always
+RestartSec=3
+KillSignal=SIGTERM
+TimeoutStopSec=30
+
+# ── Hardening ────────────────────────────────────────────────────────────────
+NoNewPrivileges=yes
+PrivateTmp=yes
+PrivateDevices=yes
+ProtectSystem=strict
+ProtectHome=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectControlGroups=yes
+ProtectClock=yes
+RestrictSUIDSGID=yes
+RestrictNamespaces=yes
+RestrictRealtime=yes
+LockPersonality=yes
+MemoryDenyWriteExecute=yes
+SystemCallArchitectures=native
+SystemCallFilter=@system-service
+# The application writes nothing to disk; only the venv's bytecode cache path is needed.
+ReadWritePaths=/opt/aipassport/backend/.venv
+
+# ── Limits ───────────────────────────────────────────────────────────────────
+LimitNOFILE=8192
+MemoryMax=1G
+
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=aipassport-api
+
+[Install]
+WantedBy=multi-user.target

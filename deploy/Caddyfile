@@ -1,0 +1,65 @@
+# Caddy reverse proxy for the AIPassport API (recommended: automatic HTTPS, no cert cron).
+#
+#   sudo cp deploy/Caddyfile /etc/caddy/Caddyfile
+#   sudo systemctl reload caddy
+#
+# Replace api.aipassport.example.edu with your API hostname and set the Netlify origin below.
+# Only ports 80 and 443 need to be open in the security group. Never open 5432 or 8000.
+
+{
+	email ops@example.edu
+	servers {
+		# Trust only the loopback proxy chain when reading X-Forwarded-For.
+		trusted_proxies static 127.0.0.1/32
+	}
+}
+
+api.aipassport.example.edu {
+	encode zstd gzip
+
+	# 1MB cap, matching the FastAPI middleware.
+	request_body {
+		max_size 1MB
+	}
+
+	header {
+		Strict-Transport-Security "max-age=31536000; includeSubDomains"
+		X-Content-Type-Options    "nosniff"
+		Referrer-Policy           "strict-origin-when-cross-origin"
+		# The API returns JSON only; nothing here should ever be framed or run scripts.
+		Content-Security-Policy   "default-src 'none'; frame-ancestors 'none'"
+		-Server
+	}
+
+	# The FastAPI CORS middleware owns the allowlist; the proxy must not add its own
+	# Access-Control-Allow-Origin or the two will conflict.
+
+	@health path /health /health/ready /api/v1/health /api/v1/health/ready
+	handle @health {
+		reverse_proxy 127.0.0.1:8000
+	}
+
+	handle {
+		reverse_proxy 127.0.0.1:8000 {
+			header_up X-Real-IP {remote_host}
+			header_up X-Forwarded-Proto {scheme}
+			transport http {
+				read_timeout 60s
+				write_timeout 60s
+				# The AI routes call an upstream model; allow for its latency.
+				dial_timeout 5s
+			}
+			health_uri /health
+			health_interval 30s
+			health_timeout 5s
+		}
+	}
+
+	log {
+		output file /var/log/caddy/aipassport-api.log {
+			roll_size 50MiB
+			roll_keep 10
+		}
+		format json
+	}
+}
