@@ -1,6 +1,6 @@
 # AIPassport Deployment & Canvas Integration Guide
 
-This document outlines how to deploy the Gemini-powered AI Passport application and embed specific modules into Canvas.
+This document outlines how to deploy the AI Passport application and embed specific subsections into Canvas.
 
 ---
 
@@ -18,10 +18,13 @@ This document outlines how to deploy the Gemini-powered AI Passport application 
 
 3.  **Secrets & Environment**:
     - Click **"Advanced settings..."** before deploying (or go to App Settings > Secrets after deploying).
-    - Add your Gemini API Key:
+    - Add your UF NaviGator Toolkit key:
       ```toml
-      GEMINI_API_KEY = "your_actual_key_here"
+      NAVIGATOR_TOOLKIT_API_KEY = "your_actual_key_here"
       ```
+    - This is the only secret the app reads. Without it the app still deploys and every page renders; the
+      AI Guide and the LLM-backed activities (1.1's Fact-or-Fiction and all of Module 7) explain that
+      feedback is unavailable and disable their inputs.
 
 ---
 

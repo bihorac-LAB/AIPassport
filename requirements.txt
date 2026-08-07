@@ -1,4 +1,9 @@
 # Core Libraries
+# NOTE: the >=1.31.0 floor below is understated and predates this file's history.
+# The entrypoint's st.navigation() needs >=1.36, and the notebooks use newer APIs
+# still (st.segmented_control, bordered columns, st.spinner(show_time=...)).
+# Verified end to end against streamlit 1.61.1 via scripts/verify_notebooks.py.
+# Raising the floor is a deployment decision, so it is left as-is rather than guessed.
 streamlit>=1.31.0
 pandas
 numpy
@@ -27,5 +32,3 @@ pyarrow
 # Model Explainability
 shap
 lime
-
-openai
