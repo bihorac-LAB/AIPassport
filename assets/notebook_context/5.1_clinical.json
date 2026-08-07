@@ -1,12 +1,39 @@
 {
-  "module": "5",
+  "id": "5.1_clinical",
+  "module": "Module 5 - Images",
+  "subsection": "5.1",
   "microskill": "5.1",
   "track": "clinical",
-  "title": "Clinical Imaging Assignment",
-  "summary": "Uses X-ray edge detection and contrast adjustment to compare clinical imaging structures and modalities.",
-  "guide_notes": [
-    "Explain edge detection as a structural aid, not a diagnosis.",
-    "Frame threshold, contrast, and brightness in clinical image interpretation terms.",
-    "Remind learners not to upload protected health information."
+  "title": "How Biomedical Images Become Data",
+  "audience": "Clinical researchers and clinician-scientists new to AI",
+  "objectives": [
+    "Explain how physical attenuation becomes pixel intensity, and read a histogram.",
+    "Find structure with Canny edge detection and say what an edge detector cannot tell you.",
+    "Compare a dense-structure view against a soft-tissue view using contrast and brightness.",
+    "Apply gamma, contrast rescaling, equalization, and CLAHE, and say why.",
+    "Recognise that no intensity operation adds information that was not acquired."
+  ],
+  "sections": [
+    {
+      "name": "1.1 Finding structure: Canny edge detection",
+      "purpose": "Locate boundaries in a real radiograph.",
+      "how_to_use": "Set the low and high thresholds on the bundled radiograph (or upload one). The edge image, the intensity histogram, and a 'share of pixels marked as edge' metric update together. Dropping the low threshold makes the edge fraction climb as the detector starts outlining texture and grain."
+    },
+    {
+      "name": "1.2 Contrast and brightness as modality",
+      "purpose": "See two clinical questions in one acquisition.",
+      "how_to_use": "Contrast starts at 1.0 (no change). Raising it separates dense structure like a CT; brightness plus moderate contrast reveals soft tissue like an MRI. The page reports how much saturation your adjustment *added* on top of the image's pre-existing white background."
+    },
+    {
+      "name": "Intensity operation tabs",
+      "purpose": "Change what is visible without changing what was measured.",
+      "how_to_use": "Four tabs sharing one image selectbox: Gamma (one slider; below 1 brightens, above 1 darkens), Contrast rescaling (window minimum and maximum; the minimum must stay below the maximum), Histogram equalization (bin count; shows before/after images and histograms), and CLAHE (clip limit and tile grid size). Each has a 'Reveal expected outcome' expander."
+    }
+  ],
+  "chatbot_guidance": [
+    "The bundled radiograph is 'Identifying Structures in X-Ray Imaging.png'. About 17.6% of it is already pure-white background, which is why saturation is reported as an increase rather than an absolute.",
+    "An edge detector reports where the gradient is, not what it means. That is the answer to why edge detection alone cannot find a fracture.",
+    "None of the intensity operations adds information. If structure was not captured, no transform recovers it -- and one that appears to has invented it.",
+    "Whatever enhancement is applied here must be applied identically at training and inference. The enhancement pipeline is part of the model."
   ]
 }

@@ -1,46 +1,44 @@
 {
   "id": "1.2_clinical",
   "module": "Module 1 - Fundamentals",
+  "subsection": "1.2",
   "microskill": "1.2",
   "track": "clinical",
-  "title": "Artificial Intelligence Lifecycle",
-  "audience": "Clinical learners studying AI deployment and monitoring",
+  "title": "Designing a Study You Can Defend",
+  "audience": "Clinical researchers and clinician-scientists new to AI",
   "objectives": [
-    "Explore how deployed AI model performance changes across data batches.",
-    "Connect data drift, validation checks, and retraining decisions.",
-    "Practice interpreting accuracy, ROC-AUC, confusion matrices, and predicted probability distributions."
+    "Write a design brief: a concrete gap, a SMART question, and a data plan.",
+    "Detect outliers with the 1.5xIQR rule and quantify what each handling strategy costs.",
+    "Write the outlier-handling sentence that belongs in a methods section.",
+    "Commit to a splitting strategy, a cross-validation design, an external-validation plan, and a subgroup audit.",
+    "Draft a professional message that carries a decision to a mixed-expertise team."
   ],
   "sections": [
     {
-      "name": "Dataset Overview",
-      "purpose": "Introduce a simulated EHR-style heart disease risk dataset.",
-      "how_to_use": "Review the sample patient records and the outcome definition before changing model or batch selections."
+      "name": "1. The Design Brief",
+      "purpose": "State the gap, the research question, and the data plan before any modelling.",
+      "how_to_use": "Six inputs: a gap, a SMART research question, a multiselect of data elements, cohort criteria, missingness and bias, and preprocessing. Keep each answer short and specific."
     },
     {
-      "name": "Model Version and New Data",
-      "purpose": "Compare deployed model versions against incoming batches.",
-      "how_to_use": "Change the model version and incoming batch. Watch how accuracy, ROC-AUC, the confusion matrix, and predicted probabilities change."
+      "name": "2. Rigor Lab: Outliers",
+      "purpose": "Detect and handle outliers, and see what each choice costs.",
+      "how_to_use": "Five steps, each with its own variable selectbox: 2.1 boxplot, 2.2 the 1.5xIQR bounds plus a table of flagged rows, 2.3 mean/std/median with and without outliers, 2.4 a strategy radio (remove, winsorize, impute with median) whose metrics show the delta, and 2.5 a methods sentence to write."
     },
     {
-      "name": "Model Drift",
-      "purpose": "Help learners decide when model monitoring should trigger retraining.",
-      "how_to_use": "Try Model v1 on later batches, then compare against retrained versions. Use the notes box to record where performance changes."
+      "name": "3. A Validation Strategy You Can Defend",
+      "purpose": "Commit to splitting, cross-validation, external validation, and subgroup performance.",
+      "how_to_use": "Four tasks: a multiselect of what makes a random split unsafe plus a splitting radio; a cross-validation design selectbox with a folds slider and a metrics multiselect; a free-text external-validation plan; and a subgroup multiselect. A summary line restates the design you chose."
     },
     {
-      "name": "Data Validation Checks",
-      "purpose": "Show why clinical AI systems need input validation before inference or retraining.",
-      "how_to_use": "Adjust age, blood pressure, cholesterol, and BMI thresholds. Review which patient rows are flagged."
-    },
-    {
-      "name": "Lifecycle Management Scenario",
-      "purpose": "Prompt learners to plan monitoring, versioning, documentation, and communication.",
-      "how_to_use": "Write a short action plan for model versioning, MLflow or DVC-style documentation, and stakeholder communication."
+      "name": "4. Carrying the Decision to Your Team",
+      "purpose": "Communicate the design to a mixed-expertise team.",
+      "how_to_use": "Open the shared-vocabulary table first, answer the team question, then draft the professional message and compare it against the worked example behind the button."
     }
   ],
   "chatbot_guidance": [
-    "When asked how to use this notebook, tell the learner to start by comparing model versions and data batches.",
-    "Explain metrics in clinical language: accuracy is overall correctness, ROC-AUC is ranking ability, and the confusion matrix shows false positives and false negatives.",
-    "When learners see drift, connect it to population changes, changing clinical practice, and retraining governance.",
-    "Keep answers short and practical."
+    "The scenario is 30-day CHF readmission at an academic medical centre; the rigor lab uses a 40-patient simulated admission table (age, length_of_stay, bnp, sodium).",
+    "Push back gently on vague design-brief answers. 'We will handle missing data' is not a plan; naming the mechanism is.",
+    "A flagged outlier is not automatically an error. Whether it is a data-entry mistake or a genuinely unusual patient changes what the learner is allowed to do next.",
+    "The four validation tasks are four separate claims. A strong answer to one does not cover the others."
   ]
 }

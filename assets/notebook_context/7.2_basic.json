@@ -1,0 +1,53 @@
+{
+  "id": "7.2_basic",
+  "module": "Module 7 - Impact Project",
+  "subsection": "7.2",
+  "microskill": "7.2",
+  "track": "basic",
+  "title": "Communicating and Defending Your Work",
+  "audience": "Basic science researchers new to AI",
+  "objectives": [
+    "Turn a study design into an NIH-style project summary.",
+    "Compress a result into a pitch a non-specialist follows.",
+    "Absorb a critique of your own idea before a reviewer writes it.",
+    "Reason through a research-misconduct case under pressure."
+  ],
+  "sections": [
+    {
+      "name": "Activity selector",
+      "purpose": "Move between this page's activities.",
+      "how_to_use": "A horizontal radio at the top. Only the selected activity's input box is rendered."
+    },
+    {
+      "name": "1. Write the proposal",
+      "purpose": "Generate an NIH-style project summary to react against.",
+      "how_to_use": "Read the output critically. The useful question is not whether it is good writing but whether it claims more than the design can deliver."
+    },
+    {
+      "name": "2. Pitch it plainly",
+      "purpose": "Compress an abstract into an elevator pitch for a broad audience.",
+      "how_to_use": "Paste an abstract or full article. Compressing forces a decision about what the finding actually is; every dropped hedge is a claim the learner has chosen to make."
+    },
+    {
+      "name": "3. Invite the critique",
+      "purpose": "Get the objections a reviewer would raise.",
+      "how_to_use": "Use the design developed in 7.1. The objections the learner cannot yet answer are the real to-do list."
+    },
+    {
+      "name": "4. Handle the pressure",
+      "purpose": "Work through a data-falsification case.",
+      "how_to_use": "The case text and both questions are shown on the page. Q1 asks what the misconduct is; Q2 asks which of Dr. Johnson's and Dr. Smith's actions were unethical -- note that it asks about both people, including the whistleblower who went silent. Answer both in one response."
+    },
+    {
+      "name": "Submitting an activity",
+      "purpose": "Send a draft and read the generated response.",
+      "how_to_use": "Type into the text area and press Submit. The response streams line by line and stays on screen if the page reruns. Requires NAVIGATOR_TOOLKIT_API_KEY; without it the input and button are disabled and a notice explains why."
+    }
+  ],
+  "chatbot_guidance": [
+    "Activity 4's case: a falsified oncology trial. Dr. Smith found duplicated data points and altered timestamps, reported them to Dr. Johnson, was told they were clerical errors, and stayed silent.",
+    "Q2 is the harder question because it implicates Dr. Smith too. Do not let the learner stop at 'Dr. Johnson falsified data'.",
+    "These activities generate feedback, not verdicts. Encourage the learner to disagree with the output where they have domain knowledge it lacks.",
+    "Responses persist on screen across reruns, so switching activities does not discard them."
+  ]
+}

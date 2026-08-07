@@ -1,12 +1,49 @@
 {
-  "module": "4",
+  "id": "4.2_basic",
+  "module": "Module 4 - Machine Learning",
+  "subsection": "4.2",
   "microskill": "4.2",
   "track": "basic",
-  "title": "Applied Fundamentals of ML and DL",
-  "summary": "Explores data inspection, neural-network optimization, cross-validation trade-offs, and model-selection strategy.",
-  "guide_notes": [
-    "Explain neural-network concepts without assuming TensorFlow is running.",
-    "Mention that interactive training uses a lightweight sklearn MLP implementation.",
-    "Help learners compare performance, interpretability, sensitivity, and specificity."
+  "title": "Evaluating and Explaining a Model",
+  "audience": "Basic science researchers new to AI",
+  "objectives": [
+    "Locate the point where a model stops generalizing and starts memorizing.",
+    "Choose a cross-validation strategy that protects the minority class.",
+    "Audit per-stratum performance and recognise when a stratum is too thin to judge.",
+    "Explain a model globally with SHAP and one prediction with LIME.",
+    "Test a model counterfactually against domain knowledge."
+  ],
+  "sections": [
+    {
+      "name": "Dataset selector",
+      "purpose": "Choose the cohort all four activities share.",
+      "how_to_use": "A dataset selector, not a track selector: the real eICU cohort is messier; the synthetic cohort has a known ground truth. One split and one scaler follow from this choice."
+    },
+    {
+      "name": "Tab 1 - Overfitting and Tuning",
+      "purpose": "Locate the point where a model stops generalizing.",
+      "how_to_use": "Set a low k and a high k to compare decision-boundary contours, then raise 'maximum k to test' to plot train vs. test accuracy. The dashed line marks the best test k; the train-test gap at k=1 is reported as a metric."
+    },
+    {
+      "name": "Tab 2 - Validation Strategies",
+      "purpose": "Choose a folding scheme that earns the number you report.",
+      "how_to_use": "Set folds and model complexity to see the accuracy distribution across folds, then compare K-Fold against Stratified K-Fold, including their standard deviations. LOO-CV is explained in the caption rather than computed."
+    },
+    {
+      "name": "Tab 3 - Subgroup Fairness",
+      "purpose": "Split the test set and check whether the model serves every stratum.",
+      "how_to_use": "Pick a subgroup variable and drag the two-handle slider to set the stratum boundaries. The per-stratum table reports accuracy, sensitivity, and specificity. Strata with fewer than 5 positive cases are flagged unestimable and excluded from the sensitivity spread."
+    },
+    {
+      "name": "Tab 4 - Explaining Predictions",
+      "purpose": "Explain the model globally, one record locally, and by counterfactual.",
+      "how_to_use": "SHAP summary plot (set how many features to display), LIME for a single test record (set its index), and a what-if simulator: move the feature sliders and watch the prediction and probability change."
+    }
+  ],
+  "chatbot_guidance": [
+    "The basic track opens on the synthetic cohort, where the known ground truth makes overfitting easy to see; the learner can switch to the real eICU cohort, which is messier.",
+    "In tab 3, moving the stratum boundaries changes how unfair the model looks. That is the point: strata must be chosen for biological reasons and stated in advance.",
+    "A stratum with fewer than five positive cases is flagged unestimable, because a single record swings sensitivity from 0.00 to 1.00.",
+    "SHAP explains the model, LIME explains one prediction, and the what-if simulator tests whether either agrees with what the learner already knows."
   ]
 }

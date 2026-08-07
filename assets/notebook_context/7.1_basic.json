@@ -1,0 +1,47 @@
+{
+  "id": "7.1_basic",
+  "module": "Module 7 - Impact Project",
+  "subsection": "7.1",
+  "microskill": "7.1",
+  "track": "basic",
+  "title": "From Idea to Study Design",
+  "audience": "Basic science researchers new to AI",
+  "objectives": [
+    "State a specific, concrete gap in your own field.",
+    "Turn that gap into a feasible AI study design and absorb structured feedback on it.",
+    "Produce the datasheet or model card that documents the design's limits."
+  ],
+  "sections": [
+    {
+      "name": "Activity selector",
+      "purpose": "Move between this page's activities.",
+      "how_to_use": "A horizontal radio at the top. Only the selected activity's input box is rendered."
+    },
+    {
+      "name": "1. Find the opening",
+      "purpose": "Name a gap worth closing and see a candidate AI approach.",
+      "how_to_use": "The more concrete the gap, the more useful the response. 'We don't use AI yet' produces nothing; a specific unmet prediction need produces something buildable."
+    },
+    {
+      "name": "2. Design the study",
+      "purpose": "Get structured feedback on the experiment's feasibility and clarity.",
+      "how_to_use": "Describe the question, the data, the approach, and how you would know it worked. This activity adds a markdown-formatting instruction to the prompt, so its output is organised with headers and bullets."
+    },
+    {
+      "name": "3. Make it rigorous",
+      "purpose": "Generate a datasheet or model card for the dataset or model at the centre of the design.",
+      "how_to_use": "Name or describe a public biomedical dataset or model. The output states intended use, provenance, and known limitations."
+    },
+    {
+      "name": "Submitting an activity",
+      "purpose": "Send a draft and read the generated response.",
+      "how_to_use": "Type into the text area and press Submit. The response streams line by line and stays on screen if the page reruns. Requires NAVIGATOR_TOOLKIT_API_KEY; without it the input and button are disabled and a notice explains why."
+    }
+  ],
+  "chatbot_guidance": [
+    "Work the three activities in order; each takes the output of the previous one.",
+    "These activities generate feedback, not verdicts. Encourage the learner to disagree with the output where they have domain knowledge it lacks.",
+    "The learner built a smaller model card in subsection 2.2. The point is the same: the artefact is what lets the next person inherit the caveats.",
+    "Responses persist on screen across reruns, so switching activities does not discard them."
+  ]
+}
