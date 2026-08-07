@@ -23,8 +23,6 @@ from sklearn.metrics import accuracy_score, recall_score, confusion_matrix
 # ── Track-specific framing (this file is the basic science track) ───────────
 DEFAULT_DATASET_INDEX = 1  # basic science track opens on the synthetic cohort
 
-st.title("4.2 Evaluating and Explaining a Model (Basic Science)")
-
 st.markdown(
     """
 Subsection 4.1 built a model. This one stops trusting it.

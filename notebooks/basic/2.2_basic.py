@@ -9,8 +9,6 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import roc_auc_score, confusion_matrix
 from sklearn.calibration import calibration_curve
 
-st.title("2.2 Measuring and Documenting Model Quality")
-
 st.markdown(
     """
 Subsection 2.1 reasoned about harm. This one **measures** it, then writes the measurement down.

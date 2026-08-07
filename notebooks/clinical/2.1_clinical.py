@@ -1,7 +1,5 @@
 import streamlit as st
 
-st.title("2.1 Ethics, Bias, and Human Oversight (Clinical Research)")
-
 st.markdown(
     """
 Before a model is measured, it has to be reasoned about. This subsection asks three questions in

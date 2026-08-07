@@ -3,8 +3,6 @@ import pandas as pd
 import numpy as np
 import plotly.express as px
 
-st.title("1.2 Designing a Study You Can Defend (Basic Science)")
-
 st.markdown(
     """
 You are a computational biologist in a lab studying how cells respond to drug compounds. Your images

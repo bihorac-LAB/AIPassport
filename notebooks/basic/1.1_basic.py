@@ -4,8 +4,6 @@ from openai import OpenAI
 import json
 import aipassport_config as cfg
 
-st.title("1.1 What AI Is, and How an AI Project Works (Basic Science)")
-
 header_cols = st.columns(3)
 with header_cols[1]:
     st.image("assets/images/headers/1.1_header.png", width=300)

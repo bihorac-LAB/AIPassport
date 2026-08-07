@@ -8,8 +8,6 @@ from skimage.util import random_noise
 from skimage.morphology import closing, disk
 from skimage.feature import graycomatrix, graycoprops
 
-st.title("5.2 Preprocessing, Features, and Trustworthy Pipelines (Clinical Research)")
-
 st.markdown(
     """
 Subsection 5.1 established that a pixel is a measurement and that intensity operations change what is

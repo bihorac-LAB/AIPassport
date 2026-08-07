@@ -18,8 +18,6 @@ OUTCOME_FRAMING = (
 POSITIVE_LABEL = "Diagnosed (Class 1)"
 NEGATIVE_LABEL = "Not diagnosed (Class 0)"
 
-st.title("4.1 Building a Model End to End (Clinical Research)")
-
 st.markdown(
     f"""
 {OUTCOME_FRAMING}

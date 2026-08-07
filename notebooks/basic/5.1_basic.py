@@ -5,8 +5,6 @@ import matplotlib.pyplot as plt
 import skimage.io as io
 from skimage import exposure, img_as_float
 
-st.title("5.1 How Biomedical Images Become Data (Basic Science)")
-
 st.markdown(
     """
 An image is not a picture to a model — it is a matrix of numbers. This subsection establishes where those

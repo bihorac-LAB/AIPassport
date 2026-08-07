@@ -5,8 +5,6 @@ import matplotlib.pyplot as plt
 import skimage.io as io
 from skimage import exposure, img_as_float
 
-st.title("5.1 How Biomedical Images Become Data (Clinical Research)")
-
 st.markdown(
     """
 An image is not a picture to a model — it is a matrix of numbers. This subsection establishes where those
@@ -139,8 +137,9 @@ else:
         "Contrast",
         1.0,
         3.0,
-        1.2,
-        help="Multiplies the distance between light and dark, separating tissue types.",
+        1.0,
+        help="Multiplies the distance between light and dark, separating tissue types. "
+        "Starts at 1.0 — no change — so you can see what each step costs.",
         key="m5_form_contrast",
     )
     brightness = mod_cols[1].slider(
@@ -162,15 +161,30 @@ else:
         use_container_width=True,
     )
 
-    clipped = float((cv2.cvtColor(adjusted, cv2.COLOR_RGB2GRAY) >= 255).mean())
-    if clipped > 0.02:
+    # Report the saturation this adjustment *added*. This radiograph's background is already
+    # pure white, and that pre-existing 255 is not something the learner did.
+    baseline_clipped = float((gray >= 255).mean())
+    now_clipped = float((cv2.cvtColor(adjusted, cv2.COLOR_RGB2GRAY) >= 255).mean())
+    added = max(0.0, now_clipped - baseline_clipped)
+
+    if added > 0.10:
         st.error(
-            f"**{clipped:.1%} of pixels are now saturated at 255.** Those values are gone — clipped to pure "
-            "white with no way back. This is the failure mode that makes aggressive enhancement dangerous: "
-            "the image looks more confident and contains less."
+            f"**Your adjustment has pushed a further {added:.1%} of the image to pure white** "
+            f"({baseline_clipped:.1%} was already background). Those values are gone with no way back. This "
+            "is the failure mode that makes aggressive enhancement dangerous: the image looks more confident "
+            "and contains less."
+        )
+    elif added > 0.02:
+        st.warning(
+            f"A further {added:.1%} of the image is now saturated at 255 "
+            f"(background was {baseline_clipped:.1%}). You are beginning to trade real detail for apparent "
+            "contrast."
         )
     else:
-        st.caption(f"Saturated pixels: {clipped:.2%}. Nothing meaningful has been clipped yet.")
+        st.caption(
+            f"Newly saturated: {added:.2%}. Nothing meaningful has been clipped yet — "
+            f"{baseline_clipped:.1%} of this image was already pure-white background."
+        )
 
 st.markdown("---")
 

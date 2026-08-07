@@ -3,8 +3,6 @@ import time
 from openai import OpenAI
 import aipassport_config as cfg
 
-st.title("7.2 Communicating and Defending Your Work (Basic)")
-
 st.markdown(
     """
 Subsection 7.1 produced a study design and a rigor artefact. A design nobody funds, nobody understands, and

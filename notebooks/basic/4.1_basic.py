@@ -18,8 +18,6 @@ OUTCOME_FRAMING = (
 POSITIVE_LABEL = "Positive class (1)"
 NEGATIVE_LABEL = "Negative class (0)"
 
-st.title("4.1 Building a Model End to End (Basic Science)")
-
 st.markdown(
     f"""
 {OUTCOME_FRAMING}

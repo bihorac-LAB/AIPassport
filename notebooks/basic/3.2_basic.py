@@ -12,8 +12,6 @@ ID_PREFIX = "SMP"
 TARGET_LABEL = "Cytokine IL-6"
 SECONDARY_LABEL = "T-Cell Count"
 
-st.title("3.2 Cleaning and Sharing Data Across Sites (Basic Science)")
-
 st.markdown(
     f"""
 Subsection 3.1 decided whether the data was worth using. Now you do the work.

@@ -15,8 +15,6 @@ SUBJECT_TERM = "Patient"
 SAMPLE_TERM = "Electronic Health Record (EHR)"
 UNDERSERVED_EXAMPLE = "Rural populations with limited hospital access"
 
-st.title("3.1 Getting Data You Can Trust (Clinical Research)")
-
 st.markdown(
     f"""
 Before you clean a dataset, you have to decide whether it is worth using at all. You are acting as the
@@ -293,6 +291,8 @@ with tab4:
         return (total_var - within_item_var) / total_var if total_var > 0 else 0
 
     icc_value = icc(numeric_data)
+    rater_word = "radiologist"
+    item_word = "X-ray"
 
     col_icc, col_dist = st.columns(2)
     with col_icc:
@@ -302,7 +302,14 @@ with tab4:
             f"{icc_value:.4f}",
             help="Near 1.0 means the radiologists agree. Lower values mean the label itself is noisy.",
         )
-        if icc_value < 0.5:
+        if icc_value < 0:
+            st.error(
+                f"**A negative ICC ({icc_value:.3f}) is not a bug.** It means the {rater_word}s disagree with "
+                f"each other *more* than the {item_word}s differ from one another — so the label carries "
+                "essentially no signal about which "
+                f"{item_word} is which. Training on this would teach a model to reproduce the disagreement."
+            )
+        elif icc_value < 0.5:
             st.error(
                 "Poor agreement. No model can be more reliable than the labels it was trained on — this is "
                 "a data problem, not a modelling problem."

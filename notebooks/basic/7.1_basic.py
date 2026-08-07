@@ -3,8 +3,6 @@ import time
 from openai import OpenAI
 import aipassport_config as cfg
 
-st.title("7.1 From Idea to Study Design (Basic)")
-
 header_cols = st.columns(3)
 with header_cols[1]:
     st.image("assets/images/headers/7.1_header.png")

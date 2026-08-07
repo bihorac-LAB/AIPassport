@@ -12,8 +12,6 @@ ID_PREFIX = "PT"
 TARGET_LABEL = "WBC Count"
 SECONDARY_LABEL = "O2 Saturation"
 
-st.title("3.2 Cleaning and Sharing Data Across Sites (Clinical Research)")
-
 st.markdown(
     f"""
 Subsection 3.1 decided whether the data was worth using. Now you do the work.

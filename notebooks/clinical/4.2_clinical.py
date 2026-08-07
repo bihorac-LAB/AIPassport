@@ -23,8 +23,6 @@ from sklearn.metrics import accuracy_score, recall_score, confusion_matrix
 # ── Track-specific framing (this file is the clinical track) ────────────────
 DEFAULT_DATASET_INDEX = 0  # clinical track opens on the eICU cohort
 
-st.title("4.2 Evaluating and Explaining a Model (Clinical Research)")
-
 st.markdown(
     """
 Subsection 4.1 built a model. This one stops trusting it.

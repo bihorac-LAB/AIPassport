@@ -3,8 +3,6 @@ import pandas as pd
 import numpy as np
 import plotly.express as px
 
-st.title("1.2 Designing a Study You Can Defend (Clinical Research)")
-
 st.markdown(
     """
 You are a clinical informatics researcher at a large academic medical center. Your hospital has
