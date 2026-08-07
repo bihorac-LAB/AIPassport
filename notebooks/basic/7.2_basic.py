@@ -3,7 +3,7 @@ import time
 from openai import OpenAI
 import aipassport_config as cfg
 
-st.title("7.2 Communicating and Defending Your Work (Clinical)")
+st.title("7.2 Communicating and Defending Your Work (Basic)")
 
 st.markdown(
     """
