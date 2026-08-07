@@ -127,29 +127,45 @@ structure easier to see — for you or for a model. None of them adds informatio
 
 
 @st.cache_data
-def load_microscopy_images():
-    """Bundled microscopy and MRI samples."""
-    if_cells = io.imread("assets/datasets/images/IFCells.jpg")
-    brightfield = io.imread("assets/datasets/images/BloodSmear.png")
-    kidney_mri = io.imread("assets/datasets/images/kidney_mri.jpg")
-    if if_cells.ndim == 3 and if_cells.shape[-1] == 4:
-        if_cells = if_cells[:, :, :3]
-    if brightfield.ndim == 3 and brightfield.shape[-1] == 4:
-        brightfield = brightfield[:, :, :3]
+def load_intensity_samples_basic():
+    """Bundled imaging samples, alpha stripped so every one is RGB or greyscale."""
+
+    def read(path):
+        image = io.imread(path)
+        if image.ndim == 3 and image.shape[-1] == 4:
+            image = image[:, :, :3]
+        return image
+
     return {
-        "Brightfield (blood smear)": brightfield,
-        "Fluorescence (IF cells)": if_cells,
-        "Kidney MRI": kidney_mri,
+        "Brightfield (blood smear)": read("assets/datasets/images/BloodSmear.png"),
+        "Fluorescence (IF cells)": read("assets/datasets/images/IFCells.jpg"),
+        "Low-contrast sample": read("assets/datasets/images/low_contrast2.jpg"),
+        "Kidney MRI (low dynamic range)": read("assets/datasets/images/kidney_mri.jpg"),
+        "Mammography (low contrast)": read("assets/datasets/images/breast.png"),
     }
 
 
-images = load_microscopy_images()
+images = load_intensity_samples_basic()
+
+def to_gray_for_stats(image):
+    return cv2.cvtColor(image, cv2.COLOR_RGB2GRAY) if image.ndim == 3 else image
+
 
 image_choice = st.selectbox(
-    "Image:", list(images), help="The same operation behaves differently on each of these.",
+    "Image:",
+    list(images),
+    help="The same operation behaves differently on each of these. The low-contrast and "
+    "low-dynamic-range samples are where rescaling and CLAHE earn their keep; on a "
+    "well-exposed brightfield image they mostly amplify noise.",
     key="m5_intensity_image",
 )
 img = images[image_choice]
+
+st.caption(
+    f"5th-95th percentile spread of **{image_choice}**: "
+    f"{int(np.percentile(to_gray_for_stats(img), 95) - np.percentile(to_gray_for_stats(img), 5))} "
+    "of 255 available levels. The narrower that is, the more an intensity operation has to work with."
+)
 
 
 def to_gray(image):

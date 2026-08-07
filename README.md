@@ -21,6 +21,16 @@ Instead of a complex external backend, the AI Guide is implemented as a **Direct
 - **`notebooks/clinical/`**: Specialized tracks for medical/clinical AI applications.
 - **`notebooks/basic/`**: Core AI/ML concepts for general learners.
 - Each notebook is a standalone Streamlit page that can also leverage the central AI configuration.
+- **Every module presents exactly two subsections**, `{module}.1` and `{module}.2`, following an
+  Understand → Apply arc. Both tracks exist for all twelve subsections. The pairing and the titles live in
+  `MODULE_SUBSECTIONS` in `aipassport_notebooks.py`, which is what the registration loop walks — adding a
+  subsection requires an entry there as well as a notebook file. See `docs/consolidation-plan.md` for how the
+  curriculum was consolidated and `docs/deployment_doc.md` for the full path list.
+
+### 5. Notebook Context (`assets/notebook_context/`)
+One JSON per notebook, named `{module}.{subsection}_{track}.json`. The AI Guide receives it verbatim, and
+reads `sections[].how_to_use` to tell learners which control to use — so it must be updated whenever a
+notebook's controls change.
 
 ### 4. Assets & LLM Resources
 - **`assets/llm/`**: Contains system instructions and JSON response schemas for structured AI activities.
