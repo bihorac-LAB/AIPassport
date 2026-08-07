@@ -68,7 +68,11 @@ with tab1:
             "Eight numeric predictors and one binary outcome. Nothing here is categorical, which is why no "
             "encoding step appears in this pipeline."
         )
-        st.write(df.dtypes)
+        # .astype(str): a Series of numpy dtype objects is not Arrow-serializable, and
+        # Streamlit would log a conversion traceback before falling back to strings anyway.
+        st.dataframe(
+            df.dtypes.astype(str).rename("dtype").to_frame(), use_container_width=True
+        )
 
     st.subheader("Distributions by outcome")
     feature_to_plot = st.selectbox(
