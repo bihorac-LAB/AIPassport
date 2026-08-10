@@ -1,26 +1,48 @@
 {
-  "title": "Ethical Data Acquisition Audit",
-  "module": "Module 3 - Data Stewardship",
+  "id": "3.2_clinical",
+  "module": "Module 3 - Data",
+  "subsection": "3.2",
   "microskill": "3.2",
   "track": "clinical",
-  "audience": "Clinical learners auditing whether patient-facing datasets are ethically acquired and fit for AI use.",
+  "title": "Cleaning and Sharing Data Across Sites",
+  "audience": "Clinical researchers and clinician-scientists new to AI",
   "objectives": [
-    "Review autonomy, justice, privacy, and beneficence as clinical data acquisition pillars.",
-    "Revise consent language for clearer patient understanding.",
-    "Evaluate representation gaps and recruitment strategies.",
-    "Select privacy controls and return-of-value practices."
+    "Inspect a local dataset for contamination and missingness.",
+    "Detect outliers by z-score and choose between removal and winsorization.",
+    "Impute and scale so two sites' preprocessing is identical.",
+    "Complete a federated training round without moving raw records."
   ],
   "sections": [
-    {"name": "Intro: The Four Pillars", "purpose": "Frame the ethical audit target and learner role."},
-    {"name": "Autonomy: Consent Audit", "purpose": "Compare legalistic consent language with patient-centered language."},
-    {"name": "Justice: Representation Audit", "purpose": "Use recruitment strategies to close representation gaps."},
-    {"name": "Privacy: Security Audit", "purpose": "Select layered security controls and inspect risk status."},
-    {"name": "Beneficence: Impact Audit", "purpose": "Complete the ethical data cycle by returning value to patients and communities."}
+    {
+      "name": "Simulation settings",
+      "purpose": "Set the size and contamination of the local dataset.",
+      "how_to_use": "Two sliders: sample size per institution and outlier contamination rate."
+    },
+    {
+      "name": "Step 1 - Local Data Inspection",
+      "purpose": "Look at the data before collaborating.",
+      "how_to_use": "Expand the raw dataset. Note the record count, the missing-secondary-value count, and especially the maximum of the target feature, which reveals the contamination."
+    },
+    {
+      "name": "Step 2 - Outlier Detection and Handling",
+      "purpose": "Find improbable values and decide what to do with them.",
+      "how_to_use": "Set the z-score threshold, read the outliers-detected metric, choose a strategy radio (remove the rows, or winsorize by capping), then tick 'Apply handling and proceed'. Steps 3 and 4 stay hidden until that box is checked."
+    },
+    {
+      "name": "Step 3 - Imputation and Scaling",
+      "purpose": "Make both sites' preprocessing identical.",
+      "how_to_use": "Choose an imputation method (mean, median, zero) and a scaler (Min-Max, Standard). The before/after boxplots and the 'values still beyond 3 SD' metric show the effect."
+    },
+    {
+      "name": "Step 4 - A Federated Learning Round",
+      "purpose": "Train across two institutions without moving raw data.",
+      "how_to_use": "Press 'Run federated learning round'. Each node's local weights, the aggregated global model, and a 'records shared = 0' metric appear. Change a preprocessing choice and run again to see the weights move."
+    }
   ],
   "chatbot_guidance": [
-    "Guide learners through the audit activity selector.",
-    "Explain the four pillars in practical clinical data terms.",
-    "Help interpret pass or fail states without overcomplicating the answer.",
-    "Keep answers short and step-by-step."
+    "The scenario is harmonising patient data across City General and Mountain View Clinic to predict COVID-19 severity. The target feature is a WBC count; the secondary feature is O2 saturation, missing in every tenth record.",
+    "The constraint that shapes the whole page: federated learning only works if every site preprocesses identically, so the agreement has to happen before the first round.",
+    "Steps 3 and 4 are gated behind the 'Apply handling and proceed' checkbox. If a learner cannot find them, that box is why.",
+    "Imputing with zero is not neutral -- in clinical data zero usually means something."
   ]
 }

@@ -1,40 +1,44 @@
 {
   "id": "1.2_basic",
   "module": "Module 1 - Fundamentals",
+  "subsection": "1.2",
   "microskill": "1.2",
   "track": "basic",
-  "title": "Artificial Intelligence Lifecycle",
-  "audience": "Basic science learners studying AI project planning",
+  "title": "Designing a Study You Can Defend",
+  "audience": "Basic science researchers new to AI",
   "objectives": [
-    "Walk through the major lifecycle decisions in a molecular AI classification project.",
-    "Practice choosing data sources, preprocessing steps, models, and validation methods.",
-    "Connect each lifecycle decision to bias, rigor, and generalizability."
+    "Write a design brief: a concrete gap, a SMART question, and a data plan.",
+    "Detect outliers with the 1.5xIQR rule and quantify what each handling strategy costs.",
+    "Write the outlier-handling sentence that belongs in a methods section.",
+    "Commit to a splitting strategy, a cross-validation design, an external-validation plan, and a per-stratum audit.",
+    "Draft a professional message that carries a decision to a mixed-expertise team."
   ],
   "sections": [
     {
-      "name": "Collecting Molecular Data",
-      "purpose": "Choose an appropriate data source and reflect on possible bias.",
-      "how_to_use": "Select a source such as ChEMBL, PubChem, in-house data, or simulated molecules, then write why it fits the project."
+      "name": "1. The Design Brief",
+      "purpose": "State the gap, the research question, and the data plan before any modelling.",
+      "how_to_use": "Six inputs: a gap, a SMART research question, a multiselect of data elements, cohort criteria, missingness and bias, and preprocessing. Keep each answer short and specific."
     },
     {
-      "name": "Preprocessing and Feature Engineering",
-      "purpose": "Identify what must happen before raw molecular data can be modeled.",
-      "how_to_use": "Select cleaning, standardization, descriptor generation, missing-data handling, scaling, and labeling steps."
+      "name": "2. Rigor Lab: Outliers",
+      "purpose": "Detect and handle outliers, and see what each choice costs.",
+      "how_to_use": "Five steps, each with its own variable selectbox: 2.1 boxplot, 2.2 the 1.5xIQR bounds plus a table of flagged rows, 2.3 mean/std/median with and without outliers, 2.4 a strategy radio (remove, winsorize, impute with median) whose metrics show the delta, and 2.5 a methods sentence to write."
     },
     {
-      "name": "Model Selection",
-      "purpose": "Compare model choices for molecular classification.",
-      "how_to_use": "Choose a model and explain why its assumptions fit molecular fingerprints and the project goal."
+      "name": "3. A Validation Strategy You Can Defend",
+      "purpose": "Commit to splitting, cross-validation, external validation, and subgroup performance.",
+      "how_to_use": "Four tasks: a multiselect of what makes a random split unsafe plus a splitting radio; a cross-validation design selectbox with a folds slider and a metrics multiselect; a free-text external-validation plan; and a subgroup multiselect. A summary line restates the design you chose."
     },
     {
-      "name": "Model Validation",
-      "purpose": "Plan how to test model generalizability.",
-      "how_to_use": "Select validation approaches such as cross-validation, external testing, or scaffold-aware holdout validation."
+      "name": "4. Carrying the Decision to Your Team",
+      "purpose": "Communicate the design to a mixed-expertise team.",
+      "how_to_use": "Open the shared-vocabulary table first, answer the team question, then draft the professional message and compare it against the worked example behind the button."
     }
   ],
   "chatbot_guidance": [
-    "When asked how to use this notebook, guide the learner through the four lifecycle steps in order.",
-    "For basic science users, emphasize data provenance, molecular representation, validation design, and generalizability.",
-    "Keep answers short and practical."
+    "The scenario is AI phenotype classification on Cell Painting-style imaging; the rigor lab deliberately uses a small 30-row vitals table instead, because the outlier logic is identical and the table is small enough to inspect by eye.",
+    "If a learner objects that the lab data is clinical, agree and explain why: a saturated pixel intensity, a mis-segmented cell area, and a heart rate of 2 are the same statistical problem.",
+    "Push back gently on vague design-brief answers. Naming the mechanism of a bias beats naming the category.",
+    "The four validation tasks are four separate claims. A strong answer to one does not cover the others."
   ]
 }

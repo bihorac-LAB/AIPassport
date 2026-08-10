@@ -1,284 +1,587 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
-import os
-from sklearn.model_selection import KFold
+import matplotlib.pyplot as plt
+import seaborn as sns
+import plotly.graph_objects as go
+from plotly.subplots import make_subplots
+import shap
+import lime
+import lime.lime_tabular
+from sklearn.model_selection import (
+    train_test_split,
+    KFold,
+    StratifiedKFold,
+    cross_val_score,
+)
 from sklearn.preprocessing import StandardScaler
-from sklearn.metrics import confusion_matrix
-from sklearn.neural_network import MLPClassifier
-from sklearn.metrics import accuracy_score
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.linear_model import LogisticRegression
+from sklearn.datasets import make_classification
+from sklearn.metrics import accuracy_score, recall_score, confusion_matrix
 
-# ---------------------------------
-# Page Config & Sidebar
-# ---------------------------------
-st.markdown("### 1. Select Perspective")
-perspective = st.radio(
-    "View demonstration through the lens of:",
-    ["Clinical Science", "Foundational Science"],
-    help="Toggle this to see how the same machine learning pipeline is interpreted differently depending on the scientific domain."
+# ── Track-specific framing (this file is the clinical track) ────────────────
+DEFAULT_DATASET_INDEX = 0  # clinical track opens on the eICU cohort
+
+st.markdown(
+    """
+Subsection 4.1 built a model. This one stops trusting it.
+
+Four questions, in the order you should ask them:
+
+1. **Where does it start memorizing?** Compare a model that is too complex with one that is too simple.
+2. **Which validation strategy earns the number you report?**
+3. **Does it work equally well for everyone?** Aggregate accuracy hides subgroup failure.
+4. **Why did it say that?** Globally with SHAP, for one individual with LIME, and by hand with a what-if
+   simulator.
+
+All four share **one dataset, one split, and one scaler** — chosen immediately below.
+"""
 )
 
-st.markdown("### 2. Navigation")
-activity = st.radio(
-    "Go to:",
-    [
-        "Activity 1 - Data Exploration",
-        "Activity 2 - Model Optimization",
-        "Activity 3 - Cross-Validation Analysis",
-        "Activity 4 - Strategic Evaluation"
-    ],
-    help="Select an activity to interact with the corresponding stage of the pipeline."
-)
 
-# ---------------------------------
-# Context Variables
-# ---------------------------------
-if perspective == "Clinical Science":
-    app_desc = "Interactive demonstration of a clinical analytics pipeline. Observe how a Deep Neural Network learns to predict in-hospital mortality using data from the eICU Collaborative Research Database."
-else:
-    app_desc = "Interactive demonstration of a computational biology pipeline. Analyze how a Deep Neural Network maps continuous input features to a binary target on a highly imbalanced dataset."
+def render_plotly_chart(fig, height=520):
+    fig.update_layout(
+        height=height,
+        margin=dict(l=20, r=20, t=60, b=40),
+        legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
+    )
+    st.plotly_chart(fig, use_container_width=True, config={"responsive": True})
 
-st.title("Applied Fundamentals of Machine Learning (ML) and Deep Learning (DL)")
-st.write(app_desc)
 
-# ---------------------------------
-# Load Dataset 
-# ---------------------------------
 @st.cache_data
-def load_data():
-    try:
-        df = pd.read_csv("assets/datasets/csv/diabetes.csv")
-    except FileNotFoundError:
-        try:
-            df = pd.read_csv("diabetes.csv")
-        except FileNotFoundError:
-            from sklearn.datasets import load_diabetes
-            data = load_diabetes(as_frame=True)
-            df = data.frame.copy()
-            df['Outcome'] = (df['target'] > df['target'].median()).astype(int)
-            df.drop(columns='target', inplace=True)
-            
-    mapping = {
-        'age': 'Age', 'bmi': 'BMI', 'bp': 'BloodPressure', 
-        'Pregnancies': 'Pregnancies', 'Glucose': 'Glucose', 
-        'SkinThickness': 'SkinThickness', 'Insulin': 'Insulin',
-        'DiabetesPedigreeFunction': 'DiabetesPedigreeFunction'
-    }
-    df.rename(columns=mapping, inplace=True)
-    return df
+def load_eicu_subset():
+    """Bundled eICU demo extract. No network access: the CSV ships with the repository."""
+    df = pd.read_csv("assets/datasets/csv/eicu_demo.csv")
+    if "weight" in df.columns and "weight_admission" not in df.columns:
+        df = df.rename(columns={"weight": "weight_admission"})
+    feats = ["age", "lab_glucose", "lab_creatinine", "lab_potassium"]
+    for col in feats:
+        df[col] = pd.to_numeric(df[col], errors="coerce")
+    df[feats] = df[feats].fillna(df[feats].mean())
+    df = df.dropna(subset=["in_hospital_mortality"])
+    sample = df.sample(n=min(200, len(df)), random_state=42).reset_index(drop=True)
+    return sample, feats, "in_hospital_mortality"
 
-df = load_data()
 
-# --------------------
-# Activity 1 - Data Exploration
-# --------------------
-if activity == "Activity 1 - Data Exploration":
-    st.header("Activity 1: Exploring Data Types")
-    
-    st.markdown("### Instructions")
-    st.write("Complete each activity in order. In the sidebar, toggle between the Clinical Science and Foundational Science perspectives. Record your responses to the module activities exclusively in your Canvas submission area.")
-    st.write("Before training a model, researchers must inspect the raw data to understand feature distributions and identify class imbalances.")
-    
-    st.subheader("Data Preview")
-    n_rows = st.slider(
-        "Number of records to display", 
-        min_value=1, max_value=20, value=5,
-        help="Adjust the number of rows visible in the dataset table."
+@st.cache_data
+def load_synthetic_cohort():
+    """A synthetic, well-separated dataset: useful when you need a known ground truth."""
+    X, y = make_classification(
+        n_samples=200,
+        n_features=4,
+        n_informative=2,
+        n_redundant=1,
+        n_clusters_per_class=1,
+        flip_y=0.1,
+        random_state=42,
     )
-    st.dataframe(df.head(n_rows), use_container_width=True)
-    
-    with st.expander("View Data Types (.dtypes)"):
-        st.write("Variable types recognized for each column:")
-        st.write(df.dtypes)
-    
-    st.subheader("Feature Distributions")
-    feature_cols = [col for col in df.columns if col != 'Outcome']
-    feature_to_plot = st.selectbox(
-        "Select a feature to visualize:", 
-        feature_cols,
-        help="Choose a specific metric to observe its distribution across outcomes."
+    features = ["gene_x_expression", "protein_y_level", "culture_ph", "temperature_c"]
+    df = pd.DataFrame(X, columns=features)
+    df["gene_x_expression"] = (df["gene_x_expression"] * 10) + 50
+    df["protein_y_level"] = (df["protein_y_level"] * 5) + 20
+    df["culture_ph"] = (df["culture_ph"] * 0.5) + 7.4
+    df["temperature_c"] = (df["temperature_c"] * 1.5) + 37.0
+    df["cellular_apoptosis"] = y
+    return df, features, "cellular_apoptosis"
+
+
+DATASETS = {
+    "eICU cohort (real ICU admissions, in-hospital mortality)": load_eicu_subset,
+    "Synthetic cohort (simulated measurements, known ground truth)": load_synthetic_cohort,
+}
+
+dataset_choice = st.selectbox(
+    "Dataset for all four activities:",
+    list(DATASETS),
+    index=DEFAULT_DATASET_INDEX,
+    help="This is a dataset selector, not a track selector. The real cohort is messier and more "
+    "realistic; the synthetic one has a known ground truth, which makes overfitting easier to see.",
+    key="m4_eval_dataset",
+)
+
+df, FEATURES, TARGET = DATASETS[dataset_choice]()
+
+X = df[FEATURES]
+y = df[TARGET]
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.3, random_state=42, stratify=y
+)
+
+scaler = StandardScaler()
+X_train_s = scaler.fit_transform(X_train)
+X_test_s = scaler.transform(X_test)
+
+st.caption(
+    f"{len(df)} records · {len(FEATURES)} features · target `{TARGET}` · "
+    f"{len(X_train)} train / {len(X_test)} test (stratified, random_state=42)."
+)
+
+tab1, tab2, tab3, tab4 = st.tabs(
+    [
+        "1. Overfitting and Tuning",
+        "2. Validation Strategies",
+        "3. Subgroup Fairness",
+        "4. Explaining Predictions",
+    ]
+)
+
+# ═══════════════════════════════════════════════════════════════════════════
+# 1 — Overfitting and tuning
+# ═══════════════════════════════════════════════════════════════════════════
+with tab1:
+    st.header("Activity 1: Where the Model Starts Memorizing")
+    st.markdown(
+        """
+    A k-nearest-neighbours model has exactly one knob, which makes it the clearest possible illustration.
+    **Low k** draws a boundary around every individual point. **High k** draws one broad region and ignores
+    local structure. Neither generalizes; the answer is in between, and you find it by measurement.
+    """
     )
-    
-    col1, col2 = st.columns([1, 1.5])
-    with col1:
-        st.markdown("**Outcome Distribution**")
-        class_counts = df['Outcome'].value_counts().rename(index={0: 'Survival (0)', 1: 'Death (1)'})
-        st.bar_chart(class_counts, color="#1f77b4")
-        st.write(f"**Data Summary:** There are {class_counts.iloc[0]} Survival records and {class_counts.iloc[1]} Death records. This confirms a significant class imbalance.")
-        
-    with col2:
-        st.markdown(f"**Mean {feature_to_plot} by Outcome**")
-        feature_means = df.groupby('Outcome')[feature_to_plot].mean()
-        st.bar_chart(feature_means, color="#ff7f0e")
-        st.write(f"**Data Summary:** The average {feature_to_plot} for Survivors is {feature_means.iloc[0]:.2f}, while the average for Deaths is {feature_means.iloc[1]:.2f}.")
 
-    st.markdown("---")
-    with st.expander("Reveal: Conceptual Insights for Activity 1"):
-        if perspective == "Clinical Science":
-            st.info("""
-            **The Job Task:** The objective is to predict in-hospital mortality using demographic and lab data to support ICU triage.
-            **The Algorithmic Advantage:** A Deep Neural Network evaluates the non-linear interactions between variables. A specific blood pressure value may be safe for one patient but critical for another when combined with specific BMI and Glucose levels.
-            **Understanding the Data Format:** Features are standardized so that large numerical values do not dominate the model's weight updates, ensuring all clinical metrics are treated proportionally.
-            """)
-        else:
-            st.info("""
-            **The Job Task:** The task is binary classification, mapping continuous input arrays to a discrete target on an imbalanced dataset.
-            **The Algorithmic Advantage:** The DNN uses multiple hidden layers for automated feature extraction, capturing abstract patterns without manual feature engineering.
-            **Understanding the Data Format:** Standardizing data to a mean of 0 and variance of 1 ensures stable gradient updates during the backpropagation process.
-            """)
+    st.subheader("Decision boundaries (first two features)")
+    c1, c2 = st.columns(2)
+    k_low = c1.number_input(
+        "Complex model (k)", 1, 50, 1, help="A low k is highly sensitive to noise.", key="m4_eval_k_low"
+    )
+    k_high = c2.number_input(
+        "Simple model (k)", 1, 50, 15, help="A high k smooths the boundary out.", key="m4_eval_k_high"
+    )
 
-# --------------------
-# Activity 2 - Model Optimization
-# --------------------
-elif activity == "Activity 2 - Model Optimization":
-    st.header("Activity 2: Model Optimization")
-    
-    st.markdown("### Instructions")
-    st.write("Configure the optimization parameters to dictate how the network updates its internal weights. Execute the training pipeline and evaluate the resulting learning curve.")
-    
-    st.subheader("Training Parameters")
-    epochs = st.slider("Epochs", 5, 50, 50, help="Total passes through the training data.")
-    batch_size = st.select_slider("Batch Size", options=[8, 16, 32], value=16, help="Samples processed before weights are updated.")
+    def boundary_data(k_val):
+        X_2d = X_train_s[:, :2]
+        knn = KNeighborsClassifier(n_neighbors=k_val).fit(X_2d, y_train)
+        x_min, x_max = X_2d[:, 0].min() - 1, X_2d[:, 0].max() + 1
+        y_min, y_max = X_2d[:, 1].min() - 1, X_2d[:, 1].max() + 1
+        xx, yy = np.meshgrid(np.arange(x_min, x_max, 0.1), np.arange(y_min, y_max, 0.1))
+        Z = knn.predict(np.c_[xx.ravel(), yy.ravel()]).reshape(xx.shape)
+        return X_2d, xx, yy, Z
 
-    col1, col2 = st.columns([1, 1.5])
-    
-    with col1:
-        st.subheader("Deep Neural Network Architecture")
-        st.code("""
-model = Sequential([
-    Input(shape=(X_scaled.shape[1],)),
-    Dense(128, activation='relu'),
-    Dropout(0.3),
-    Dense(64, activation='relu'),
-    Dropout(0.2),
-    Dense(32, activation='relu'),
-    Dense(1, activation='sigmoid')
-])
-        """, language='python')
-        
-        if st.button("Execute Training"):
-            X = df.drop(columns=['Outcome']).values
-            y = df['Outcome'].values
-            scaler = StandardScaler()
-            X_scaled = scaler.fit_transform(X)
-            
-            model = MLPClassifier(hidden_layer_sizes=(128, 64, 32), max_iter=epochs, batch_size=batch_size, random_state=42)
-            with st.spinner("Executing model training..."):
-                model.fit(X_scaled, y)
-            st.session_state['act2_history'] = {'accuracy': [accuracy_score(y, model.predict(X_scaled))]}
-            st.success("Training Complete")
-            
-    with col2:
-        if 'act2_history' in st.session_state:
-            st.subheader("Model Learning Curve")
-            st.line_chart(pd.DataFrame(st.session_state['act2_history'])['accuracy'])
-            final_acc = st.session_state['act2_history']['accuracy'][-1]
-            st.metric("Final Global Accuracy", f"{final_acc:.4f}")
-            st.write(f"**Data Summary:** The model achieved a final global training accuracy of {final_acc:.2%}.")
+    fig_b = make_subplots(
+        rows=1,
+        cols=2,
+        subplot_titles=(f"Overfitting (k={k_low})", f"Underfitting (k={k_high})"),
+        horizontal_spacing=0.08,
+    )
+    for col, k_val in ((1, k_low), (2, k_high)):
+        x_2d, xx, yy, z = boundary_data(k_val)
+        fig_b.add_trace(
+            go.Contour(
+                x=xx[0],
+                y=yy[:, 0],
+                z=z,
+                colorscale="Cividis",
+                opacity=0.75,
+                showscale=False,
+                hoverinfo="skip",
+            ),
+            row=1,
+            col=col,
+        )
+        fig_b.add_trace(
+            go.Scatter(
+                x=x_2d[:, 0],
+                y=x_2d[:, 1],
+                mode="markers",
+                marker=dict(
+                    color=y_train, colorscale="Cividis", size=7, line=dict(color="white", width=1)
+                ),
+                showlegend=False,
+                hovertemplate=(
+                    f"{FEATURES[0]}: %{{x:.2f}}<br>{FEATURES[1]}: %{{y:.2f}}<extra></extra>"
+                ),
+            ),
+            row=1,
+            col=col,
+        )
+        fig_b.update_xaxes(title_text=f"{FEATURES[0]} (scaled)", row=1, col=col)
+        fig_b.update_yaxes(title_text=f"{FEATURES[1]} (scaled)", row=1, col=col)
+    render_plotly_chart(fig_b, height=560)
+    st.caption(
+        "Colourblind-accessible contour plot of the two models' decision boundaries. Yellow regions predict "
+        "one class, dark blue the other; white-outlined dots are individual records. The left panel's "
+        "islands are memorized points, not structure."
+    )
 
-    st.markdown("---")
-    with st.expander("Reveal: Conceptual Insights for Activity 2"):
-        if perspective == "Clinical Science":
-            st.warning("""
-            **Comparison to MS1:** The DNN can reach higher accuracy than the Decision Tree by finding hidden layers of risk, but global accuracy alone is deceptive.
-            **Metric Suitability:** In mortality prediction, accuracy is an insufficient metric. Because most patients survive, the model could guess 'Survival' for everyone and still appear accurate while failing to detect at-risk patients.
-            """)
-        else:
-            st.warning("""
-            **Comparison to MS1:** The DNN has higher capacity, but researchers must check if the model is genuinely learning the minority class or simply defaulting to the majority class distribution.
-            **Metric Suitability:** Total accuracy is skewed in imbalanced datasets because the loss function is dominated by the majority class samples.
-            """)
+    st.subheader("The accuracy curve — where the two lines part")
+    st.markdown(
+        "Now measure it. Train accuracy and test accuracy agree while the model is learning general rules, "
+        "and separate the moment it starts memorizing. That divergence is the signature of overfitting."
+    )
+    k_max = st.slider(
+        "Maximum k to test", 5, 50, 20, help="Extend this to see the model slide into underfitting.",
+        key="m4_eval_kmax",
+    )
 
-# --------------------
-# Activity 3 - Cross-Validation Analysis
-# --------------------
-elif activity == "Activity 3 - Cross-Validation Analysis":
-    st.header("Activity 3: Cross-Validation and Trade-Offs")
-    
-    st.markdown("### Instructions")
-    st.write("Execute the 5-fold cross-validation analysis. Adjust the classification threshold to observe the statistical trade-offs between Sensitivity and Specificity.")
+    ks = list(range(1, k_max + 1))
+    train_acc, test_acc = [], []
+    for k in ks:
+        knn = KNeighborsClassifier(n_neighbors=k).fit(X_train_s, y_train)
+        train_acc.append(accuracy_score(y_train, knn.predict(X_train_s)))
+        test_acc.append(accuracy_score(y_test, knn.predict(X_test_s)))
 
-    if st.button("Run 5-Fold Evaluation"):
-        X = df.drop(columns=['Outcome']).values
-        y = df['Outcome'].values
-        kf = KFold(n_splits=5, shuffle=True, random_state=42)
-        
-        results = []
-        progress_bar = st.progress(0)
-        
-        for fold, (train_idx, val_idx) in enumerate(kf.split(X)):
-            scaler = StandardScaler()
-            X_train = scaler.fit_transform(X[train_idx])
-            X_val = scaler.transform(X[val_idx])
-            y_train, y_val = y[train_idx], y[val_idx]
-            
-            model = MLPClassifier(hidden_layer_sizes=(128, 64, 32), max_iter=15, batch_size=32, random_state=42)
-            model.fit(X_train, y_train)
-            y_prob = model.predict_proba(X_val)[:, 1]
-            results.append((y_val, y_prob))
-            progress_bar.progress((fold + 1) / 5)
-        
-        st.session_state['act3_results'] = results
-        st.success("Evaluation Metrics Generated")
+    fig_acc = go.Figure()
+    fig_acc.add_trace(
+        go.Scatter(x=ks, y=train_acc, mode="lines+markers", name="Train accuracy",
+                   line=dict(color="#00204c"))
+    )
+    fig_acc.add_trace(
+        go.Scatter(x=ks, y=test_acc, mode="lines+markers", name="Test accuracy",
+                   line=dict(color="#d6b800"))
+    )
+    best_k = ks[int(np.argmax(test_acc))]
+    fig_acc.add_vline(
+        x=best_k, line_dash="dash", line_color="#d62728", annotation_text=f"best test k={best_k}"
+    )
+    fig_acc.update_xaxes(title_text="Number of neighbours (k)")
+    fig_acc.update_yaxes(title_text="Accuracy", range=[0, 1.05])
+    render_plotly_chart(fig_acc, height=470)
+    st.caption(
+        "Dark blue is training accuracy, yellow is test accuracy. At k=1 training accuracy is perfect and "
+        "meaningless — the nearest neighbour of a training point is itself."
+    )
 
-    if 'act3_results' in st.session_state:
-        threshold = st.slider("Classification Threshold", 0.1, 0.9, 0.5)
-        
-        metrics = []
-        for y_true, y_prob in st.session_state['act3_results']:
-            y_pred = (y_prob > threshold).astype(int).flatten()
-            tn, fp, fn, tp = confusion_matrix(y_true, y_pred).ravel()
-            acc = (tp + tn) / (tp + tn + fp + fn)
-            sens = tp / (tp + fn) if (tp + fn) > 0 else 0
-            spec = tn / (tn + fp) if (tn + fp) > 0 else 0
-            prec = tp / (tp + fp) if (tp + fp) > 0 else 0
-            metrics.append([acc, sens, spec, prec])
-        
-        avg_m = np.mean(metrics, axis=0)
-        c1, c2, c3, c4 = st.columns(4)
-        c1.metric("Avg Accuracy", f"{avg_m[0]:.3f}")
-        c2.metric("Avg Sensitivity", f"{avg_m[1]:.3f}")
-        c3.metric("Avg Specificity", f"{avg_m[2]:.3f}")
-        c4.metric("Avg Precision", f"{avg_m[3]:.3f}")
+    gap = train_acc[0] - test_acc[0]
+    st.metric("Train-test gap at k=1", f"{gap:.3f}", help="The size of the memorization effect.")
 
-    st.markdown("---")
-    with st.expander("Reveal: Conceptual Insights for Activity 3"):
-        st.info("""
-        **Performance Evaluation:** Lowering the threshold improves Sensitivity (catching more deaths) but reduces Specificity (more false alarms). This adjustment is the interactive equivalent of moving along an ROC curve to find the optimal clinical balance.
-        """)
+    with st.expander("Reveal concept summary"):
+        st.write(
+            f"The best test accuracy on this split occurs at k={best_k}. Choose the hyperparameter just "
+            "before the curves diverge substantially. A large gap between high training accuracy and low "
+            "test accuracy is the mathematical signature of overfitting — and note that you can only see it "
+            "because the test set was held back."
+        )
 
-# --------------------
-# Activity 4 - Strategic Evaluation
-# --------------------
-elif activity == "Activity 4 - Strategic Evaluation":
-    st.header("Activity 4: Strategic Evaluation")
-    
-    st.markdown("### Instructions")
-    st.write("Determine the optimal algorithmic approach based on organizational requirements for interpretability versus performance.")
+# ═══════════════════════════════════════════════════════════════════════════
+# 2 — Validation strategies
+# ═══════════════════════════════════════════════════════════════════════════
+with tab2:
+    st.header("Activity 2: Which Validation Strategy Earns Your Number")
+    st.markdown(
+        "The accuracy in tab 1 came from one split. Change the split and it changes. Cross-validation shows "
+        "you the whole distribution, and *how* you fold matters as much as how many times."
+    )
 
-    st.subheader("Architectural Comparison")
-    col1, col2 = st.columns(2)
-    with col1:
-        st.markdown("**Decision Tree (MS1)**")
-        st.write("- Logic: Interpretable 'If-Then' splits.")
-        st.write("- Transparency: High (White Box).")
-    with col2:
-        st.markdown("**Deep Neural Network (Current)**")
-        st.write("- Logic: Complex non-linear combinations across hidden layers.")
-        st.write("- Transparency: Low (Black Box).")
-        
-    st.markdown("---")
-    priority = st.select_slider("Select Core Requirement:", options=["Interpretability", "Balanced", "Performance"])
-    
-    if priority == "Interpretability":
-        st.info("Strategy: Use the Decision Tree. Clinician trust often relies on being able to follow the model's logic step-by-step.")
-    elif priority == "Performance":
-        st.success("Strategy: Use the DNN. Raw predictive power is prioritized to maximize patient safety and triage accuracy.")
+    col_cv1, col_cv2 = st.columns(2)
+    n_f = col_cv1.slider(
+        "Number of folds", 2, 10, 5, help="How many subsets the data is split into.", key="m4_eval_folds"
+    )
+    k_cv = col_cv2.slider(
+        "Model complexity (k)", 1, 20, 5, help="Neighbour count for the model being validated.",
+        key="m4_eval_kcv",
+    )
+
+    knn_cv = KNeighborsClassifier(n_neighbors=k_cv)
+    X_s = StandardScaler().fit_transform(X)
+    kf_scores = cross_val_score(knn_cv, X_s, y, cv=KFold(n_splits=n_f, shuffle=True, random_state=42))
+
+    fig_cv = go.Figure()
+    fig_cv.add_trace(
+        go.Box(
+            x=kf_scores,
+            name=f"{n_f} folds",
+            boxpoints="all",
+            jitter=0.35,
+            pointpos=0,
+            marker_color="#d6b800",
+            line_color="#00204c",
+        )
+    )
+    fig_cv.update_xaxes(title_text="Accuracy", range=[0, 1.05])
+    fig_cv.update_layout(title=f"Accuracy distribution across {n_f} folds")
+    render_plotly_chart(fig_cv, height=400)
+    st.caption(
+        "Each dot is one fold. A wide box means the model's performance depends heavily on which records "
+        "happened to land in the test fold — so a single split would have been a coin toss."
+    )
+
+    st.subheader("K-Fold vs. Stratified K-Fold")
+    st.markdown(
+        "Plain K-Fold slices the data without regard to the outcome. With an imbalanced target, a fold can "
+        "end up with almost none of the minority class, and its score becomes noise."
+    )
+
+    skf_scores = cross_val_score(
+        knn_cv, X_s, y, cv=StratifiedKFold(n_splits=n_f, shuffle=True, random_state=42)
+    )
+
+    methods = ["K-Fold", "Stratified K-Fold"]
+    means = [kf_scores.mean(), skf_scores.mean()]
+    stds = [kf_scores.std(), skf_scores.std()]
+
+    fig_bar = go.Figure(
+        go.Bar(
+            x=methods,
+            y=means,
+            error_y=dict(type="data", array=stds, visible=True),
+            marker_color=["#00204c", "#d6b800"],
+            text=[f"{m:.3f}" for m in means],
+        )
+    )
+    fig_bar.update_yaxes(title_text="Mean accuracy", range=[0, 1.1])
+    render_plotly_chart(fig_bar, height=430)
+
+    strat_cols = st.columns(2)
+    strat_cols[0].metric("K-Fold std. dev.", f"{kf_scores.std():.4f}")
+    strat_cols[1].metric(
+        "Stratified std. dev.",
+        f"{skf_scores.std():.4f}",
+        delta=f"{skf_scores.std() - kf_scores.std():+.4f}",
+        delta_color="inverse",
+    )
+
+    minority_share = float(min(y.mean(), 1 - y.mean()))
+    st.caption(
+        f"The minority class is {minority_share:.1%} of this dataset. Stratified K-Fold guarantees that "
+        f"ratio in every fold, which is why it is the default choice for biomedical data. "
+        "**Leave-one-out CV** is the limiting case — one fold per record. It is nearly unbiased and "
+        f"prohibitively expensive: on these {len(df)} records it would fit {len(df)} models to answer the "
+        "same question these folds already answered, which is why it is described here rather than run."
+    )
+
+# ═══════════════════════════════════════════════════════════════════════════
+# 3 — Subgroup fairness
+# ═══════════════════════════════════════════════════════════════════════════
+with tab3:
+    st.header("Activity 3: Does It Work Equally Well for Everyone?")
+    st.markdown(
+        "One aggregate number can hide a model that works well for the majority and fails for a subgroup. "
+        "The only way to find out is to split the test set and score each stratum separately."
+    )
+
+    fair_model = LogisticRegression(solver="lbfgs", max_iter=1000)
+    fair_model.fit(X_train, y_train)
+
+    overall_cols = st.columns(3)
+    overall_pred = fair_model.predict(X_test)
+    overall_cols[0].metric("Overall accuracy", f"{accuracy_score(y_test, overall_pred):.3f}")
+    overall_cols[1].metric(
+        "Overall sensitivity", f"{recall_score(y_test, overall_pred, zero_division=0):.3f}"
+    )
+    tn_o, fp_o, _, _ = confusion_matrix(y_test, overall_pred, labels=[0, 1]).ravel()
+    overall_cols[2].metric(
+        "Overall specificity", f"{tn_o / (tn_o + fp_o) if (tn_o + fp_o) else 0:.3f}"
+    )
+
+    st.subheader("Now split it")
+    subgroup_feature = st.selectbox(
+        "Stratify the test set by:",
+        FEATURES,
+        help="Any feature can define a subgroup. Pick the one whose subgroups you would actually have to "
+        "answer for.",
+        key="m4_eval_subgroup_feature",
+    )
+
+    lo = float(df[subgroup_feature].min())
+    hi = float(df[subgroup_feature].max())
+    cut_low, cut_high = st.slider(
+        f"Boundaries for the three {subgroup_feature} strata:",
+        lo,
+        hi,
+        (lo + (hi - lo) / 3, lo + 2 * (hi - lo) / 3),
+        key="m4_eval_subgroup_cuts",
+    )
+
+    X_test_grouped = X_test.copy()
+    X_test_grouped["Stratum"] = pd.cut(
+        X_test_grouped[subgroup_feature],
+        bins=[-np.inf, cut_low, cut_high, np.inf],
+        labels=["Low", "Middle", "High"],
+    )
+
+    metrics_list = []
+    for group in ["Low", "Middle", "High"]:
+        idx = X_test_grouped["Stratum"] == group
+        if not idx.any():
+            continue
+        g_pred = fair_model.predict(X_test[idx.values])
+        g_true = y_test[idx.values]
+        tn, fp, fn, tp = confusion_matrix(g_true, g_pred, labels=[0, 1]).ravel()
+        metrics_list.append(
+            {
+                f"{subgroup_feature} stratum": group,
+                "Samples": int(len(g_true)),
+                "Positives": int(g_true.sum()),
+                "Accuracy": accuracy_score(g_true, g_pred),
+                "Sensitivity": recall_score(g_true, g_pred, zero_division=0),
+                "Specificity": tn / (tn + fp) if (tn + fp) else 0.0,
+            }
+        )
+
+    fair_df = pd.DataFrame(metrics_list)
+
+    col_a, col_b = st.columns([1, 1.5])
+    col_a.dataframe(fair_df, use_container_width=True)
+
+    fig_fair, ax_fair = plt.subplots(figsize=(8, 4))
+    sns.barplot(
+        data=fair_df.melt(
+            id_vars=f"{subgroup_feature} stratum",
+            value_vars=["Accuracy", "Sensitivity", "Specificity"],
+        ),
+        x=f"{subgroup_feature} stratum",
+        y="value",
+        hue="variable",
+        ax=ax_fair,
+        palette="viridis",
+    )
+    ax_fair.set_ylim(0, 1.1)
+    ax_fair.set_ylabel("Metric score")
+    col_b.pyplot(fig_fair)
+    plt.close(fig_fair)
+
+    MIN_POSITIVES = 5
+    reliable = fair_df[fair_df["Positives"] >= MIN_POSITIVES] if not fair_df.empty else fair_df
+    thin = fair_df[fair_df["Positives"] < MIN_POSITIVES] if not fair_df.empty else fair_df
+
+    if not thin.empty:
+        st.warning(
+            "**Too thin to judge:** "
+            + ", ".join(
+                f"the {row[f'{subgroup_feature} stratum']} stratum has only "
+                f"{int(row['Positives'])} positive case(s)"
+                for _, row in thin.iterrows()
+            )
+            + f". Sensitivity on fewer than {MIN_POSITIVES} positives is noise, not a disparity — a single "
+            "record flips it from 0.00 to 1.00. Report it as unestimable rather than as a finding."
+        )
+
+    if len(reliable) >= 2:
+        worst = reliable.loc[reliable["Sensitivity"].idxmin()]
+        spread = reliable["Sensitivity"].max() - reliable["Sensitivity"].min()
+        st.metric(
+            "Sensitivity spread across estimable strata",
+            f"{spread:.3f}",
+            help=f"Computed only over strata with at least {MIN_POSITIVES} positive cases.",
+        )
+        st.markdown(
+            f"The **{worst[f'{subgroup_feature} stratum']}** stratum has the lowest sensitivity "
+            f"({worst['Sensitivity']:.3f}) on {int(worst['Samples'])} records. Move the boundaries and watch "
+            "the spread change — which should tell you something uncomfortable: **how unfair the model looks "
+            "depends partly on where you draw the lines.** That is why the strata have to be chosen for "
+            "clinical or biological reasons and stated in advance, not discovered afterwards."
+        )
+    elif not fair_df.empty:
+        st.info(
+            "Fewer than two strata have enough positive cases to compare. Widen the middle band, or accept "
+            "that this test set cannot answer the fairness question for this variable — which is itself a "
+            "reportable finding."
+        )
+
+# ═══════════════════════════════════════════════════════════════════════════
+# 4 — Explaining predictions
+# ═══════════════════════════════════════════════════════════════════════════
+with tab4:
+    st.header("Activity 4: Why Did It Say That?")
+    st.markdown(
+        "Three complementary answers to the same question, at three different scales. All use the logistic "
+        "regression from tab 3, so the explanations describe the model you just audited."
+    )
+
+    st.subheader("Globally: SHAP")
+    st.markdown(
+        "SHAP attributes each prediction to its features and lets you aggregate across the whole test set. "
+        "It answers: *which features drive this model overall, and in which direction?*"
+    )
+
+    max_display = st.slider(
+        "Features to display", 1, len(FEATURES), min(5, len(FEATURES)), key="m4_eval_shap_n"
+    )
+
+    with st.spinner("Computing SHAP values..."):
+        explainer = shap.Explainer(fair_model, X_test)
+        shap_values = explainer(X_test)
+
+    fig_shap = plt.figure()
+    shap.summary_plot(shap_values, X_test, max_display=max_display, show=False)
+    st.pyplot(plt.gcf())
+    plt.close(fig_shap)
+    st.caption(
+        "Each dot is one record. Position on the x-axis is that feature's contribution to that record's "
+        "prediction; colour is the feature's value. A feature whose dots spread far from zero matters; one "
+        "whose dots cluster at zero does not, however clinically important you expected it to be."
+    )
+
+    st.divider()
+    st.subheader("Locally: LIME")
+    st.markdown(
+        "A global summary does not tell a specific person why *their* prediction came out the way it did. "
+        "LIME fits a simple local model around one record and reports what moved that single decision."
+    )
+
+    record_idx = st.number_input(
+        "Record index (from the test set)", 0, len(X_test) - 1, 0, key="m4_eval_lime_idx"
+    )
+
+    with st.spinner("Explaining this record..."):
+        lime_explainer = lime.lime_tabular.LimeTabularExplainer(
+            training_data=np.array(X_train),
+            feature_names=list(X_train.columns),
+            class_names=[f"{TARGET} = 0", f"{TARGET} = 1"],
+            mode="classification",
+        )
+        exp = lime_explainer.explain_instance(
+            X_test.iloc[record_idx].values,
+            fair_model.predict_proba,
+            num_features=min(5, len(FEATURES)),
+        )
+
+    lime_cols = st.columns([1.4, 1])
+    with lime_cols[0]:
+        fig_lime = exp.as_pyplot_figure()
+        st.pyplot(fig_lime)
+        plt.close(fig_lime)
+    with lime_cols[1]:
+        st.markdown(f"**Record #{record_idx}**")
+        st.dataframe(X_test.iloc[[record_idx]].T.rename(columns={X_test.index[record_idx]: "Value"}))
+        st.markdown(f"True label: **{int(y_test.iloc[record_idx])}**")
+        st.markdown(
+            f"Predicted probability: **{fair_model.predict_proba(X_test.iloc[[record_idx]])[0][1]:.3f}**"
+        )
+
+    st.divider()
+    st.subheader("By hand: the what-if simulator")
+    st.markdown(
+        "The last check is counterfactual. Build a profile, then change one value and see whether the model "
+        "moves the way domain knowledge says it should. A model that responds in the wrong direction is "
+        "telling you something the accuracy score never will."
+    )
+
+    profile = {}
+    sim_cols = st.columns(min(4, len(FEATURES)))
+    for i, col in enumerate(FEATURES):
+        with sim_cols[i % len(sim_cols)]:
+            profile[col] = st.slider(
+                col,
+                float(df[col].min()),
+                float(df[col].max()),
+                float(df[col].mean()),
+                key=f"m4_eval_whatif_{col}",
+            )
+
+    input_df = pd.DataFrame([profile])[FEATURES]
+    prediction = fair_model.predict(input_df)[0]
+    prob = float(fair_model.predict_proba(input_df)[0][1])
+
+    label = f"Positive ({TARGET} = 1)" if prediction == 1 else f"Negative ({TARGET} = 0)"
+    if prediction == 1:
+        st.error(f"Prediction: {label}")
     else:
-        st.warning("Strategy: A balanced approach may require hybrid models or post-hoc explainability tools.")
+        st.success(f"Prediction: {label}")
+    st.progress(prob, text=f"Predicted probability: {prob:.1%}")
 
-    st.markdown("---")
-    with st.expander("Reveal: Conceptual Insights for Activity 4"):
-        st.success("""
-        **Model Selection:** The DNN trades human readability for mathematical capacity. It is chosen for its superior ability to map complex features, but the Decision Tree remains the standard if structural transparency is the priority.
-        """)
+st.markdown(
+    """
+---
+**Key takeaways**
+
+- Overfitting is measurable, not a vibe: it is the gap between training and held-out performance.
+- Stratified K-Fold is the default for biomedical data because it protects the minority class in every fold.
+- Aggregate performance is not performance. Report it by subgroup, with the strata chosen in advance.
+- SHAP explains the model, LIME explains one prediction, and a counterfactual check tests whether either
+  agrees with what you know. A model can be accurate and still be reasoning wrongly.
+
+**Resources:** [SHAP](https://shap.readthedocs.io/) · [LIME](https://github.com/marcotcr/lime) ·
+[scikit-learn cross-validation](https://scikit-learn.org/stable/modules/cross_validation.html)
+"""
+)

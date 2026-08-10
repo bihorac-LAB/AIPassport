@@ -1,287 +1,349 @@
 import streamlit as st
+import numpy as np
 import pandas as pd
 import plotly.express as px
+from scipy.stats import zscore
+from sklearn.preprocessing import StandardScaler, MinMaxScaler
 
-st.markdown("""
-<style>
-    .narrator-box {
-        background-color: #f4f6f7; 
-        border-left: 5px solid #2c3e50; 
-        padding: 20px; 
-        border-radius: 4px; 
-        font-style: italic; 
-        font-family: 'Georgia', serif;
-        margin-bottom: 25px;
-        color: #333;
-    }
-    .instruction-box {
-        background-color: #e8f6f3;
-        border: 1px solid #a2d9ce;
-        padding: 15px;
-        border-radius: 5px;
-        margin-bottom: 20px;
-        color: #0e6655;
-    }
-    .header-box {
-        background-color: #eaf2f8; 
-        border: 1px solid #d5d8dc; 
-        padding: 15px; 
-        border-radius: 5px; 
-        margin-bottom: 20px;
-    }
-    .toolkit-step {
-        background-color: #fdfefe;
-        border: 1px solid #eaecee;
-        padding: 15px;
-        border-radius: 5px;
-        margin-bottom: 10px;
-    }
-    h2 { color: #1a5276; border-bottom: 1px solid #eee; padding-bottom: 10px; }
-    h4 { color: #2c3e50; margin-top: 10px; }
-</style>
-""", unsafe_allow_html=True)
+# ── Track-specific framing (this file is the basic science track) ───────────
+SCENARIO = "Aggregating immunology data from two labs to analyze cytokine responses"
+INSTITUTIONS = ["Lab_Alpha", "Lab_Beta"]
+ID_PREFIX = "SMP"
+TARGET_LABEL = "Cytokine IL-6"
+SECONDARY_LABEL = "T-Cell Count"
 
-# --- 2. TRACK & CONFIGURATION ---
-st.title("3.2 Ethical Data Acquisition Audit")
+st.markdown(
+    f"""
+Subsection 3.1 decided whether the data was worth using. Now you do the work.
 
-with st.expander("Audit Configuration", expanded=True):
-    track = st.radio(
-        "Select Research Track:",
-        ["Clinical Track (IC3 COVID-19)", "Basic Science Track (ImmPort)"],
-        horizontal=True,
-        help="Select the dataset context for this audit session."
-    )
+**Scenario:** {SCENARIO}. Two labs — **{INSTITUTIONS[0].replace('_', ' ')}** and
+**{INSTITUTIONS[1].replace('_', ' ')}** — want to train one model together, and neither is permitted to
+send raw donor-level measurements to the other.
 
-# Set Variables based on Track
-if "Clinical" in track:
-    dataset_name = "IC3 UF Public COVID-19 Dataset"
-    dataset_link = "https://ic3.center.ufl.edu/research/resources/datasets/"
-    subject_term = "Patient"
-    sample_term = "Electronic Health Record (EHR)"
-    underserved_example = "Rural populations with limited hospital access"
-else:
-    dataset_name = "ImmPort (Immunology Database)"
-    dataset_link = "https://www.immport.org/shared/home"
-    subject_term = "Donor"
-    sample_term = "Biological Specimen"
-    underserved_example = "Donors of non-European ancestry"
-
-st.info(f"Current context: {dataset_name} | Subject: {subject_term}")
-
-# Navigation
-section = st.selectbox(
-    "Select Audit Activity:",
-    [
-        "1. Intro: The Four Pillars",
-        "2. Autonomy: Consent Audit",
-        "3. Justice: Representation Audit",
-        "4. Privacy: Security Audit",
-        "5. Beneficence: Impact Audit"
-    ]
+**The constraint that shapes everything below:** federated learning only works if every site preprocesses
+identically. A different outlier rule at one lab produces model weights that cannot be meaningfully
+averaged with the other's. So you will fix your local data first, then share only what is safe to share.
+"""
 )
 
-# --- 3. HELPER FUNCTIONS ---
-def narrator(text):
-    st.markdown(f'<div class="narrator-box"><b>Narrator:</b> "{text}"</div>', unsafe_allow_html=True)
-
-def instruction(text):
-    st.markdown(f'<div class="instruction-box"><b>Activity Instructions:</b> {text}</div>', unsafe_allow_html=True)
-
-# --- 4. APP CONTENT ---
-
-# === SECTION 1: INTRO ===
-if section == "1. Intro: The Four Pillars":
-    st.header("Module MS2: Acquiring Ethically Sourced Biomedical Data")
-    
-    narrator(
-        "Welcome to this educational journey. Today, we embark on an exploration of practices that honor patient autonomy, "
-        "ensure societal justice, and promote the beneficence of improving human health. Our journey will focus on four key pillars."
+with st.expander("Simulation settings", expanded=True):
+    c1, c2 = st.columns(2)
+    sample_size = c1.slider(
+        "Sample size (per institution)",
+        50,
+        500,
+        200,
+        step=50,
+        help="Simulates larger or smaller local datasets.",
+        key="m3_share_n",
     )
-    
-    st.markdown(f"""
-    <div class="header-box">
-        <h4>Audit Target: {dataset_name}</h4>
-        <p><b>Source:</b> <a href="{dataset_link}" target="_blank">Link to Dataset</a></p>
-        <p><b>Role:</b> You are acting as the Ethical Compliance Officer. Your goal is to review the proposed study protocol 
-        and identify failures in consent, representation, and security.</p>
-    </div>
-    """, unsafe_allow_html=True)
-    
-    col1, col2, col3, col4 = st.columns(4)
-    with col1: st.info("**1. Autonomy**\n\nInformed Consent & Control")
-    with col2: st.info("**2. Justice**\n\nEquitable Representation")
-    with col3: st.info("**3. Privacy**\n\nData Security & Encryption")
-    with col4: st.info("**4. Beneficence**\n\nReturning Value to Society")
-
-# === SECTION 2: AUTONOMY ===
-elif section == "2. Autonomy: Consent Audit":
-    st.header("Activity 1: The 'Fine Print' Audit (Autonomy)")
-    
-    narrator(
-        "Informed consent is a critical component of respecting patient autonomy. It transcends a simple signature on a document; "
-        "it is a dynamic, ongoing dialogue. Simplifying complex medical jargon is crucial."
-    )
-    
-    instruction(
-        f"The current protocol uses standard legal text for {subject_term} consent. "
-        "Use the tool below to revise the language and observe the impact on participant comprehension."
-    )
-    
-    col1, col2 = st.columns([1, 1])
-    
-    with col1:
-        st.markdown("#### Current Protocol (Legal Standard)")
-        st.warning(
-            f"The undersigned {subject_term} hereby grants permissions for the indefinite utilization of "
-            f"{sample_term}s and associated metadata, waiving all rights to pecuniary gain..."
-        )
-        st.write("**Audit Finding:** Low comprehension. Participants may feel alienated or coerced.")
-
-    with col2:
-        st.markdown("#### Revision Tool")
-        literacy = st.select_slider(
-            "Select Language Complexity Level:", 
-            options=["Medical Jargon", "Standard", "Simplified & Empowering"], 
-            value="Medical Jargon",
-            help="Adjusting this slider changes the phrasing of the consent form."
-        )
-        
-        if literacy == "Medical Jargon":
-            st.info("Status: No changes made. (See warning on left)")
-        elif literacy == "Standard":
-            st.info("Status: Improved, but still transactional.")
-        elif literacy == "Simplified & Empowering":
-            st.success(
-                f"**Revised Text:** 'We are asking for your permission to use your {sample_term} to help researchers understand disease. "
-                "You can say no without affecting your care. You can also withdraw later. We want you to be a partner in this science.'"
-            )
-            st.write("**Audit Result:** Compliant. The participant is empowered to make an informed choice.")
-
-# === SECTION 3: JUSTICE (REP-EQUITY TOOLKIT) ===
-elif section == "3. Justice: Representation Audit":
-    st.header("Activity 2: The 'Hidden Population' Audit (Justice)")
-    
-    narrator(
-        "Societal justice requires a commitment to equitable practices. This means diversifying the recruitment for studies. "
-        "Achieving health equity demands robust community engagement."
-    )
-    
-    instruction(
-        "The current recruitment plan is passive (email only). Use the REP-EQUITY Toolkit below to identify the missing group "
-        "and select active strategies to close the representation gap."
+    outlier_rate = c2.slider(
+        "Outlier contamination",
+        0.0,
+        0.10,
+        0.02,
+        step=0.01,
+        format="%f",
+        help="Share of the dataset carrying erroneous or extreme values.",
+        key="m3_share_contamination",
     )
 
-    # --- REP-EQUITY SIMULATION ---
-    st.markdown("#### REP-EQUITY Toolkit Configuration")
-    
-    c1, c2 = st.columns([1, 1])
-    
+
+@st.cache_data
+def generate_lab_cohort(n_samples, contamination):
+    rng = np.random.default_rng(42)
+
+    n_outliers = int(n_samples * contamination)
+    n_regular = n_samples - n_outliers
+
+    # Regular IL-6 concentrations, plus equipment-spike outliers
+    il6 = np.append(
+        rng.gamma(2, 10, n_regular),
+        rng.uniform(500, 1500, n_outliers),
+    )
+    rng.shuffle(il6)  # so the outliers are not all at the end
+
+    return pd.DataFrame(
+        {
+            "ID": [f"{ID_PREFIX}-{i:03d}" for i in range(n_samples)],
+            "Institution": rng.choice(INSTITUTIONS, n_samples),
+            "Feature_Target": il6,
+            # Every tenth record is missing its secondary measurement
+            "Feature_Secondary": [
+                np.nan if i % 10 == 0 else x
+                for i, x in enumerate(rng.normal(1200, 300, n_samples))
+            ],
+        }
+    )
+
+
+df_raw = generate_lab_cohort(sample_size, outlier_rate)
+
+# ═══════════════════════════════════════════════════════════════════════════
+# Step 1 — Local inspection
+# ═══════════════════════════════════════════════════════════════════════════
+st.header("Step 1: Local Data Inspection")
+st.markdown(
+    f"Before collaborating, look at what you actually have. `Feature_Target` is {TARGET_LABEL} — the "
+    f"critical model input. `Feature_Secondary` is {SECONDARY_LABEL}, and it has gaps."
+)
+
+with st.expander("View the raw dataset", expanded=True):
+    st.dataframe(df_raw.head(10), use_container_width=True)
+    miss = int(df_raw["Feature_Secondary"].isna().sum())
+    inspect_cols = st.columns(3)
+    inspect_cols[0].metric("Records", f"{len(df_raw):,}")
+    inspect_cols[1].metric("Missing secondary values", f"{miss}")
+    inspect_cols[2].metric(
+        f"Max {TARGET_LABEL}", f"{df_raw['Feature_Target'].max():,.0f}"
+    )
+    st.caption(
+        "That maximum is the tell. A value two orders of magnitude above the rest means an assay spike or "
+        "a plate-reader error somewhere upstream."
+    )
+
+# ═══════════════════════════════════════════════════════════════════════════
+# Step 2 — Outlier detection and handling
+# ═══════════════════════════════════════════════════════════════════════════
+st.header("Step 2: Outlier Detection and Handling")
+st.markdown(
+    "Outliers skew federated models badly — a single extreme value shifts one site's weights and drags the "
+    "global average with it. Use the z-score to find the statistically improbable points, then decide what "
+    "to do with them."
+)
+
+col_controls, col_viz = st.columns([1, 2])
+
+with col_controls:
+    st.subheader("Configuration")
+    z_threshold = st.slider(
+        "Z-score threshold",
+        1.5,
+        5.0,
+        3.0,
+        step=0.1,
+        help="How many standard deviations from the mean before a point is called an outlier. "
+        "Lower removes more; higher is more permissive.",
+        key="m3_share_zthreshold",
+    )
+
+    df_processing = df_raw.copy()
+    df_processing["z_score"] = zscore(df_processing["Feature_Target"])
+    is_outlier = np.abs(df_processing["z_score"]) > z_threshold
+
+    st.metric(
+        "Outliers detected",
+        f"{int(is_outlier.sum())}",
+        delta=f"{-int(is_outlier.sum())} rows" if is_outlier.any() else "none",
+        delta_color="inverse",
+    )
+
+    outlier_strategy = st.radio(
+        "Handling strategy:",
+        ["Remove the rows", "Winsorize (cap at the threshold)"],
+        help="Removing is honest but shrinks the cohort. Winsorizing keeps every record at the cost of a "
+        "value that was never measured.",
+        key="m3_share_strategy",
+    )
+
+    apply_filter = st.checkbox(
+        "Apply handling and proceed",
+        value=False,
+        help="Both sites must agree on this rule before either one trains anything.",
+        key="m3_share_apply",
+    )
+
+with col_viz:
+    plot_df = df_processing.reset_index().rename(columns={"index": "Row"})
+    plot_df["Status"] = np.where(is_outlier, "Outlier", "Valid data")
+    fig = px.scatter(
+        plot_df,
+        x="Row",
+        y="Feature_Target",
+        color="Status",
+        symbol="Status",
+        title=f"Distribution of {TARGET_LABEL}",
+        labels={"Feature_Target": TARGET_LABEL},
+        color_discrete_map={"Outlier": "#d62728", "Valid data": "#1f77b4"},
+    )
+    fig.add_hline(
+        y=df_processing["Feature_Target"].mean(),
+        line_dash="dash",
+        line_color="blue",
+        annotation_text="Mean",
+    )
+    fig.update_layout(height=430, margin=dict(l=40, r=20, t=55, b=45))
+    st.plotly_chart(fig, use_container_width=True)
+
+if not apply_filter:
+    st.warning(
+        "Check **Apply handling and proceed** to continue to preprocessing and the federated round."
+    )
+else:
+    if outlier_strategy == "Remove the rows":
+        clean_data = df_processing[~is_outlier].copy()
+    else:
+        lower_limit = df_processing.loc[~is_outlier, "Feature_Target"].min()
+        upper_limit = df_processing.loc[~is_outlier, "Feature_Target"].max()
+        clean_data = df_processing.copy()
+        clean_data["Feature_Target"] = clean_data["Feature_Target"].clip(lower_limit, upper_limit)
+
+    st.success(
+        f"{outlier_strategy} applied — {len(clean_data):,} records carried forward "
+        f"(from {len(df_raw):,})."
+    )
+
+    # ═══════════════════════════════════════════════════════════════════════
+    # Step 3 — Imputation and scaling
+    # ═══════════════════════════════════════════════════════════════════════
+    st.header("Step 3: Imputation and Scaling")
+    st.markdown(
+        "Both sites must run **identical** preprocessing, or the weights they exchange in Step 4 describe "
+        "different quantities and averaging them is meaningless."
+    )
+
+    c1, c2 = st.columns(2)
+
     with c1:
-        st.markdown('<div class="toolkit-step"><b>Step 1: Define Underserved Groups</b></div>', unsafe_allow_html=True)
-        st.text_input(
-            f"Identify the group missing from {dataset_name}:", 
-            value=underserved_example,
-            help="This group will be the focus of your recruitment efforts."
+        st.subheader("Imputation")
+        impute_method = st.selectbox(
+            "Method for the missing secondary values:",
+            ["Mean", "Median", "Zero"],
+            help="Mean and median preserve the distribution's centre. Zero introduces a value that means "
+            "something biologically — an absent population — and is almost always wrong.",
+            key="m3_share_impute",
         )
 
-        st.markdown('<div class="toolkit-step"><b>Steps 3 & 4: Set Recruitment Goal</b></div>', unsafe_allow_html=True)
-        goal = st.slider(
-            f"Target Proportion for Underserved {subject_term}s (%):", 
-            0, 100, 30,
-            help="The percentage of the total sample that should come from the underserved group to ensure statistical power."
-        )
-        baseline = 5 # Fixed baseline for demo
-        
+        df_imputed = clean_data.copy()
+        if impute_method == "Mean":
+            fill_val = df_imputed["Feature_Secondary"].mean()
+        elif impute_method == "Median":
+            fill_val = df_imputed["Feature_Secondary"].median()
+        else:
+            fill_val = 0
+
+        n_filled = int(df_imputed["Feature_Secondary"].isna().sum())
+        df_imputed["Feature_Secondary"] = df_imputed["Feature_Secondary"].fillna(fill_val)
+        st.success(f"{n_filled} missing values filled with the {impute_method.lower()} ({fill_val:.2f}).")
+
     with c2:
-        st.markdown('<div class="toolkit-step"><b>Step 5: Manage External Factors (Select Strategies)</b></div>', unsafe_allow_html=True)
-        s1 = st.checkbox("Community Liaisons (+10%)", help="Hire trusted community members to facilitate recruitment.")
-        s2 = st.checkbox("Translated Materials (+5%)", help="Provide consent forms in the native language of the target group.")
-        s3 = st.checkbox("Logistical Support (+10%)", help="Provide transportation or mobile clinics to reduce access barriers.")
-        
-        # Calculate Logic
-        current = baseline + (10 if s1 else 0) + (5 if s2 else 0) + (10 if s3 else 0)
-        
-        st.markdown('<div class="toolkit-step"><b>Step 6: Evaluate Representation</b></div>', unsafe_allow_html=True)
-        
-        df = pd.DataFrame({
-            "Stage": ["Baseline (Passive)", "With Selected Strategies", "Target Goal"],
-            "Percentage": [baseline, current, goal]
-        })
-        fig = px.bar(df, x="Stage", y="Percentage", color="Stage", 
-                     color_discrete_map={"Baseline (Passive)":"#95a5a6", "With Selected Strategies":"#27ae60", "Target Goal":"#2c3e50"})
-        fig.update_layout(height=250, showlegend=False)
-        st.plotly_chart(fig, use_container_width=True)
+        st.subheader("Scaling")
+        scaler_type = st.selectbox(
+            "Scaler:",
+            ["Min-Max Scaler (0 to 1)", "Standard Scaler (z-score)"],
+            help="Min-Max squeezes values into [0, 1]. Standard centres them on 0 with unit variance.",
+            key="m3_share_scaler",
+        )
 
-    if current >= goal:
-        st.success(f"**Audit Result:** PASS. The selected strategies are sufficient to achieve a representative sample in the {dataset_name}.")
-    else:
-        st.warning("**Audit Result:** FAIL. Additional strategies are needed to reach the target goal.")
+        scaler = MinMaxScaler() if "Min-Max" in scaler_type else StandardScaler()
+        cols_to_scale = ["Feature_Target", "Feature_Secondary"]
+        df_final = df_imputed.copy()
+        df_final[cols_to_scale] = scaler.fit_transform(df_final[cols_to_scale])
+        st.success(f"Both features scaled with the {scaler_type}.")
 
-# === SECTION 4: PRIVACY ===
-elif section == "4. Privacy: Security Audit":
-    st.header("Activity 3: The 'Data Fortress' Audit (Privacy)")
-    
-    narrator(
-        "Protecting patient privacy is not merely a legal obligation, it is a moral imperative. "
-        "Employ multi-layered security protocols, including state-of-the-art encryption and routine security audits."
+    st.subheader("Before and after")
+    st.markdown(
+        f"Left: the raw values, where {TARGET_LABEL} spans four orders of magnitude and "
+        f"{SECONDARY_LABEL} is invisible next to it. Right: after handling and scaling, both features "
+        "occupy a comparable range — which is what lets a single model weight them fairly."
     )
-    
-    instruction(
-        f"The protocol currently lacks depth. Select the necessary security layers below to protect the {sample_term} data. "
-        "You must achieve a 'Secure' rating to pass the audit."
-    )
-    
-    st.subheader("Security Protocol Checklist")
 
-    c1, c2, c3, c4 = st.columns(4)
-    l1 = c1.checkbox("End-to-End Encryption", help="Data is encoded so only authorized parties can read it.")
-    l2 = c2.checkbox("Role-Based Access Control", help="Restricts system access to authorized users based on their role.")
-    l3 = c3.checkbox("De-identification", help="Removes personal identifiers (Name, ID) from the dataset.")
-    l4 = c4.checkbox("Regular Audits", help="Routine checks to identify and patch vulnerabilities.")
-    
-    score = sum([l1, l2, l3, l4])
-    
-    st.markdown("---")
-    st.markdown("#### Simulation Results")
-    
-    if score == 4:
-        st.success("Status: SECURE. Multi-layered protocols are active. Compliance verified.")
-    elif score >= 2:
-        st.warning("Status: VULNERABLE. Some protections are in place, but gaps remain. High risk of breach.")
-    else:
-        st.error("Status: CRITICAL RISK. Data is effectively unprotected. Protocol rejected.")
-
-# === SECTION 5: BENEFICENCE ===
-elif section == "5. Beneficence: Impact Audit":
-    st.header("Activity 4: Closing the Loop (Beneficence)")
-    
-    narrator(
-        "To maximize beneficence, researchers must cultivate an ethical framework that integrates continuous patient feedback. "
-        "Outcomes from research should be made accessible to the contributing communities."
+    box_before = df_raw[cols_to_scale].melt(var_name="Feature", value_name="Value")
+    box_before["Feature"] = box_before["Feature"].map(
+        {"Feature_Target": TARGET_LABEL, "Feature_Secondary": SECONDARY_LABEL}
     )
-    
-    instruction(
-        "The current protocol ends at 'Research Analysis'. Click the button below to mandate the 'Return of Value' phase "
-        "and complete the ethical cycle."
+    box_after = df_final[cols_to_scale].melt(var_name="Feature", value_name="Value")
+    box_after["Feature"] = box_after["Feature"].map(
+        {"Feature_Target": TARGET_LABEL, "Feature_Secondary": SECONDARY_LABEL}
     )
-    
-    st.subheader("The Ethical Data Cycle")
-    
-    col1, col2, col3 = st.columns(3)
-    col1.info(f"1. Acquisition\n\n({subject_term} provides data)")
-    col2.info("2. Research\n\n(Analysis of patterns)")
-    
-    if col3.button("Execute 'Return of Value' Phase", help="Distribute findings and health insights back to the participants."):
-        col3.success("3. Beneficence\n\n(Findings returned)")
-        st.markdown(f"""
-        **Impact Report:**
-        * **For {subject_term}s:** Received actionable health insights.
-        * **For Community:** Trust restored; willing to participate in future studies.
-        * **For {dataset_name}:** Validated as a tool for public good.
-        """)
-    else:
-        col3.warning("3. [Pending Action]\n\n(Cycle incomplete)")
 
-# --- FOOTER ---
-st.markdown("---")
-st.caption("Module MS2 | Course Materials | Based on REP-EQUITY Toolkit & IC3/ImmPort Datasets")
+    box_cols = st.columns(2)
+    with box_cols[0]:
+        fig_before = px.box(
+            box_before, x="Feature", y="Value", color="Feature", title="Raw (unprocessed)"
+        )
+        fig_before.update_layout(
+            height=380, showlegend=False, margin=dict(l=40, r=20, t=55, b=45)
+        )
+        st.plotly_chart(fig_before, use_container_width=True)
+    with box_cols[1]:
+        fig_after = px.box(
+            box_after, x="Feature", y="Value", color="Feature", title=f"Processed ({scaler_type})"
+        )
+        fig_after.update_layout(
+            height=380, showlegend=False, margin=dict(l=40, r=20, t=55, b=45)
+        )
+        st.plotly_chart(fig_after, use_container_width=True)
+
+    remaining = int((np.abs(df_final[cols_to_scale].apply(zscore)) > 3).sum().sum())
+    st.metric("Values still beyond 3 SD", remaining, delta="clean" if remaining == 0 else "review")
+
+    with st.expander("View the processed data, ready for training"):
+        st.dataframe(df_final.head(), use_container_width=True)
+
+    # ═══════════════════════════════════════════════════════════════════════
+    # Step 4 — Federated round
+    # ═══════════════════════════════════════════════════════════════════════
+    st.header("Step 4: A Federated Learning Round")
+    st.markdown(
+        """
+    This simulates the **NVIDIA FLARE** workflow. Instead of sending the cleaned data to a central server:
+
+    1. Each institution trains locally and computes its own weights.
+    2. **Only the weights** travel to the aggregator.
+    3. The aggregator averages them into a global model and sends it back.
+
+    Nobody ever sees the other site's records.
+    """
+    )
+
+    if st.button("Run federated learning round", key="m3_share_run_round"):
+        inst_names = df_final["Institution"].unique()
+        inst_A = df_final[df_final["Institution"] == inst_names[0]]
+        inst_B = df_final[df_final["Institution"] == inst_names[1]]
+
+        weights_A = inst_A[cols_to_scale].mean()
+        weights_B = inst_B[cols_to_scale].mean()
+        global_model = (weights_A + weights_B) / 2
+
+        res1, res2, res3 = st.columns(3)
+        with res1:
+            st.markdown(f"#### Node A — {inst_names[0].replace('_', ' ')}")
+            st.json(weights_A.to_dict())
+            st.caption(f"Local weights from {len(inst_A)} private records")
+        with res2:
+            st.markdown(f"#### Node B — {inst_names[1].replace('_', ' ')}")
+            st.json(weights_B.to_dict())
+            st.caption(f"Local weights from {len(inst_B)} private records")
+        with res3:
+            st.markdown("#### Global server")
+            st.json(global_model.to_dict())
+            st.caption("Aggregated global model")
+
+        st.success("Federated round complete. The global model updated with no data leakage.")
+        st.metric(
+            "Donor records shared",
+            value=0,
+            help="Zero rows of raw data left either laboratory.",
+        )
+        st.caption(
+            "Try changing the z-score threshold or the scaler and running again. The weights move — which "
+            "is exactly why both sites have to agree on the preprocessing before the first round, not after."
+        )
+
+st.markdown(
+    """
+---
+**Key takeaways**
+
+- Outlier handling is a choice with a cost: removal shrinks the cohort, winsorizing invents a value.
+  Either is defensible; silently doing neither is not.
+- Imputing with zero is not a neutral default — a zero cell count is a biological claim, not a blank.
+- Scaling is what lets a model weight two features fairly when their units differ by orders of magnitude.
+- Federated learning does not remove the need to agree. It moves the agreement earlier: **identical
+  preprocessing is the precondition, not a detail.**
+
+**Resources:** [NVIDIA FLARE](https://github.com/NVIDIA/NVFlare) ·
+[scikit-learn preprocessing](https://scikit-learn.org/stable/modules/preprocessing.html)
+"""
+)

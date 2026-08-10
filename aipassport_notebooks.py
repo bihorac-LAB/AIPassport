@@ -87,8 +87,6 @@ button[kind="primary"]:hover {
 </style>
 """, unsafe_allow_html=True)
 
-N_MICROSKILLS_PER_MODULE = 7
-
 MODULE_NAMES = [
     "Module 1 - Fundamentals",
     "Module 2 - Alignment",
@@ -98,6 +96,38 @@ MODULE_NAMES = [
     "Module 6 - Generative AI",
     "Module 7 - Impact Project",
 ]
+
+# Every instructional module presents exactly two learner-facing subsections.
+# The subsection number is its url_path ("1.1", "1.2", ...) and drives the
+# notebook filename via get_notebook_path(); the title is what the home page
+# shows on its button. Module 6 has no content, so it has no subsections.
+MODULE_SUBSECTIONS = {
+    "Module 1 - Fundamentals": [
+        "What AI Is, and How an AI Project Works",
+        "Designing a Study You Can Defend",
+    ],
+    "Module 2 - Alignment": [
+        "Ethics, Bias, and Human Oversight",
+        "Measuring and Documenting Model Quality",
+    ],
+    "Module 3 - Data": [
+        "Getting Data You Can Trust",
+        "Cleaning and Sharing Data Across Sites",
+    ],
+    "Module 4 - Machine Learning": [
+        "Building a Model End to End",
+        "Evaluating and Explaining a Model",
+    ],
+    "Module 5 - Images": [
+        "How Biomedical Images Become Data",
+        "Preprocessing, Features, and Trustworthy Pipelines",
+    ],
+    "Module 6 - Generative AI": [],
+    "Module 7 - Impact Project": [
+        "From Idea to Study Design",
+        "Communicating and Defending Your Work",
+    ],
+}
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -158,10 +188,12 @@ def render_home_page():
     
     for module_name, pages in sidebar.items():
         if module_name == "Home": continue
+        # A module with no notebooks (Module 6) would otherwise draw an empty box.
+        if not pages: continue
         with st.expander(f"📂 {module_name}", expanded=True):
-            cols = st.columns(3)
+            cols = st.columns(len(pages))
             for i, p in enumerate(pages):
-                with cols[i % 3]:
+                with cols[i]:
                     if st.button(f"{p.title}", key=f"btn_{p.url_path}", use_container_width=True):
                         st.switch_page(p)
 
@@ -260,16 +292,17 @@ sidebar["Home"] = [st.Page(page=render_home_page, title="Home", icon="🏠", def
 for module_idx, module_name in enumerate(MODULE_NAMES):
     sidebar[module_name] = []
 
-    for microskill_idx in range(N_MICROSKILLS_PER_MODULE):
-        clinical_exists = os.path.exists(get_notebook_path(f"{module_idx + 1}.{microskill_idx + 1}", "clinical"))
-        basic_exists = os.path.exists(get_notebook_path(f"{module_idx + 1}.{microskill_idx + 1}", "basic"))
-        
+    for subsection_idx, subsection_title in enumerate(MODULE_SUBSECTIONS.get(module_name, [])):
+        url_path = f"{module_idx + 1}.{subsection_idx + 1}"
+        clinical_exists = os.path.exists(get_notebook_path(url_path, "clinical"))
+        basic_exists = os.path.exists(get_notebook_path(url_path, "basic"))
+
         if clinical_exists or basic_exists:
             page = st.Page(
-                page=render_notebook_page, 
-                title=f"Microskill {module_idx + 1}.{microskill_idx + 1}",
+                page=render_notebook_page,
+                title=f"{url_path} {subsection_title}",
                 icon="📝",
-                url_path=f"{module_idx + 1}.{microskill_idx + 1}",
+                url_path=url_path,
             )
             sidebar[module_name].append(page)
 

@@ -1,47 +1,43 @@
 {
   "id": "2.1_clinical",
   "module": "Module 2 - Alignment",
+  "subsection": "2.1",
   "microskill": "2.1",
   "track": "clinical",
-  "title": "The Fundamental Principles of Bioethics",
-  "audience": "Clinical learners applying bioethical principles to AI and patient data",
+  "title": "Ethics, Bias, and Human Oversight",
+  "audience": "Clinical researchers and clinician-scientists new to AI",
   "objectives": [
-    "Identify the four principles of bioethics in a clinical AI privacy case.",
-    "Explain conflicts between AI accuracy, patient privacy, harm prevention, and fairness.",
-    "Justify which principle should guide hospital policy when re-identification risk exists.",
-    "Reflect on rare groups, de-identification limits, and trust in clinical AI."
+    "Apply the four bioethical principles to a concrete clinical AI case.",
+    "Name which principles are in tension and what one costs the other.",
+    "Defend a view about which principle should take precedence.",
+    "Trace how a training-population mismatch becomes deployed harm.",
+    "Decide what to do about a flawed AI tool that is already in use."
   ],
   "sections": [
     {
-      "name": "Clinical Case",
-      "purpose": "Introduce a hospital AI system using de-identified data with re-identification risk.",
-      "how_to_use": "Read the case and notice the tension between detailed data for accuracy and privacy risks."
+      "name": "1. The Four Principles of Bioethics",
+      "purpose": "Reason about a re-identification risk in a de-identified EHR dataset.",
+      "how_to_use": "Read the case, then use the principles multiselect and the conflict and precedence text areas. Each has a 'Show example' button; encourage the learner to answer before revealing."
     },
     {
-      "name": "Bioethical Principles",
-      "purpose": "Map the case to autonomy, beneficence, non-maleficence, and justice.",
-      "how_to_use": "Select all relevant principles, then optionally compare with the example."
+      "name": "2. How a Population Mismatch Becomes Deployed Harm",
+      "purpose": "Identify bias vectors in an ER acuity-ranking algorithm.",
+      "how_to_use": "Read the level-one trauma centre case and answer in the text area, addressing the data, the bias vectors, and the practical consequences. Then reveal the example."
     },
     {
-      "name": "Principle Conflicts",
-      "purpose": "Explain ethical tensions around detailed clinical data use.",
-      "how_to_use": "Describe how improving care can conflict with privacy, harm prevention, and fairness."
-    },
-    {
-      "name": "Precedence",
-      "purpose": "Practice defending an ethical clinical policy position.",
-      "how_to_use": "Choose which principle should guide clinicians and hospital policy, then justify the tradeoff."
+      "name": "3. When a Human Must Stay in the Loop",
+      "purpose": "Decide what to do about an AI transcription tool already in clinical use.",
+      "how_to_use": "The tool fabricated conversation, mischaracterised patients as aggressive, and degraded on accents. Notes are already in charts, so every option costs something. There is no reveal here on purpose."
     },
     {
       "name": "Reflection",
-      "purpose": "Connect bioethics to patient trust and vulnerable groups.",
-      "how_to_use": "Reflect on rare demographic groups, privacy safeguards, and questions raised by AI data use."
+      "purpose": "Bridge from reasoning to measurement.",
+      "how_to_use": "Ask which of the three cases a metric could have caught and which needed a person to notice. Subsection 2.2 makes these measurable."
     }
   ],
   "chatbot_guidance": [
-    "When asked how to use this notebook, guide the learner through the clinical case, principles, conflicts, precedence, and reflection.",
-    "For clinical users, emphasize patient privacy, re-identification, trust, discrimination risks, and population benefit.",
-    "Help learners distinguish de-identification from guaranteed anonymity.",
-    "Keep answers short and practical."
+    "Do not resolve the cases for the learner. The point is defending a position, not reaching a preset answer.",
+    "The third case has no worked example deliberately -- it is the hardest one because the tool is already deployed.",
+    "If asked what comes next: 2.2 turns each of these concerns into a metric and a model card."
   ]
 }

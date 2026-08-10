@@ -1,2 +1,6 @@
 venv/
 .streamlit/secrets.toml
+
+# Python bytecode from local runs
+__pycache__/
+*.pyc

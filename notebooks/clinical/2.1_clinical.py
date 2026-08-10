@@ -1,94 +1,218 @@
 import streamlit as st
 
-st.title("2.1 The Fundamental Principles of Bioethics")
-st.subheader("Navigating AI and Bioethical Principles in Clinical Practice")
-st.markdown("---")
+st.markdown(
+    """
+Before a model is measured, it has to be reasoned about. This subsection asks three questions in
+sequence, each one narrower and more consequential than the last:
 
-st.markdown("""\
-**Objective:**  
-Develop the skills to navigate ethical issues arising from the use of AI using the four principles of bioethics.
-""")
+1. **Which ethical principles are in tension** when a clinical AI system is deployed?
+2. **How does a training-population mismatch become deployed harm?**
+3. **When must a human stay in the loop** — and what do you do when the tool is already in use?
 
-st.markdown("---")
-
-with st.expander("Read the Case (click to expand)", expanded=True):
-    st.markdown("""
-A hospital is piloting an AI system to predict disease risks and support early diagnosis, hoping to improve patient outcomes.  
-The system uses vast amounts of **de-identified patient data**, such as demographics, clinical histories, and lifestyle information.  
-De-identified data means no names or addresses, but the AI still analyzes broad health trends.
-
-**Ethical Dilemma:** For maximum accuracy, the AI benefits from detailed geographic and demographic information.  
-But: such details can sometimes allow "re-identification"—figuring out who an individual is, especially in unique combinations or rare diseases.
-
-If a patient’s health information were re-identified and accessed by third parties (employers, insurers, cybercriminals),  
-it could lead to discrimination, financial harm, and loss of privacy.
-""")
-st.markdown("---")
-
-st.header("1. Which of the four principles of bioethics apply here?")
-
-bioethics_options = [
-    "Autonomy (respecting patient choice and privacy)",
-    "Beneficence (acting to benefit the patient and population)",
-    "Non-maleficence (do no harm)",
-    "Justice (fairness and equity in healthcare)"
-]
-
-bioethics_selected = st.multiselect(
-    "Select all that clearly apply in this scenario:",
-    bioethics_options
+Subsection 2.2 then makes each of these measurable.
+"""
 )
 
-if st.button("Show Example - Principles"):
+st.markdown("---")
+
+# ═══════════════════════════════════════════════════════════════════════════
+# Part 1 — The four principles in tension
+# ═══════════════════════════════════════════════════════════════════════════
+st.header("1. The Four Principles of Bioethics")
+
+with st.expander("Read the case (click to expand)", expanded=True):
+    st.markdown(
+        """
+    A hospital is piloting an AI system to predict disease risks and support early diagnosis, hoping to
+    improve patient outcomes. The system uses large volumes of **de-identified patient data** —
+    demographics, clinical histories, and lifestyle information. De-identified means no names or
+    addresses, but the AI still analyzes broad health trends.
+
+    **The dilemma:** for maximum accuracy, the model benefits from detailed geographic and demographic
+    information. Those same details can permit **re-identification** — working out who an individual is,
+    especially in unusual combinations of attributes or for rare diseases.
+
+    If a patient's health information were re-identified and reached third parties — employers, insurers,
+    cybercriminals — the consequences include discrimination, financial harm, and irreversible loss of
+    privacy.
+    """
+    )
+
+st.subheader("1.1 Which principles apply here?")
+st.multiselect(
+    "Select all that clearly apply in this scenario:",
+    [
+        "Autonomy (respecting patient choice and privacy)",
+        "Beneficence (acting to benefit the patient and population)",
+        "Non-maleficence (do no harm)",
+        "Justice (fairness and equity in healthcare)",
+    ],
+    key="m2_ethics_principles",
+)
+
+if st.button("Show example — principles", key="m2_ethics_principles_btn"):
     st.success(
         "All four principles are relevant:\n"
         "- **Autonomy**: Patients expect control over their private information; re-identification risks violate their autonomy and privacy.\n"
         "- **Beneficence**: The AI could improve diagnosis and outcomes (population benefit).\n"
         "- **Non-maleficence**: Re-identification could cause real harm (discrimination, financial harm).\n"
-        "- **Justice**: If certain groups are more at risk for re-identification (rare conditions, small communities), or are excluded for privacy, this raises fairness concerns."
+        "- **Justice**: If certain groups are more at risk of re-identification (rare conditions, small communities), or are excluded in order to protect privacy, this raises fairness concerns."
     )
 
-st.markdown("---")
+st.subheader("1.2 Which principles are in conflict, and how?")
+st.text_area(
+    "Name the specific tension — not the principles in the abstract, but what one costs the other here:",
+    height=140,
+    key="m2_ethics_conflict",
+)
 
-st.header("2. Which principles are in conflict? Why?")
-
-conflict_response = st.text_area("Explain which principles may come into conflict and describe how:", height=140)
-if st.button("Show Example - Conflicts"):
+if st.button("Show example — conflicts", key="m2_ethics_conflict_btn"):
     st.info(
-        "- **Beneficence** (improving care via better AI) vs. **Autonomy**/**Non-maleficence** (protecting privacy, preventing harm):\n"
-        "• The more detailed the data, the more AI helps patients—BUT the higher the risk of re-identification and harm.\n"
-        "- **Justice** can also conflict if privacy risks are unequally distributed, or if some populations are excluded to protect privacy."
+        "- **Beneficence** (improving care via a better model) vs. **Autonomy** and **Non-maleficence** "
+        "(protecting privacy, preventing harm): the more detailed the data, the more the AI helps "
+        "patients — and the higher the risk of re-identification and harm.\n"
+        "- **Justice** also conflicts if privacy risks are unevenly distributed, or if some populations "
+        "are excluded from the data specifically in order to protect them."
     )
 
-st.markdown("---")
+st.subheader("1.3 Which principle should take precedence? Why?")
+st.text_area(
+    "Defend your view: which principle should guide clinicians and hospital policy here, and why?",
+    height=140,
+    key="m2_ethics_precedence",
+)
 
-st.header("3. On your view, which principle should take precedence? Why?")
-
-precedence_response = st.text_area("Defend your view: which principle should guide clinicians and hospital policy here, and why?", height=140)
-if st.button("Show Example - Precedence"):
+if st.button("Show example — precedence", key="m2_ethics_precedence_btn"):
     st.info(
-        "Example: While beneficence is important, **non-maleficence** (do no harm) and **autonomy** (patient privacy) should take precedence—especially where privacy breaches can cause irreversible harm. The hospital must put safeguards in place so that no patient can be re-identified, even if it reduces AI accuracy somewhat; otherwise, trust is lost and harm may result."
+        "Example: while beneficence is important, **non-maleficence** (do no harm) and **autonomy** "
+        "(patient privacy) should take precedence — especially where a privacy breach causes irreversible "
+        "harm. The hospital must put safeguards in place so that no patient can be re-identified, even if "
+        "that reduces model accuracy somewhat; otherwise trust is lost and harm may follow."
     )
 
 st.markdown("---")
 
+# ═══════════════════════════════════════════════════════════════════════════
+# Part 2 — Where bias enters
+# ═══════════════════════════════════════════════════════════════════════════
+st.header("2. How a Population Mismatch Becomes Deployed Harm")
+
+with st.expander("Read the case (click to expand)", expanded=True):
+    st.markdown(
+        """
+    A large hospital is the only level-one trauma center within a 100-mile radius of a small city in the
+    Southern United States. Because of this it receives an unusual concentration of traumatic
+    injuries — vehicle crashes, shootings, catastrophic injuries — through its emergency room.
+
+    Staff and administration want a better way to determine which patients should receive the most
+    immediate care. The proposal is an algorithm that **ranks patients by acuity**, calculated from the
+    symptoms and demographic data entered by hospital staff.
+
+    > - What are the possible **vectors of bias** that might affect patient care?
+    > - What should the hospital consider **before** deploying the tool?
+    > - What are the possible negative outcomes?
+    """
+    )
+
+st.text_area(
+    "Your answer — address the data, the bias vectors, and the practical consequences:",
+    height=180,
+    key="m2_bias_response",
+)
+
+if st.button("Reveal example and guidance", key="m2_bias_example_btn"):
+    st.success(
+        """
+**Example:**
+
+The vectors of bias for the algorithm include the data and the people who will interpret the guidance
+from the algorithm. As the only trauma center in a 100-mile radius, the hospital will receive all kinds of
+terrible injuries that other hospitals may not receive, therefore, if the data that was used to train the
+algorithm is not similar, the resulting guidance will be off-base. Further, although the algorithms will
+only be used to offer guidance, some clinicians will think that the algorithm cannot be wrong, and they
+won't critically consider the results.
+
+**Guidance:**
+- Consider how the unique patient population (regional, demographic, trauma-specific) may or may not be
+  reflected in the data used to train the model.
+- Consider the risk that social, demographic, or subjective inputs introduce or amplify bias.
+- Reflect on the consequences: inequities in care, over-reliance on the algorithm, errors propagating
+  because nobody expected the tool to be wrong.
+"""
+    )
+
+st.markdown("---")
+
+# ═══════════════════════════════════════════════════════════════════════════
+# Part 3 — Human oversight
+# ═══════════════════════════════════════════════════════════════════════════
+st.header("3. When a Human Must Stay in the Loop")
+
+with st.expander("Read the case (click to expand)", expanded=True):
+    st.markdown(
+        """
+    A large hospital has implemented an **AI transcription system** for staff to use in care settings. The
+    intent was more accurate notes in patient records. After about a month of use across various care
+    settings, staff reviewed the resulting transcripts and found that although the tool transcribed
+    patient interviews, it also:
+
+    - **made up segments of conversations that did not happen**;
+    - made certain patients appear to be **behaving aggressively** with staff, when that behaviour was not
+      present; and
+    - was **markedly less accurate** in conversations with patients with accents, from around the US or
+      otherwise.
+
+    **What are the possible routes the hospital could take after reviewing the transcription data? What
+    should the hospital do? Explain your answer.**
+    """
+    )
+
+st.markdown(
+    """
+This is the harder version of the oversight question. The tool is already deployed, notes are already in
+charts, and every option costs something. Say what you would do, and be explicit about what your choice
+gives up.
+"""
+)
+
+st.text_area(
+    "Your response:",
+    height=200,
+    key="m2_oversight_response",
+)
+
+st.markdown("---")
+
+# ═══════════════════════════════════════════════════════════════════════════
+# Closing reflection
+# ═══════════════════════════════════════════════════════════════════════════
 st.header("Reflection")
 
-st.markdown("""
-- What new questions do you have about the use of AI and patient data in healthcare?
-- How might your thinking change if you were a member of a rare demographic group?
-""")
-reflection_text = st.text_area("Optional: Add your reflections here", height=100)
+st.markdown(
+    """
+Each case above was resolved by reasoning. None of it is verifiable yet — which is the problem subsection
+2.2 exists to solve.
 
-st.success("Thank you for your thoughtful engagement with AI and bioethics in clinical care.")
+- How would you **monitor** fairness *after* deployment, rather than argue about it beforehand?
+- Which of the three cases could have been caught by a metric, and which needed a person to notice?
+"""
+)
+st.text_area("Your reflection:", height=120, key="m2_ethics_reflection")
 
-st.markdown("""
+st.markdown(
+    """
 ---
-**Key Concepts:**  
-- Autonomy = respecting patients’ wishes and privacy  
-- Beneficence = doing good for the patient/population  
-- Non-maleficence = avoiding harm  
-- Justice = fairness in distribution of risks and benefits
+**Key concepts**
 
-**Further reading:** [Principlism in Clinical Ethics (Stanford)](https://plato.stanford.edu/entries/principle-bioethics/)
-""")
+- **Autonomy** = respecting patients' wishes and privacy · **Beneficence** = doing good for the
+  patient and population · **Non-maleficence** = avoiding harm · **Justice** = fairness in the
+  distribution of risks and benefits.
+- No algorithm is objective or immune to bias. Both the technical design and the human interpretation can
+  perpetuate or reduce inequity.
+- A tool that is *usually* right in a high-stakes setting creates a new failure mode: nobody checks it.
+
+**Further reading:** [Principlism in Clinical Ethics (Stanford)](https://plato.stanford.edu/entries/principle-bioethics/) ·
+[AMA: AI and Health Equity](https://www.ama-assn.org/delivering-care/ethics/artificial-intelligence-health-care) ·
+[WHO: Ethics & Governance of AI for Health](https://www.who.int/publications/i/item/9789240029200)
+"""
+)

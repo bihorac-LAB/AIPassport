@@ -1,47 +1,43 @@
 {
   "id": "2.1_basic",
   "module": "Module 2 - Alignment",
+  "subsection": "2.1",
   "microskill": "2.1",
   "track": "basic",
-  "title": "The Fundamental Principles of Bioethics",
-  "audience": "Basic science learners applying bioethical principles to biomedical AI",
+  "title": "Ethics, Bias, and Human Oversight",
+  "audience": "Basic science researchers new to AI",
   "objectives": [
-    "Identify the four principles of bioethics in an AI disease-risk prediction case.",
-    "Explain conflicts between beneficence, non-maleficence, justice, and autonomy.",
-    "Justify which principle should guide deployment when AI model bias may reinforce disparities.",
-    "Reflect on bias auditing, transparency, community engagement, and IRB or regulatory guidance."
+    "Apply the four bioethical principles to a concrete biomedical AI case.",
+    "Name which principles are in tension and what one costs the other.",
+    "Defend a view about which principle should take precedence.",
+    "Trace how a training-population mismatch becomes deployed harm.",
+    "Decide whether to use a flawed AI tool that has already touched the data."
   ],
   "sections": [
     {
-      "name": "Case Study",
-      "purpose": "Introduce an AI genetic risk model with biased predictions across racial and ethnic groups.",
-      "how_to_use": "Read the case and identify who benefits, who may be harmed, and where fairness concerns arise."
+      "name": "1. The Four Principles of Bioethics",
+      "purpose": "Reason about Dr. Lee's genetic risk model, which is biased by ancestry.",
+      "how_to_use": "Read the case, then use the principles multiselect and the conflict and precedence text areas. Each has a 'Show example' button; encourage the learner to answer before revealing."
     },
     {
-      "name": "Bioethical Principles",
-      "purpose": "Map the case to autonomy, beneficence, non-maleficence, and justice.",
-      "how_to_use": "Select all relevant principles, then optionally compare with the example."
+      "name": "2. How a Population Mismatch Becomes Deployed Harm",
+      "purpose": "Identify bias vectors in a public-health-crisis detection algorithm.",
+      "how_to_use": "Its training data comes from areas whose population and income demographics do not match the cities that would deploy it. Answer in the text area, then reveal the example."
     },
     {
-      "name": "Principle Conflicts",
-      "purpose": "Explain ethical tensions in the deployment decision.",
-      "how_to_use": "Describe how helping many patients can conflict with avoiding harm and ensuring justice."
-    },
-    {
-      "name": "Precedence",
-      "purpose": "Practice justifying an ethical decision.",
-      "how_to_use": "Choose which principle should take priority and explain why."
+      "name": "3. When a Human Must Stay in the Loop",
+      "purpose": "Decide whether to use an AI transcription tool that failed its evaluation.",
+      "how_to_use": "It fabricated conversation, mischaracterised interviewees, degraded on accents, and wrote PII into transcript metadata. There is no reveal here on purpose."
     },
     {
       "name": "Reflection",
-      "purpose": "Connect the case to governance and responsible AI development.",
-      "how_to_use": "Write additional safeguards such as bias audits, stakeholder communication, transparency, or IRB review."
+      "purpose": "Bridge from reasoning to measurement.",
+      "how_to_use": "Ask which of the three cases a metric could have caught and which needed a person to notice. Subsection 2.2 makes these measurable."
     }
   ],
   "chatbot_guidance": [
-    "When asked how to use this notebook, guide the learner through the case, principles, conflicts, precedence, and reflection.",
-    "For basic science users, emphasize fairness in training data, bias auditing, transparency, and responsible deployment.",
-    "Help learners distinguish beneficence from justice and non-maleficence.",
-    "Keep answers short and practical."
+    "Do not resolve the cases for the learner. The point is defending a position, not reaching a preset answer.",
+    "The third case has no worked example deliberately -- the tool has already touched the data and the interviews cannot be cheaply re-run.",
+    "If asked what comes next: 2.2 turns each of these concerns into a metric and a model card."
   ]
 }
